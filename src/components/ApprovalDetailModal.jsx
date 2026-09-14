@@ -4,7 +4,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import {
   X, FileText, Calendar, CheckCircle2, XCircle, RotateCcw,
-  Lock, Send, MessageSquare, Clock, ListTodo
+  Lock, Send, MessageSquare, Clock, ListTodo, Paperclip, Image as ImageIcon
 } from 'lucide-react';
 
 const STATUS_STYLES = {
@@ -56,6 +56,10 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
     .map(id => logs.find(l => String(l.id) === String(id)))
     .filter(Boolean);
 
+  const attachments = typeof approval.attachments === 'string'
+    ? (() => { try { return JSON.parse(approval.attachments); } catch { return []; } })()
+    : (approval.attachments || []);
+
   const handleClientResponse = () => {
     if (!clientDecision) return;
     const entry = {
@@ -90,7 +94,7 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
     setShowPmReply(false);
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
     const entry = {
       actor: 'Project Manager',
       action: 'Approval closed — cycle complete',
@@ -99,7 +103,12 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
     };
     const newTrail = [...auditTrail, entry];
     setAuditTrail(newTrail);
-    onUpdate(approval.id, { status: 'Closed', auditTrail: newTrail });
+    try {
+      await onUpdate(approval.id, { status: 'Closed', auditTrail: newTrail });
+    } catch (error) {
+      setAuditTrail(auditTrail);
+      alert(error.message || 'Could not close approval.');
+    }
   };
 
   const StatusIcon = STATUS_ICON[approval.status] || Clock;
@@ -155,6 +164,29 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
                 </h3>
                 <div className="bg-slate-50  rounded-lg p-4 border border-border">
                   <p className="text-sm text-slate-700  leading-relaxed">{approval.description}</p>
+                </div>
+              </div>
+            )}
+
+            {attachments.length > 0 && (
+              <div>
+                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Paperclip className="w-4 h-4" /> Attachments ({attachments.length})
+                </h3>
+                <div className="space-y-3">
+                  {attachments.map((attachment, index) => {
+                    const url = attachment.fullUrl || `http://localhost:8080${attachment.url || ''}`;
+                    const isImage = attachment.category === 'image' || attachment.type?.startsWith('image/');
+                    return (
+                      <div key={`${url}-${index}`} className="border border-border rounded-lg p-3 bg-slate-50">
+                        {isImage && <img src={url} alt={attachment.originalName || 'Approval attachment'} className="max-h-56 w-full object-contain rounded mb-2" />}
+                        <a href={url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2">
+                          {isImage ? <ImageIcon className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                          {attachment.originalName || 'Open attachment'}
+                        </a>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

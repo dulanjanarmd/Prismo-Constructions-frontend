@@ -73,29 +73,33 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    addApprovalRequest({
-      ...formData,
-      projectId,
-      status: 'Pending',
-      feedback: '',
-      dateRequested: new Date().toISOString().split('T')[0],
-      auditTrail: [{
-        actor: currentUser?.name || 'Project Manager',
-        action: 'Created approval request',
-        timestamp: new Date().toLocaleString(),
-        type: 'create'
-      }]
-    });
-    setIsModalOpen(false);
-    setFormData({ title: '', description: '', dueDate: '', linkedLogIds: [], attachedDocuments: [], attachedPhotos: [] });
+    try {
+      await addApprovalRequest({
+        ...formData,
+        projectId,
+        status: 'Pending',
+        feedback: '',
+        dateRequested: new Date().toISOString().split('T')[0],
+        auditTrail: [{
+          actor: currentUser?.name || 'Project Manager',
+          action: 'Created approval request',
+          timestamp: new Date().toLocaleString(),
+          type: 'create'
+        }]
+      });
+      setIsModalOpen(false);
+      setFormData({ title: '', description: '', dueDate: '', linkedLogIds: [], attachedDocuments: [], attachedPhotos: [] });
+    } catch (error) {
+      alert(error.message || 'Could not create approval request.');
+    }
   };
 
-  const handleUpdate = (id, updates) => {
-    updateApproval(id, updates);
-    // Refresh the selected approval
+  const handleUpdate = async (id, updates) => {
+    const result = await updateApproval(id, updates);
     setSelectedApproval(prev => prev ? { ...prev, ...updates } : null);
+    return result;
   };
 
   return (

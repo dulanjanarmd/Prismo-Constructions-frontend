@@ -119,7 +119,7 @@ export const DataProvider = ({ children }) => {
             clientId: a.client?.id ? `u${a.client.id}` : null,
             auditTrail: typeof a.auditTrail === 'string' ? JSON.parse(a.auditTrail) : (a.auditTrail || []),
             status: a.status ? (a.status.charAt(0) + a.status.slice(1).toLowerCase()) : 'Pending',
-            documentUrl: '#'
+            attachments: typeof a.attachments === 'string' ? JSON.parse(a.attachments) : (a.attachments || [])
           })));
         }
 
@@ -666,8 +666,9 @@ export const DataProvider = ({ children }) => {
   };
 
   const updateApproval = async (id, updates) => {
+    const currentApproval = approvals.find(a => String(a.id) === String(id));
     // Optimistically update local state
-    setApprovals(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
+    setApprovals(prev => prev.map(a => String(a.id) === String(id) ? { ...a, ...updates } : a));
     try {
       // Mirror to backend (strip prefix if any)
       const numId = typeof id === 'string' ? id.replace('a', '') : id;
@@ -681,19 +682,52 @@ export const DataProvider = ({ children }) => {
           status: updates.status,
           auditTrail: updates.auditTrail,
           feedback: updates.feedback,
-          pmReply: updates.pmReply
+          pmReply: updates.pmReply,
+          dueDate: updates.dueDate ?? currentApproval?.dueDate,
+          attachments: updates.attachments ?? currentApproval?.attachments
         })
       });
       if (!response.ok) {
         throw new Error(await response.text() || `Approval update failed (${response.status})`);
       }
-    } catch (err) { console.error('updateApproval:', err); }
+      const saved = await response.json();
+      setApprovals(prev => prev.map(a => String(a.id) === String(id) ? {
+        ...a,
+        ...updates,
+        id: saved.id,
+        status: saved.status ? saved.status.charAt(0) + saved.status.slice(1).toLowerCase() : a.status,
+        auditTrail: typeof saved.auditTrail === 'string' ? JSON.parse(saved.auditTrail) : (saved.auditTrail || []),
+        attachments: typeof saved.attachments === 'string' ? JSON.parse(saved.attachments) : (saved.attachments || [])
+      } : a));
+      return saved;
+    } catch (err) {
+      setApprovals(prev => prev.map(a => String(a.id) === String(id) ? currentApproval : a));
+      console.error('updateApproval:', err);
+      throw err;
+    }
   };
 
   const addApprovalRequest = async (request) => {
-    // Optimistically add to local state
-    const tempId = `a${Date.now()}`;
-    setApprovals(prev => [...prev, { ...request, id: tempId }]);
+    const uploadAttachment = async (file) => {
+      const body = new FormData();
+      body.append('file', file);
+      const uploadResponse = await fetch('http://localhost:8080/api/files/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${currentUser.token}` },
+        body
+      });
+      if (!uploadResponse.ok) throw new Error(await uploadResponse.text() || 'Attachment upload failed');
+      return uploadResponse.json();
+    };
+
+    const files = [
+      ...(request.attachedDocuments || []).map(file => ({ file, category: 'document' })),
+      ...(request.attachedPhotos || []).map(file => ({ file, category: 'image' }))
+    ];
+    const attachments = await Promise.all(files.map(async ({ file, category }) => ({
+      ...(await uploadAttachment(file)),
+      category
+    })));
     try {
       const numProjectId = typeof request.projectId === 'string'
         ? parseInt(request.projectId.replace('p', ''))
@@ -709,23 +743,26 @@ export const DataProvider = ({ children }) => {
           description: request.description,
           projectId: numProjectId,
           status: 'PENDING',
+          dueDate: request.dueDate || null,
           dateRequested: new Date().toISOString().split('T')[0],
-          auditTrail: request.auditTrail || []
+          auditTrail: request.auditTrail || [],
+          attachments
         })
       });
       if (res.ok) {
         const saved = await res.json();
-        // Replace temp entry with saved one
-        setApprovals(prev => prev.map(a => a.id === tempId ? {
+        setApprovals(prev => [...prev, {
           ...saved,
           projectId: `p${saved.project?.id}`,
           clientId: saved.client?.id ? `u${saved.client.id}` : null,
           auditTrail: typeof saved.auditTrail === 'string' ? JSON.parse(saved.auditTrail) : (saved.auditTrail || []),
           status: saved.status ? (saved.status.charAt(0) + saved.status.slice(1).toLowerCase()) : 'Pending',
-          documentUrl: '#'
-        } : a));
+          attachments: typeof saved.attachments === 'string' ? JSON.parse(saved.attachments) : (saved.attachments || [])
+        }]);
+        return saved;
       }
-    } catch (err) { console.error('addApprovalRequest:', err); }
+      throw new Error(await res.text() || `Approval creation failed (${res.status})`);
+    } catch (err) { console.error('addApprovalRequest:', err); throw err; }
   };
 
   const addConsultation = (consultation) => setConsultations([...consultations, { ...consultation, id: `c${Date.now()}` }]);

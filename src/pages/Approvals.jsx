@@ -47,9 +47,10 @@ const Approvals = () => {
     return acc;
   }, {});
 
-  const handleUpdate = (id, updates) => {
-    updateApproval(id, updates);
+  const handleUpdate = async (id, updates) => {
+    const result = await updateApproval(id, updates);
     setSelectedApproval(prev => prev ? { ...prev, ...updates } : null);
+    return result;
   };
 
   return (
