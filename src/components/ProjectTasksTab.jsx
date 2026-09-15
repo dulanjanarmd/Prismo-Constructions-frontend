@@ -282,7 +282,11 @@ const ProjectTasksTab = ({ projectId, project }) => {
       {/* Kanban Board */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 xl:grid-cols-5">
         {STATUS_COLUMNS.map(col => {
-          const colTasks = filtered.filter(t => t.status === col);
+          const colTasks = filtered.filter(t => t.status === col).sort((a, b) => {
+            const dateA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+            const dateB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+            return dateA - dateB;
+          });
           return (
             <div 
               key={col} 
@@ -419,8 +423,8 @@ const ProjectTasksTab = ({ projectId, project }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Priority</label>
-                    <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value })}>
+                    <label className="block text-sm font-medium mb-1">Priority <span className="text-red-500">*</span></label>
+                    <select required className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value })}>
                       <option value="High">High</option>
                       <option value="Medium">Medium</option>
                       <option value="Low">Low</option>
