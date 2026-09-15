@@ -44,6 +44,7 @@ export const DataProvider = ({ children }) => {
   const [consultations, setConsultations] = useState([]);
   const [users, setUsers] = useState([]);
   const [issues, setIssues] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -131,6 +132,11 @@ export const DataProvider = ({ children }) => {
             projectId: `p${i.project?.id}`,
             reportedBy: `u${i.reportedBy?.id}`
           })));
+        }
+
+        const notifRes = await fetch('http://localhost:8080/api/notifications', { headers });
+        if (notifRes.ok) {
+          setNotifications(await notifRes.json());
         }
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -798,21 +804,80 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  const sendGlobalMessage = async (projectId, messageText) => {
+  const sendGlobalMessage = async (projectId, messageData) => {
     try {
       const numProjectId = typeof projectId === 'string' ? projectId.replace(/^p/, '') : projectId;
+      
+      // If messageData is a string, assume it's just the text (legacy compatibility)
+      const payload = typeof messageData === 'string' 
+        ? { messageText: messageData } 
+        : {
+            messageText: messageData.messageText,
+            recipient: messageData.recipientId ? { id: String(messageData.recipientId).replace('u', '') } : null,
+            messageType: messageData.messageType || 'TEXT',
+            fileUrl: messageData.fileUrl,
+            pollData: messageData.pollData,
+            eventDate: messageData.eventDate
+          };
+
       const res = await fetch(`http://localhost:8080/api/messages/${numProjectId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${currentUser.token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ messageText })
+        body: JSON.stringify(payload)
       });
       return res.ok ? await res.json() : null;
     } catch (err) {
       console.error(err);
       return null;
+    }
+  };
+
+  const editGlobalMessage = async (messageId, newText) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/messages/${messageId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ messageText: newText })
+      });
+      return res.ok ? await res.json() : null;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+
+  const deleteGlobalMessage = async (messageId) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/messages/${messageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      });
+      return res.ok;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
+  const markNotificationAsRead = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${currentUser.token}` }
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -851,7 +916,11 @@ export const DataProvider = ({ children }) => {
     addIssueMeeting,
     updateIssueStatus,
     getGlobalMessages,
-    sendGlobalMessage
+    sendGlobalMessage,
+    editGlobalMessage,
+    deleteGlobalMessage,
+    notifications,
+    markNotificationAsRead
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

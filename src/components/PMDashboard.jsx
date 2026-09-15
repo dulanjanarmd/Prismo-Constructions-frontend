@@ -10,33 +10,6 @@ import { MessageSquare, Send } from 'lucide-react';
 const PMDashboard = () => {
   const { projects, tasks, logs, approvals, getGlobalMessages, sendGlobalMessage } = useData();
   const { currentUser } = useAuth();
-  const [clientRequests, setClientRequests] = useState([]);
-  const [replyText, setReplyText] = useState({});
-
-  useEffect(() => {
-    let cancelled = false;
-    const loadClientRequests = async () => {
-      const messages = (await Promise.all(projects.map(async project => {
-        const projectId = String(project.id).replace(/^p/, '');
-        return (await getGlobalMessages(projectId)).map(message => ({ ...message, project }));
-      }))).flat()
-        .filter(message => message.messageText?.startsWith('[CLIENT REQUEST]'))
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      if (!cancelled) setClientRequests(messages);
-    };
-    if (projects.length) loadClientRequests();
-    return () => { cancelled = true; };
-  }, [projects]);
-
-  const handleReply = async (request) => {
-    const text = replyText[request.id]?.trim();
-    if (!text) return;
-    const saved = await sendGlobalMessage(request.project.id, text);
-    if (saved) {
-      setClientRequests(prev => prev.filter(message => message.id !== request.id));
-      setReplyText(prev => ({ ...prev, [request.id]: '' }));
-    }
-  };
 
   const recentActivities = useMemo(() => {
     const activities = [];
@@ -103,40 +76,6 @@ const PMDashboard = () => {
       <PortfolioSummaryCards projects={projects} />
 
       <ProjectTable projects={projects} />
-
-      {clientRequests.length > 0 && (
-        <section className="glass-card p-5 border-l-4 border-l-blue-500">
-          <div className="flex items-center gap-2 mb-4">
-            <MessageSquare className="w-5 h-5 text-blue-600" />
-            <div>
-              <h2 className="text-lg font-bold text-slate-900">Client Requests</h2>
-              <p className="text-sm text-slate-500">Messages sent from the client portal</p>
-            </div>
-          </div>
-          <div className="space-y-3">
-            {clientRequests.slice(0, 5).map(request => (
-              <div key={request.id} className="rounded-lg border border-border bg-slate-50/50 p-4">
-                <div className="flex justify-between gap-3 mb-2">
-                  <p className="text-sm font-semibold text-slate-900">{request.project.name}</p>
-                  <span className="text-xs text-slate-500">{request.sender?.name || 'Client'}</span>
-                </div>
-                <p className="text-sm text-slate-700 mb-3">{request.messageText.replace('[CLIENT REQUEST] ', '')}</p>
-                <div className="flex gap-2">
-                  <input
-                    value={replyText[request.id] || ''}
-                    onChange={event => setReplyText(prev => ({ ...prev, [request.id]: event.target.value }))}
-                    placeholder="Reply to client..."
-                    className="flex-1 rounded-md border border-border bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <button onClick={() => handleReply(request)} disabled={!replyText[request.id]?.trim()} className="flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50 hover:bg-blue-600 transition-colors shadow-sm">
-                    <Send className="w-4 h-4" /> Reply
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
       <RecentActivity activities={recentActivities} />
     </div>

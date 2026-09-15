@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
 import { 
   Briefcase, 
   CheckSquare, 
@@ -13,7 +14,8 @@ import {
   LayoutDashboard,
   Shield,
   AlertTriangle,
-  Activity
+  Activity,
+  Bell
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FloatingChatWidget from './FloatingChatWidget';
@@ -38,8 +40,12 @@ class ErrorBoundary extends React.Component {
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
+  const { notifications, markNotificationAsRead } = useData();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  const unreadCount = notifications?.filter(n => !n.read)?.length || 0;
 
   const navItems = {
     admin: [
@@ -101,8 +107,53 @@ const Navbar = () => {
 
         {/* Right Side: Profile and Actions */}
         <div className="flex items-center space-x-2">
-          <div className="hidden md:flex items-center bg-[#d1d5db] h-12 rounded-lg p-1 space-x-1 text-sm font-bold">
-            <div className="flex items-center text-[#4b5563] px-4 py-2">
+          <div className="hidden md:flex items-center bg-[#d1d5db] h-12 rounded-lg p-1 space-x-1 text-sm font-bold relative">
+            <button
+              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              className="relative p-2 text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              <Bell className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+            <AnimatePresence>
+              {notificationsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50"
+                >
+                  <div className="p-3 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                    <h3 className="font-bold text-slate-800">Notifications</h3>
+                    <span className="text-xs text-slate-500">{unreadCount} unread</span>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications?.length === 0 ? (
+                      <p className="p-4 text-sm text-slate-500 text-center">No notifications yet</p>
+                    ) : (
+                      notifications?.map(notif => (
+                        <div 
+                          key={notif.id} 
+                          className={`p-3 border-b border-slate-50 text-sm cursor-pointer transition-colors ${!notif.read ? 'bg-blue-50/50 hover:bg-blue-50' : 'hover:bg-slate-50'}`}
+                          onClick={() => {
+                            if (!notif.read) markNotificationAsRead(notif.id);
+                            setNotificationsOpen(false);
+                          }}
+                        >
+                          <p className={`text-slate-800 ${!notif.read ? 'font-semibold' : ''}`}>{notif.message}</p>
+                          <p className="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <div className="flex items-center text-[#4b5563] px-2 py-2">
               <User className="w-4 h-4 mr-2" />
               <span className="font-medium">{currentUser?.name}</span>
             </div>
