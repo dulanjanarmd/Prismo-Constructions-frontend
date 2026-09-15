@@ -16,8 +16,8 @@ const ProjectMilestonesTab = ({ project }) => {
   const isClient = currentUser?.role === 'client';
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [newForm, setNewForm] = useState({ name: '', dueDate: '' });
-  const [editForm, setEditForm] = useState({ name: '', dueDate: '' });
+  const [newForm, setNewForm] = useState({ name: '', dueDate: '', description: '', budgetAllocated: '', deliverables: '' });
+  const [editForm, setEditForm] = useState({ name: '', dueDate: '', description: '', budgetAllocated: '', deliverables: '' });
   const [loading, setLoading] = useState(false);
 
   const milestones = project.milestones || [];
@@ -43,7 +43,14 @@ const ProjectMilestonesTab = ({ project }) => {
       const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones`, {
         method: 'POST',
         headers: authHeaders,
-        body: JSON.stringify({ name: newForm.name, dueDate: newForm.dueDate || null, status: 'Incomplete' })
+        body: JSON.stringify({ 
+          name: newForm.name, 
+          dueDate: newForm.dueDate || null, 
+          status: 'Incomplete',
+          description: newForm.description || null,
+          budgetAllocated: newForm.budgetAllocated ? parseFloat(newForm.budgetAllocated) : null,
+          deliverables: newForm.deliverables || null
+        })
       });
       if (!res.ok) throw new Error('Failed to add milestone');
       const saved = await res.json();
@@ -65,7 +72,7 @@ const ProjectMilestonesTab = ({ project }) => {
         status: newProjectStatus
       });
       
-      setNewForm({ name: '', dueDate: '' });
+      setNewForm({ name: '', dueDate: '', description: '', budgetAllocated: '', deliverables: '' });
       setIsAdding(false);
     } catch (err) {
       console.error(err);
@@ -143,7 +150,13 @@ const ProjectMilestonesTab = ({ project }) => {
 
   const startEdit = (m) => {
     setEditingId(m.id);
-    setEditForm({ name: m.name || m.title || '', dueDate: m.dueDate || m.date || '' });
+    setEditForm({ 
+      name: m.name || m.title || '', 
+      dueDate: m.dueDate || m.date || '',
+      description: m.description || '',
+      budgetAllocated: m.budgetAllocated || '',
+      deliverables: m.deliverables || ''
+    });
   };
 
   const handleEditSave = async (id) => {
@@ -151,7 +164,13 @@ const ProjectMilestonesTab = ({ project }) => {
       const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones/${id}`, {
         method: 'PUT',
         headers: authHeaders,
-        body: JSON.stringify({ name: editForm.name, dueDate: editForm.dueDate || null })
+        body: JSON.stringify({ 
+          name: editForm.name, 
+          dueDate: editForm.dueDate || null,
+          description: editForm.description || null,
+          budgetAllocated: editForm.budgetAllocated ? parseFloat(editForm.budgetAllocated) : null,
+          deliverables: editForm.deliverables || null
+        })
       });
       if (!res.ok) throw new Error('Failed to update milestone');
       const updated = await res.json();
@@ -216,28 +235,51 @@ const ProjectMilestonesTab = ({ project }) => {
             className="glass-card p-4 border-2 border-primary/30 overflow-hidden"
           >
             <h3 className="font-semibold mb-3">New Milestone</h3>
-            <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3">
-              <input
-                required
-                type="text"
-                placeholder="Milestone name (e.g. Foundation Complete)"
-                className="flex-1 min-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                value={newForm.name}
-                onChange={e => setNewForm({ ...newForm, name: e.target.value })}
-                autoFocus
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  required
+                  type="text"
+                  placeholder="Milestone name (e.g. Foundation Complete)"
+                  className="flex-1 min-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                  value={newForm.name}
+                  onChange={e => setNewForm({ ...newForm, name: e.target.value })}
+                  autoFocus
+                />
+                <input
+                  type="date"
+                  className="w-full sm:w-auto rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                  value={newForm.dueDate}
+                  onChange={e => setNewForm({ ...newForm, dueDate: e.target.value })}
+                />
+                <input
+                  type="number"
+                  placeholder="Budget ($)"
+                  className="w-full sm:w-32 rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                  value={newForm.budgetAllocated}
+                  onChange={e => setNewForm({ ...newForm, budgetAllocated: e.target.value })}
+                />
+              </div>
+              <textarea
+                placeholder="Description"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none"
+                rows="2"
+                value={newForm.description}
+                onChange={e => setNewForm({ ...newForm, description: e.target.value })}
               />
-              <input
-                type="date"
-                className="w-full sm:w-auto rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                value={newForm.dueDate}
-                onChange={e => setNewForm({ ...newForm, dueDate: e.target.value })}
+              <textarea
+                placeholder="Deliverables (e.g. Approved Blueprints, Permits)"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none"
+                rows="2"
+                value={newForm.deliverables}
+                onChange={e => setNewForm({ ...newForm, deliverables: e.target.value })}
               />
-              <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                <button type="submit" disabled={loading} className="flex-1 sm:flex-none px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-md hover:opacity-90 transition-opacity text-sm disabled:opacity-50">
-                  {loading ? 'Saving...' : '+ Add'}
-                </button>
-                <button type="button" onClick={() => setIsAdding(false)} className="flex-1 sm:flex-none px-3 py-2 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors text-sm text-slate-700">
+              <div className="flex gap-2 w-full justify-end mt-1">
+                <button type="button" onClick={() => setIsAdding(false)} className="px-3 py-2 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors text-sm text-slate-700">
                   Cancel
+                </button>
+                <button type="submit" disabled={loading} className="px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-md hover:opacity-90 transition-opacity text-sm disabled:opacity-50">
+                  {loading ? 'Saving...' : '+ Add Milestone'}
                 </button>
               </div>
             </div>
@@ -286,18 +328,42 @@ const ProjectMilestonesTab = ({ project }) => {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     {isEditing ? (
-                      <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="flex flex-col gap-2 w-full pr-4">
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <input
+                            type="text"
+                            placeholder="Name"
+                            className="flex-1 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            value={editForm.name}
+                            onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                          />
+                          <input
+                            type="date"
+                            className="w-full sm:w-40 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            value={editForm.dueDate}
+                            onChange={e => setEditForm({ ...editForm, dueDate: e.target.value })}
+                          />
+                          <input
+                            type="number"
+                            placeholder="Budget"
+                            className="w-full sm:w-32 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            value={editForm.budgetAllocated}
+                            onChange={e => setEditForm({ ...editForm, budgetAllocated: e.target.value })}
+                          />
+                        </div>
                         <input
                           type="text"
-                          className="flex-1 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
-                          value={editForm.name}
-                          onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                          placeholder="Description"
+                          className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                          value={editForm.description}
+                          onChange={e => setEditForm({ ...editForm, description: e.target.value })}
                         />
                         <input
-                          type="date"
-                          className="w-full sm:w-40 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
-                          value={editForm.dueDate}
-                          onChange={e => setEditForm({ ...editForm, dueDate: e.target.value })}
+                          type="text"
+                          placeholder="Deliverables"
+                          className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                          value={editForm.deliverables}
+                          onChange={e => setEditForm({ ...editForm, deliverables: e.target.value })}
                         />
                       </div>
                     ) : (
@@ -305,7 +371,8 @@ const ProjectMilestonesTab = ({ project }) => {
                         <p className={`font-semibold ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-900 '}`}>
                           {displayName}
                         </p>
-                        <div className="flex items-center gap-2 mt-1">
+                        {m.description && <p className={`text-sm mt-1 ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-500'}`}>{m.description}</p>}
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
                           {displayDate && (
                             <span className={`text-xs flex items-center gap-1 ${isOverdue ? 'text-red-500 font-semibold' : 'text-slate-500'}`}>
                               <Calendar className="w-3 h-3" />
@@ -315,6 +382,16 @@ const ProjectMilestonesTab = ({ project }) => {
                           <span className={`px-2 py-0.5 text-xs font-medium rounded-full border ${statusColors[m.status] || statusColors.Incomplete}`}>
                             {m.status}
                           </span>
+                          {m.budgetAllocated && (
+                            <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                              Budget: ${m.budgetAllocated.toLocaleString()}
+                            </span>
+                          )}
+                          {m.deliverables && (
+                            <span className="text-xs text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 max-w-[200px] sm:max-w-[300px] truncate" title={m.deliverables}>
+                              Deliverables: {m.deliverables}
+                            </span>
+                          )}
                         </div>
                       </>
                     )}
