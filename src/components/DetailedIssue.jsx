@@ -35,6 +35,49 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
   const getFileUrl = (url) => url?.startsWith('/uploads/') ? `http://localhost:8080${url}` : url;
   const isImageFile = (url) => /\.(png|jpe?g|gif|webp|bmp)(\?.*)?$/i.test(url || '');
 
+  const getMinMaxDates = () => {
+    let min = null;
+    let max = null;
+    
+    const parseLocalDate = (dateStr) => {
+      if (!dateStr) return null;
+      const d = new Date(dateStr);
+      if (typeof dateStr === 'string' && dateStr.length === 10) {
+        const [y, m, day] = dateStr.split('-');
+        return new Date(y, m - 1, day);
+      }
+      return d;
+    };
+
+    if (project?.startDate) min = parseLocalDate(project.startDate);
+    if (project?.endDate) max = parseLocalDate(project.endDate);
+
+    if (task) {
+      if (task.startDate) {
+        const ts = parseLocalDate(task.startDate);
+        if (!min || ts > min) min = ts;
+      }
+      if (task.dueDate) {
+        const td = parseLocalDate(task.dueDate);
+        if (!max || td < max) max = td;
+      }
+    }
+    
+    const format = (d, isMax) => {
+      if (!d || isNaN(d.getTime())) return undefined;
+      const clone = new Date(d.getTime());
+      if (isMax) clone.setHours(23, 59, 59);
+      else clone.setHours(0, 0, 0);
+      
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${clone.getFullYear()}-${pad(clone.getMonth()+1)}-${pad(clone.getDate())}T${pad(clone.getHours())}:${pad(clone.getMinutes())}`;
+    };
+
+    return { min: format(min, false), max: format(max, true) };
+  };
+
+  const { min: minMeetingDate, max: maxMeetingDate } = getMinMaxDates();
+
   useEffect(() => {
     const fetchData = async () => {
       const c = await getIssueComments(String(issue.id).replace('i', ''));
@@ -313,7 +356,10 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Date & Time</label>
-                  <input required type="datetime-local" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={meetingData.scheduledTime} onChange={e => setMeetingData({...meetingData, scheduledTime: e.target.value})} />
+                  <input required type="datetime-local" min={minMeetingDate} max={maxMeetingDate} className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={meetingData.scheduledTime} onChange={e => setMeetingData({...meetingData, scheduledTime: e.target.value})} />
+                  <p className="text-xs text-slate-500 mt-1">
+                    {minMeetingDate && maxMeetingDate ? `Must be between ${new Date(minMeetingDate).toLocaleDateString()} and ${new Date(maxMeetingDate).toLocaleDateString()}` : ''}
+                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Meeting Link (Zoom/Meet)</label>
