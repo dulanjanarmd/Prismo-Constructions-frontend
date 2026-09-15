@@ -36,11 +36,55 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
   const [showPmReply, setShowPmReply] = useState(false);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [editData, setEditData] = useState({
     title: approval.title || '',
     description: approval.description || '',
-    dueDate: approval.dueDate || ''
+    dueDate: approval.dueDate || '',
+    attachments: typeof approval.attachments === 'string' ? JSON.parse(approval.attachments || '[]') : (approval.attachments || []),
+    linkedLogIds: approval.linkedLogIds || []
   });
+
+  const handleFileUpload = async (e, category) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    setIsUploading(true);
+    try {
+      const uploaded = [];
+      for (const file of files) {
+        const body = new FormData();
+        body.append('file', file);
+        const res = await fetch('http://localhost:8080/api/files/upload', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` },
+          body
+        });
+        if (!res.ok) throw new Error('Upload failed');
+        const data = await res.json();
+        uploaded.push({ ...data, category });
+      }
+      setEditData(prev => ({ ...prev, attachments: [...prev.attachments, ...uploaded] }));
+    } catch (err) {
+      alert('File upload failed');
+    }
+    setIsUploading(false);
+  };
+
+  const removeAttachment = (index) => {
+    setEditData(prev => ({
+      ...prev,
+      attachments: prev.attachments.filter((_, i) => i !== index)
+    }));
+  };
+
+  const toggleLog = (logId) => {
+    setEditData(prev => ({
+      ...prev,
+      linkedLogIds: prev.linkedLogIds.includes(logId)
+        ? prev.linkedLogIds.filter(id => id !== logId)
+        : [...prev.linkedLogIds, logId]
+    }));
+  };
 
   const handleSaveEdit = async () => {
     try {
@@ -198,9 +242,71 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
                   <input type="date" min={minDateStr} max={maxDateStr} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.dueDate} onChange={e => setEditData({...editData, dueDate: e.target.value})} />
                   <p className="text-xs text-slate-500 mt-1">Must be within 1 week and project timeline.</p>
                 </div>
-                <div className="flex justify-end gap-2 pt-2">
-                  <button onClick={() => setIsEditing(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors">Cancel</button>
-                  <button onClick={handleSaveEdit} className="px-4 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors shadow-sm">Save Changes</button>
+
+                {/* Edit Attachments */}
+                <div className="pt-2 border-t border-blue-200/50">
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-slate-700">
+                    <Paperclip className="w-4 h-4 text-slate-500" /> Attachments
+                  </label>
+                  <label className="flex items-center justify-center w-full border-2 border-dashed border-blue-300 rounded-lg py-3 px-4 cursor-pointer hover:border-blue-400 hover:bg-white transition-colors bg-white/50">
+                    <span className="text-sm text-blue-600 font-medium">
+                      {isUploading ? 'Uploading...' : 'Click to add files or photos'}
+                    </span>
+                    <input type="file" multiple className="hidden" disabled={isUploading} onChange={e => handleFileUpload(e, 'document')} />
+                  </label>
+                  {editData.attachments.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {editData.attachments.map((file, i) => (
+                        <div key={i} className="flex items-center justify-between bg-white border border-blue-200 rounded px-3 py-2 shadow-sm">
+                          <span className="text-sm text-slate-700 truncate flex items-center gap-2">
+                            {file.category === 'image' || file.type?.startsWith('image/') ? <ImageIcon className="w-4 h-4 text-blue-500 shrink-0" /> : <FileText className="w-4 h-4 text-blue-500 shrink-0" />} 
+                            {file.originalName || file.name || 'Attachment'}
+                          </span>
+                          <button type="button" onClick={() => removeAttachment(i)} className="text-slate-400 hover:text-red-500 shrink-0 p-1 rounded hover:bg-red-50">
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Edit Linked Logs */}
+                <div className="pt-2 border-t border-blue-200/50">
+                  <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-slate-700">
+                    <ListTodo className="w-4 h-4 text-slate-500" /> Linked Progress Logs
+                  </label>
+                  <div className="max-h-48 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                    {logs.filter(l => String(l.projectId) === String(project?.id) || l.projectId === `p${project?.id}`).length === 0 ? (
+                      <p className="text-sm text-slate-500 italic">No progress logs available for this project.</p>
+                    ) : (
+                      logs.filter(l => String(l.projectId) === String(project?.id) || l.projectId === `p${project?.id}`).map(log => {
+                        const isLinked = editData.linkedLogIds.includes(log.id);
+                        return (
+                          <div
+                            key={log.id}
+                            onClick={() => toggleLog(log.id)}
+                            className={`flex flex-col p-3 rounded-lg border cursor-pointer transition-colors ${
+                              isLinked ? 'bg-blue-50 border-blue-400 shadow-sm' : 'bg-white border-slate-200 hover:border-blue-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-sm font-bold text-slate-800">{log.date}</span>
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isLinked ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+                                +{log.percentageCompleted}%
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-600 line-clamp-2">{log.workDone}</p>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <button onClick={() => setIsEditing(false)} disabled={isUploading} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors disabled:opacity-50">Cancel</button>
+                  <button onClick={handleSaveEdit} disabled={isUploading} className="px-4 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors shadow-sm disabled:opacity-50">Save Changes</button>
                 </div>
               </div>
             ) : (
@@ -309,7 +415,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
           </div>
 
           {/* Footer — Actions */}
-          <div className="sticky bottom-0 bg-slate-50/80  backdrop-blur-md px-6 py-5 border-t border-border space-y-3">
+          <div className="sticky bottom-0 z-20 bg-slate-50/80 backdrop-blur-md px-6 py-5 border-t border-border space-y-3">
             {/* CLIENT: Respond */}
             {isClient && approval.status === 'Pending' && (
               <div className="space-y-3">

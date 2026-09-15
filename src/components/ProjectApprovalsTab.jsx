@@ -377,11 +377,14 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                 </div>
 
                 {/* Link progress logs */}
-                {projectLogs.length > 0 && (
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Link Progress Logs (optional)</label>
-                    <div className="space-y-2 max-h-36 overflow-y-auto border border-border rounded-md p-2 bg-slate-50 ">
-                      {projectLogs.map(log => (
+                {/* Link progress logs */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Link Progress Logs (optional)</label>
+                  <div className="space-y-2 max-h-36 overflow-y-auto border border-border rounded-md p-2 bg-slate-50 ">
+                    {projectLogs.length === 0 ? (
+                      <p className="text-sm text-slate-500 italic px-2 py-1">No progress logs available for this project.</p>
+                    ) : (
+                      projectLogs.map(log => (
                         <label key={log.id} className="flex items-center gap-2 cursor-pointer py-1 px-2 hover:bg-slate-100 :bg-slate-800 rounded">
                           <input
                             type="checkbox"
@@ -393,13 +396,13 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                           <span className="text-xs text-slate-500 truncate">{log.workDone}</span>
                           <span className="ml-auto text-xs text-primary font-semibold shrink-0">+{log.percentageCompleted}%</span>
                         </label>
-                      ))}
-                    </div>
-                    {formData.linkedLogIds.length > 0 && (
-                      <p className="text-xs text-primary mt-1">{formData.linkedLogIds.length} log{formData.linkedLogIds.length > 1 ? 's' : ''} selected</p>
+                      ))
                     )}
                   </div>
-                )}
+                  {formData.linkedLogIds.length > 0 && (
+                    <p className="text-xs text-primary mt-1">{formData.linkedLogIds.length} log{formData.linkedLogIds.length > 1 ? 's' : ''} selected</p>
+                  )}
+                </div>
 
                 <div className="pt-4 flex justify-end space-x-3">
                   <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>

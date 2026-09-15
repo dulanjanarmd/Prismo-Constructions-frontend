@@ -25,6 +25,17 @@ const toProjectStatus = (status) => {
   return values[status] || status;
 };
 
+const mapApprovalStatusFromBackend = (status) => {
+  if (!status) return 'Pending';
+  if (status === 'CHANGES_REQUESTED') return 'Changes Requested';
+  return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+};
+
+const mapApprovalStatusToBackend = (status) => {
+  if (status === 'Changes Requested') return 'CHANGES_REQUESTED';
+  return status ? status.toUpperCase() : 'PENDING';
+};
+
 const DataContext = createContext();
 
 export const useData = () => {
@@ -119,7 +130,7 @@ export const DataProvider = ({ children }) => {
             projectId: `p${a.project?.id}`,
             clientId: a.client?.id ? `u${a.client.id}` : null,
             auditTrail: typeof a.auditTrail === 'string' ? JSON.parse(a.auditTrail) : (a.auditTrail || []),
-            status: a.status ? (a.status.charAt(0) + a.status.slice(1).toLowerCase()) : 'Pending',
+            status: mapApprovalStatusFromBackend(a.status),
             attachments: typeof a.attachments === 'string' ? JSON.parse(a.attachments) : (a.attachments || [])
           })));
         }
@@ -700,12 +711,15 @@ export const DataProvider = ({ children }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          status: updates.status,
+          title: updates.title ?? currentApproval?.title,
+          description: updates.description ?? currentApproval?.description,
+          status: updates.status ? mapApprovalStatusToBackend(updates.status) : mapApprovalStatusToBackend(currentApproval?.status),
           auditTrail: updates.auditTrail,
           feedback: updates.feedback,
           pmReply: updates.pmReply,
           dueDate: updates.dueDate ?? currentApproval?.dueDate,
-          attachments: updates.attachments ?? currentApproval?.attachments
+          attachments: updates.attachments ?? currentApproval?.attachments,
+          linkedLogIds: updates.linkedLogIds ?? currentApproval?.linkedLogIds
         })
       });
       if (!response.ok) {
@@ -716,7 +730,7 @@ export const DataProvider = ({ children }) => {
         ...a,
         ...updates,
         id: saved.id,
-        status: saved.status ? saved.status.charAt(0) + saved.status.slice(1).toLowerCase() : a.status,
+        status: saved.status ? mapApprovalStatusFromBackend(saved.status) : a.status,
         auditTrail: typeof saved.auditTrail === 'string' ? JSON.parse(saved.auditTrail) : (saved.auditTrail || []),
         attachments: typeof saved.attachments === 'string' ? JSON.parse(saved.attachments) : (saved.attachments || [])
       } : a));
@@ -767,7 +781,8 @@ export const DataProvider = ({ children }) => {
           dueDate: request.dueDate || null,
           dateRequested: new Date().toISOString().split('T')[0],
           auditTrail: request.auditTrail || [],
-          attachments
+          attachments,
+          linkedLogIds: request.linkedLogIds || []
         })
       });
       if (res.ok) {
@@ -777,7 +792,7 @@ export const DataProvider = ({ children }) => {
           projectId: `p${saved.project?.id}`,
           clientId: saved.client?.id ? `u${saved.client.id}` : null,
           auditTrail: typeof saved.auditTrail === 'string' ? JSON.parse(saved.auditTrail) : (saved.auditTrail || []),
-          status: saved.status ? (saved.status.charAt(0) + saved.status.slice(1).toLowerCase()) : 'Pending',
+          status: mapApprovalStatusFromBackend(saved.status),
           attachments: typeof saved.attachments === 'string' ? JSON.parse(saved.attachments) : (saved.attachments || [])
         }]);
         return saved;
