@@ -26,7 +26,7 @@ const TABS = [
 const ProjectDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { projects, sendGlobalMessage } = useData();
+  const { projects } = useData();
   const { currentUser } = useAuth();
   
   const isSiteEngineer = currentUser?.role === 'site_engineer';
@@ -44,25 +44,11 @@ const ProjectDetailPage = () => {
 
   const [activeTab, setActiveTab] = useState('overview');
   const [project, setProject] = useState(null);
-  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const [requestText, setRequestText] = useState('');
-  const [requestSent, setRequestSent] = useState(false);
 
   useEffect(() => {
     const found = projects.find(p => String(p.id) === String(id) || p.id === `p${id}`);
     setProject(found);
   }, [id, projects]);
-
-  const handleSendRequest = async () => {
-    if (!requestText.trim() || !project) return;
-    await sendGlobalMessage(project.id, `[CLIENT REQUEST] ${requestText}`);
-    setRequestSent(true);
-    setRequestText('');
-    setTimeout(() => {
-      setRequestSent(false);
-      setIsRequestModalOpen(false);
-    }, 2000);
-  };
 
   if (!project) {
     return (
@@ -144,16 +130,6 @@ const ProjectDetailPage = () => {
             );
           })}
 
-          {/* Message PM tab — same style as other tabs, for clients only */}
-          {isClient && (
-            <button
-              onClick={() => setIsRequestModalOpen(true)}
-              className="flex items-center py-3 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 font-medium text-sm whitespace-nowrap transition-colors"
-            >
-              <MessageSquare className="w-4 h-4 mr-1.5 text-slate-400" />
-              Message PM
-            </button>
-          )}
         </nav>
       </div>
 
@@ -167,65 +143,6 @@ const ProjectDetailPage = () => {
         {activeTab === 'approvals'  && <ProjectApprovalsTab projectId={project.id} project={project} />}
         {activeTab === 'documents'  && <ProjectDocumentsTab project={project} />}
       </div>
-
-      {/* ── Message PM Modal (client only) ── */}
-      <AnimatePresence>
-        {isRequestModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
-            >
-              <div className="px-6 py-4 border-b flex justify-between items-center bg-indigo-50">
-                <div>
-                  <h2 className="text-lg font-bold text-indigo-900">Message Project Manager</h2>
-                  <p className="text-xs text-indigo-600 mt-0.5">Re: {project.name}</p>
-                </div>
-                <button onClick={() => setIsRequestModalOpen(false)} className="text-slate-400 hover:text-slate-600">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="p-6">
-                {requestSent ? (
-                  <div className="text-center py-6">
-                    <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <CheckSquare className="w-7 h-7 text-green-600" />
-                    </div>
-                    <p className="font-semibold text-green-700">Request sent!</p>
-                    <p className="text-sm text-slate-500 mt-1">The Project Manager will respond shortly.</p>
-                  </div>
-                ) : (
-                  <>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Your Request or Question</label>
-                    <textarea
-                      rows="5"
-                      className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
-                      placeholder="e.g. 'Please share an updated schedule for the foundation phase' or 'Can we arrange a site visit next week?'"
-                      value={requestText}
-                      onChange={e => setRequestText(e.target.value)}
-                    />
-                    <div className="flex justify-end gap-3 mt-4">
-                      <button onClick={() => setIsRequestModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-                        Cancel
-                      </button>
-                      <button
-                        onClick={handleSendRequest}
-                        disabled={!requestText.trim()}
-                        className="flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition-colors"
-                      >
-                        <Send className="w-4 h-4" />
-                        Send Request
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

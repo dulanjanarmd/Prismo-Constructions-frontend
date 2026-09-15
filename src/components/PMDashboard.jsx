@@ -105,9 +105,9 @@ const PMDashboard = () => {
       <ProjectTable projects={projects} />
 
       {clientRequests.length > 0 && (
-        <section className="glass-card p-5 border-l-4 border-l-indigo-500">
+        <section className="glass-card p-5 border-l-4 border-l-blue-500">
           <div className="flex items-center gap-2 mb-4">
-            <MessageSquare className="w-5 h-5 text-indigo-600" />
+            <MessageSquare className="w-5 h-5 text-blue-600" />
             <div>
               <h2 className="text-lg font-bold text-slate-900">Client Requests</h2>
               <p className="text-sm text-slate-500">Messages sent from the client portal</p>
@@ -115,7 +115,7 @@ const PMDashboard = () => {
           </div>
           <div className="space-y-3">
             {clientRequests.slice(0, 5).map(request => (
-              <div key={request.id} className="rounded-lg border border-indigo-100 bg-indigo-50/50 p-4">
+              <div key={request.id} className="rounded-lg border border-border bg-slate-50/50 p-4">
                 <div className="flex justify-between gap-3 mb-2">
                   <p className="text-sm font-semibold text-slate-900">{request.project.name}</p>
                   <span className="text-xs text-slate-500">{request.sender?.name || 'Client'}</span>
@@ -126,9 +126,9 @@ const PMDashboard = () => {
                     value={replyText[request.id] || ''}
                     onChange={event => setReplyText(prev => ({ ...prev, [request.id]: event.target.value }))}
                     placeholder="Reply to client..."
-                    className="flex-1 rounded-md border border-input bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                    className="flex-1 rounded-md border border-border bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
                   />
-                  <button onClick={() => handleReply(request)} disabled={!replyText[request.id]?.trim()} className="flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                  <button onClick={() => handleReply(request)} disabled={!replyText[request.id]?.trim()} className="flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50 hover:bg-blue-600 transition-colors shadow-sm">
                     <Send className="w-4 h-4" /> Reply
                   </button>
                 </div>

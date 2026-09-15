@@ -787,7 +787,8 @@ export const DataProvider = ({ children }) => {
 
   const getGlobalMessages = async (projectId) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/messages/${projectId}`, {
+      const numProjectId = typeof projectId === 'string' ? projectId.replace(/^p/, '') : projectId;
+      const res = await fetch(`http://localhost:8080/api/messages/${numProjectId}`, {
         headers: { 'Authorization': `Bearer ${currentUser.token}` }
       });
       return res.ok ? await res.json() : [];
@@ -799,7 +800,8 @@ export const DataProvider = ({ children }) => {
 
   const sendGlobalMessage = async (projectId, messageText) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/messages/${projectId}`, {
+      const numProjectId = typeof projectId === 'string' ? projectId.replace(/^p/, '') : projectId;
+      const res = await fetch(`http://localhost:8080/api/messages/${numProjectId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${currentUser.token}`,
