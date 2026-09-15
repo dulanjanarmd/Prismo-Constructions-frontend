@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, X, Calendar } from 'lucide-react';
 
-const MilestoneFormList = ({ milestones, setMilestones, projectStartDate }) => {
+const MilestoneFormList = ({ milestones, setMilestones, projectStartDate, projectEndDate }) => {
   const [newTitle, setNewTitle] = useState('');
   const [newDate, setNewDate] = useState('');
 
@@ -9,14 +9,26 @@ const MilestoneFormList = ({ milestones, setMilestones, projectStartDate }) => {
     e.preventDefault();
     if (!newTitle || !newDate) return;
     
-    if (projectStartDate) {
+    if (projectStartDate || projectEndDate) {
       const msDate = new Date(newDate);
-      const projStart = new Date(projectStartDate);
       msDate.setHours(0, 0, 0, 0);
-      projStart.setHours(0, 0, 0, 0);
-      if (msDate <= projStart) {
-        alert("Milestone due date must be strictly after the project's start date.");
-        return;
+
+      if (projectStartDate) {
+        const projStart = new Date(projectStartDate);
+        projStart.setHours(0, 0, 0, 0);
+        if (msDate <= projStart) {
+          alert("Milestone due date must be strictly after the project's start date.");
+          return;
+        }
+      }
+
+      if (projectEndDate) {
+        const projEnd = new Date(projectEndDate);
+        projEnd.setHours(0, 0, 0, 0);
+        if (msDate >= projEnd) {
+          alert("Milestone due date must be strictly before the project's end date.");
+          return;
+        }
       }
     }
     
@@ -35,6 +47,10 @@ const MilestoneFormList = ({ milestones, setMilestones, projectStartDate }) => {
 
   const minDateStr = projectStartDate 
     ? new Date(new Date(projectStartDate).getTime() + 86400000).toISOString().split('T')[0]
+    : undefined;
+
+  const maxDateStr = projectEndDate 
+    ? new Date(new Date(projectEndDate).getTime() - 86400000).toISOString().split('T')[0]
     : undefined;
 
   return (
@@ -77,6 +93,7 @@ const MilestoneFormList = ({ milestones, setMilestones, projectStartDate }) => {
           <input 
             type="date" 
             min={minDateStr}
+            max={maxDateStr}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
             value={newDate}
             onChange={(e) => setNewDate(e.target.value)}

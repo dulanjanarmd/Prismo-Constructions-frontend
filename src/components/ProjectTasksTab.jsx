@@ -393,8 +393,8 @@ const ProjectTasksTab = ({ projectId, project }) => {
                   <input required type="text" placeholder="e.g. Install foundation shuttering" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Description</label>
-                  <textarea rows="3" placeholder="Detailed instructions for the site engineer..." className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                  <label className="block text-sm font-medium mb-1">Description <span className="text-red-500">*</span></label>
+                  <textarea required rows="3" placeholder="Detailed instructions for the site engineer..." className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                 </div>
 
                 {/* Milestone link */}
@@ -429,8 +429,8 @@ const ProjectTasksTab = ({ projectId, project }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Due Date</label>
-                  <input type="date" min={minDate} max={maxDate} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.dueDate} onChange={e => setFormData({ ...formData, dueDate: e.target.value })} />
+                  <label className="block text-sm font-medium mb-1">Due Date <span className="text-red-500">*</span></label>
+                  <input required type="date" min={minDate} max={maxDate} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.dueDate} onChange={e => setFormData({ ...formData, dueDate: e.target.value })} />
                 </div>
 
                 <div className="pt-4 flex justify-end space-x-3">

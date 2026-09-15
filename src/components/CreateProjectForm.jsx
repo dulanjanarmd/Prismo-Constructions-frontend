@@ -219,7 +219,7 @@ const CreateProjectForm = () => {
             </div>
           </div>
           <div className="p-8 border-t border-border bg-slate-50/50">
-            <MilestoneFormList milestones={milestones} setMilestones={setMilestones} projectStartDate={formData.startDate} />
+            <MilestoneFormList milestones={milestones} setMilestones={setMilestones} projectStartDate={formData.startDate} projectEndDate={formData.endDate} />
           </div>
           
           <div className="p-8 flex flex-col sm:flex-row justify-end items-center gap-4 bg-slate-50 border-t border-border rounded-b-2xl">
