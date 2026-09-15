@@ -765,6 +765,23 @@ export const DataProvider = ({ children }) => {
     } catch (err) { console.error('addApprovalRequest:', err); throw err; }
   };
 
+  const deleteApprovalRequest = async (id) => {
+    try {
+      const numId = typeof id === 'string' ? id.replace('a', '') : id;
+      const res = await fetch(`http://localhost:8080/api/client/approvals/${numId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to delete approval request');
+      setApprovals(prev => prev.filter(a => String(a.id) !== String(id) && String(a.id) !== `a${numId}`));
+    } catch (err) {
+      console.error('Failed to delete approval:', err);
+      throw err;
+    }
+  };
+
   const addConsultation = (consultation) => setConsultations([...consultations, { ...consultation, id: `c${Date.now()}` }]);
   const updateConsultation = (id, updates) => setConsultations(consultations.map(c => c.id === id ? { ...c, ...updates } : c));
 
@@ -798,14 +815,41 @@ export const DataProvider = ({ children }) => {
   };
 
   const value = {
-    projects, addProject, updateProject, deleteProject,
-    tasks, addTask, updateTask, deleteTask,
-    logs, addLog, updateLog, deleteLog,
-    approvals, updateApproval, addApprovalRequest,
-    consultations, addConsultation, updateConsultation,
-    users, addUser, deleteUser, updateUser, resetUserPassword,
-    issues, addIssue, updateIssue, deleteIssue, getIssueComments, addIssueComment, getIssueMeetings, addIssueMeeting, updateIssueStatus,
-    getGlobalMessages, sendGlobalMessage
+    projects,
+    tasks,
+    logs,
+    approvals,
+    consultations,
+    users,
+    issues,
+    addProject,
+    updateProject,
+    deleteProject,
+    addTask,
+    updateTask,
+    deleteTask,
+    addLog,
+    updateLog,
+    deleteLog,
+    addApprovalRequest,
+    updateApproval,
+    deleteApprovalRequest,
+    addConsultation,
+    updateConsultation,
+    addUser,
+    deleteUser,
+    updateUser,
+    resetUserPassword,
+    addIssue,
+    updateIssue,
+    deleteIssue,
+    getIssueComments,
+    addIssueComment,
+    getIssueMeetings,
+    addIssueMeeting,
+    updateIssueStatus,
+    getGlobalMessages,
+    sendGlobalMessage
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

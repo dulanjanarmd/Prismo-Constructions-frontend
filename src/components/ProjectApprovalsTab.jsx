@@ -22,7 +22,7 @@ const STATUS_ICON = {
 };
 
 const ProjectApprovalsTab = ({ projectId, project }) => {
-  const { approvals, updateApproval, addApprovalRequest, logs } = useData();
+  const { approvals, updateApproval, addApprovalRequest, deleteApprovalRequest, logs } = useData();
   const { currentUser } = useAuth();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -100,6 +100,17 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
     const result = await updateApproval(id, updates);
     setSelectedApproval(prev => prev ? { ...prev, ...updates } : null);
     return result;
+  };
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this approval request?')) {
+      try {
+        await deleteApprovalRequest(id);
+      } catch (err) {
+        alert('Failed to delete approval request.');
+      }
+    }
   };
 
   return (
@@ -192,7 +203,18 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                     )}
                   </div>
                   <div className="flex flex-col items-end gap-2 shrink-0">
-                    <span className="text-xs text-slate-400">{approval.dateRequested}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-slate-400">{approval.dateRequested}</span>
+                      {isPM && (
+                        <button 
+                          onClick={(e) => handleDelete(e, approval.id)}
+                          className="text-slate-400 hover:text-red-500 transition-colors p-1"
+                          title="Delete Request"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                        </button>
+                      )}
+                    </div>
                     {needsAction && (
                       <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full animate-pulse">
                         Action needed
