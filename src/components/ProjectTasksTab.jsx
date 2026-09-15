@@ -158,6 +158,21 @@ const ProjectTasksTab = ({ projectId, project }) => {
     }
   };
 
+  const handleDrop = async (e, newStatus) => {
+    e.preventDefault();
+    if (!isSiteEngineer) return;
+    const taskId = e.dataTransfer.getData('taskId');
+    if (!taskId) return;
+    const task = tasks.find(t => String(t.id) === String(taskId));
+    if (!task || task.status === newStatus) return;
+
+    try {
+      await updateTask(task.id, { status: newStatus });
+    } catch (err) {
+      console.error('Error updating task status:', err);
+    }
+  };
+
   // Count per column
   const columnCounts = STATUS_COLUMNS.reduce((acc, s) => {
     acc[s] = projectTasks.filter(t => t.status === s).length;
@@ -219,7 +234,12 @@ const ProjectTasksTab = ({ projectId, project }) => {
         {STATUS_COLUMNS.map(col => {
           const colTasks = filtered.filter(t => t.status === col);
           return (
-            <div key={col} className="glass-card p-4 flex flex-col bg-slate-50/50  min-h-[200px]">
+            <div 
+              key={col} 
+              className={`glass-card p-4 flex flex-col bg-slate-50/50 min-h-[200px] ${isSiteEngineer ? 'transition-colors hover:bg-slate-100/50' : ''}`}
+              onDragOver={(e) => { if (isSiteEngineer) e.preventDefault(); }}
+              onDrop={(e) => handleDrop(e, col)}
+            >
               <h3 className="font-bold text-sm mb-4 flex items-center border-b border-border pb-3">
                 <span className={`w-2.5 h-2.5 rounded-full mr-2 ${STATUS_DOT[col]}`} />
                 {col}
@@ -240,8 +260,10 @@ const ProjectTasksTab = ({ projectId, project }) => {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className="bg-white  p-3 rounded-lg shadow-sm border border-border cursor-pointer hover:shadow-md hover:border-primary/30 transition-all"
+                        className={`bg-white p-3 rounded-lg shadow-sm border border-border cursor-pointer hover:shadow-md hover:border-primary/30 transition-all ${isSiteEngineer ? 'cursor-grab active:cursor-grabbing' : ''}`}
                         onClick={() => setSelectedTask(task)}
+                        draggable={isSiteEngineer}
+                        onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
                       >
                         <div className="flex justify-between items-start mb-2">
                           <span className={`px-1.5 py-0.5 text-xs font-semibold rounded ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
@@ -276,9 +298,11 @@ const ProjectTasksTab = ({ projectId, project }) => {
                                 <button type="button" onClick={e => { e.stopPropagation(); openEditTask(task); }} className="p-1 text-slate-400 hover:text-primary" title="Edit task">
                                   <Edit className="w-3.5 h-3.5" />
                                 </button>
-                                <button type="button" onClick={e => { e.stopPropagation(); handleDeleteTask(task); }} className="p-1 text-slate-400 hover:text-red-500" title="Delete task">
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
+                                {task.status === 'To Do' && (
+                                  <button type="button" onClick={e => { e.stopPropagation(); handleDeleteTask(task); }} className="p-1 text-slate-400 hover:text-red-500" title="Delete task">
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
                               </>
                             )}
                             {task.dueDate && (
