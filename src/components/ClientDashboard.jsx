@@ -106,14 +106,14 @@ const ClientDashboard = () => {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
-      <header className="mb-2">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            Welcome, {currentUser?.name || 'Client'}
+            Client Dashboard
           </h1>
-          <p className="text-slate-500 mt-1">Here is the latest overview of your investments.</p>
+          <p className="text-slate-500 mt-1">Welcome back, {currentUser?.name || 'Client'}</p>
         </div>
-      </header>
+      </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { UserPlus, Shield, Mail, Trash2, X, Edit, Key } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 
 const AdminPortal = () => {
   const { users, addUser, deleteUser, updateUser, resetUserPassword } = useData();
+  const { currentUser } = useAuth();
   const [usersList, setUsersList] = useState([]);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
@@ -110,10 +112,14 @@ const AdminPortal = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
-          System Administration
-        </h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
+            System Administration
+          </h1>
+          <p className="text-slate-500 mt-1">Welcome back, {currentUser?.name || 'Admin'}</p>
+        </div>
+        <div className="mt-4 md:mt-0">
         <button 
           onClick={() => setShowAddUserModal(true)}
           className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
@@ -121,6 +127,7 @@ const AdminPortal = () => {
           <UserPlus className="w-5 h-5 mr-2" />
           Add User
         </button>
+        </div>
       </div>
 
       <div className="glass-card overflow-hidden">

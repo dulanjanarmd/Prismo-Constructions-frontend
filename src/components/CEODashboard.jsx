@@ -55,12 +55,14 @@ const CEODashboard = () => {
     <div className="space-y-8 animate-in fade-in duration-500">
       
       {/* Header */}
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
-          Welcome, {currentUser?.name || 'Executive'}
-        </h1>
-        <p className="text-slate-500 mt-2">Here is your strategic portfolio overview.</p>
-      </header>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
+            Executive Dashboard
+          </h1>
+          <p className="text-slate-500 mt-1">Welcome back, {currentUser?.name || 'Executive'}</p>
+        </div>
+      </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
