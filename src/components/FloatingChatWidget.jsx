@@ -5,7 +5,7 @@ import { Send, MessageCircle, X, MessageSquare, Paperclip, Image as ImageIcon, C
 import { AnimatePresence, motion } from 'framer-motion';
 
 const FloatingChatWidget = () => {
-  const { projects, getGlobalMessages, sendGlobalMessage, users, notifications, tasks, editGlobalMessage, deleteGlobalMessage } = useData();
+  const { projects, getGlobalMessages, sendGlobalMessage, users, notifications, tasks, logs, issues, approvals, editGlobalMessage, deleteGlobalMessage } = useData();
   const { currentUser } = useAuth();
   
   const [isOpen, setIsOpen] = useState(false);
@@ -40,14 +40,35 @@ const FloatingChatWidget = () => {
       }
     });
 
+    logs?.forEach(l => {
+      if (String(l.projectId) === String(selectedProjectId) && l.siteEngineer) {
+        memberIds.add(String(l.siteEngineer.id || l.siteEngineer).replace('u', ''));
+      }
+    });
+
+    issues?.forEach(i => {
+      if (String(i.projectId) === String(selectedProjectId)) {
+        if (i.reportedBy) memberIds.add(String(i.reportedBy.id || i.reportedBy).replace('u', ''));
+        if (i.assignee) memberIds.add(String(i.assignee.id || i.assignee).replace('u', ''));
+      }
+    });
+
+    approvals?.forEach(a => {
+      if (String(a.projectId) === String(selectedProjectId)) {
+        if (a.clientId) memberIds.add(String(a.clientId.id || a.clientId).replace('u', ''));
+      }
+    });
+
+    // Add global admins and CEO since they oversee all projects, 
+    // but DO NOT add all project managers (only those related to the project will be added via tasks/issues/logs)
     users?.forEach(u => {
-      if (['project_manager', 'ceo', 'admin'].includes(u.role)) {
+      if (['ceo', 'admin'].includes(u.role)) {
         memberIds.add(String(u.id));
       }
     });
 
     return users?.filter(u => memberIds.has(String(u.id)) && String(u.id) !== String(currentUser?.id)) || [];
-  }, [selectedProjectId, projects, tasks, users, currentUser]);
+  }, [selectedProjectId, projects, tasks, logs, issues, approvals, users, currentUser]);
 
   useEffect(() => {
     if (projects?.length > 0 && !selectedProjectId) {
