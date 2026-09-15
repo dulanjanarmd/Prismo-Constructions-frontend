@@ -47,7 +47,24 @@ const ProjectMilestonesTab = ({ project }) => {
       });
       if (!res.ok) throw new Error('Failed to add milestone');
       const saved = await res.json();
-      updateProject(project.id, { milestones: [...milestones, saved] });
+      
+      const newMilestones = [...milestones, saved];
+      const completedCount = newMilestones.filter(x => x.status === 'Completed').length;
+      const pct = newMilestones.length > 0 ? Math.round((completedCount / newMilestones.length) * 100) : 0;
+      
+      let newProjectStatus = project.status;
+      if (pct === 100) {
+        newProjectStatus = 'Completed';
+      } else if (pct > 0 && pct < 100 && (project.status === 'Planning' || project.status === 'Not Started')) {
+        newProjectStatus = 'In Progress';
+      }
+
+      updateProject(project.id, { 
+        milestones: newMilestones,
+        progress: pct,
+        status: newProjectStatus
+      });
+      
       setNewForm({ name: '', dueDate: '' });
       setIsAdding(false);
     } catch (err) {
@@ -69,7 +86,25 @@ const ProjectMilestonesTab = ({ project }) => {
       });
       if (!res.ok) throw new Error('Failed to update milestone');
       const updated = await res.json();
-      updateProject(project.id, { milestones: milestones.map(x => x.id === id ? updated : x) });
+      
+      const newMilestones = milestones.map(x => x.id === id ? updated : x);
+      const completedCount = newMilestones.filter(x => x.status === 'Completed').length;
+      const pct = newMilestones.length > 0 ? Math.round((completedCount / newMilestones.length) * 100) : 0;
+      
+      let newProjectStatus = project.status;
+      if (pct === 100) {
+        newProjectStatus = 'Completed';
+      } else if (pct > 0 && pct < 100) {
+        newProjectStatus = 'In Progress';
+      } else if (pct === 0 && project.status === 'Completed') {
+        newProjectStatus = 'In Progress';
+      }
+
+      updateProject(project.id, { 
+        milestones: newMilestones,
+        progress: pct,
+        status: newProjectStatus
+      });
     } catch (err) {
       console.error(err);
     }
@@ -82,7 +117,25 @@ const ProjectMilestonesTab = ({ project }) => {
         headers: authHeaders
       });
       if (!res.ok) throw new Error('Failed to delete milestone');
-      updateProject(project.id, { milestones: milestones.filter(x => x.id !== id) });
+      
+      const newMilestones = milestones.filter(x => x.id !== id);
+      const completedCount = newMilestones.filter(x => x.status === 'Completed').length;
+      const pct = newMilestones.length > 0 ? Math.round((completedCount / newMilestones.length) * 100) : 0;
+      
+      let newProjectStatus = project.status;
+      if (pct === 100 && newMilestones.length > 0) {
+        newProjectStatus = 'Completed';
+      } else if (pct > 0 && pct < 100) {
+        newProjectStatus = 'In Progress';
+      } else if (pct === 0 && project.status === 'Completed') {
+        newProjectStatus = 'In Progress';
+      }
+
+      updateProject(project.id, { 
+        milestones: newMilestones,
+        progress: pct,
+        status: newProjectStatus
+      });
     } catch (err) {
       console.error(err);
     }

@@ -336,18 +336,39 @@ const ProjectOverviewTab = ({ project }) => {
               <form onSubmit={handleStatusSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Status</label>
-                  <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={statusData.status} onChange={e => setStatusData({ ...statusData, status: e.target.value })}>
-                    <option value="Not Started">Not Started</option>
-                    <option value="Planning">Planning</option>
-                    <option value="In Progress">In Progress</option>
+                  <select 
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-60 disabled:cursor-not-allowed" 
+                    value={statusData.status} 
+                    onChange={e => setStatusData({ ...statusData, status: e.target.value })}
+                  >
+                    <option value="Not Started" disabled={project.milestones?.length > 0 && statusData.progress > 0}>Not Started</option>
+                    <option value="Planning" disabled={project.milestones?.length > 0 && statusData.progress > 0}>Planning</option>
+                    <option value="In Progress" disabled={project.milestones?.length > 0 && statusData.progress === 100}>In Progress</option>
                     <option value="On Hold">On Hold</option>
                     <option value="Completed">Completed</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Overall Progress ({statusData.progress}%)</label>
-                  <input type="range" min="0" max="100" className="w-full accent-primary" value={statusData.progress} onChange={e => setStatusData({ ...statusData, progress: e.target.value })} />
-                  <div className="text-center font-bold text-primary mt-1">{statusData.progress}%</div>
+                  {project.milestones && project.milestones.length > 0 ? (
+                    <div className="text-sm text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                      <p className="mb-2">Progress is automatically calculated based on milestone completion.</p>
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-1 bg-slate-200 rounded-full h-2">
+                          <div
+                            style={{ width: `${statusData.progress}%` }}
+                            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full"
+                          />
+                        </div>
+                        <span className="font-bold text-primary">{statusData.progress}%</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <input type="range" min="0" max="100" className="w-full accent-primary" value={statusData.progress} onChange={e => setStatusData({ ...statusData, progress: e.target.value })} />
+                      <div className="text-center font-bold text-primary mt-1">{statusData.progress}%</div>
+                    </>
+                  )}
                 </div>
                 <div className="pt-4 flex justify-end space-x-3">
                   <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
