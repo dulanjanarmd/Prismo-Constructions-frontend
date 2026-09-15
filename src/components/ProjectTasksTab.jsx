@@ -450,7 +450,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
       </AnimatePresence>
 
       {/* Task Detail Modal */}
-      {selectedTask && (
+      {selectedTask && !isEditing && (
         <TaskDetailModal
           task={selectedTask}
           project={project}
