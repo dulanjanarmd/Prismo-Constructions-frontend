@@ -4,7 +4,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import {
   X, FileText, Calendar, CheckCircle2, XCircle, RotateCcw,
-  Lock, Send, MessageSquare, Clock, ListTodo, Paperclip, Image as ImageIcon
+  Lock, Send, MessageSquare, Clock, ListTodo, Paperclip, Image as ImageIcon, Edit
 } from 'lucide-react';
 
 const STATUS_STYLES = {
@@ -23,7 +23,7 @@ const STATUS_ICON = {
   Closed: Lock
 };
 
-const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
+const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClose, onUpdate }) => {
   const { currentUser } = useAuth();
   const { logs } = useData();
 
@@ -34,6 +34,22 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
   const [clientComment, setClientComment] = useState('');
   const [pmReply, setPmReply] = useState('');
   const [showPmReply, setShowPmReply] = useState(false);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    title: approval.title || '',
+    description: approval.description || '',
+    dueDate: approval.dueDate || ''
+  });
+
+  const handleSaveEdit = async () => {
+    try {
+      await onUpdate(approval.id, editData);
+      setIsEditing(false);
+    } catch (err) {
+      alert(err.message || 'Failed to update approval');
+    }
+  };
 
   const storedAuditTrail = typeof approval.auditTrail === 'string'
     ? (() => {
@@ -149,23 +165,55 @@ const ApprovalDetailModal = ({ approval, project, onClose, onUpdate }) => {
               <h2 className="text-xl font-bold text-slate-900  leading-tight">{approval.title}</h2>
               {project && <p className="text-sm text-slate-500 mt-0.5">{project.name}</p>}
             </div>
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 :bg-slate-800 rounded-full transition-colors shrink-0">
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              {isPM && !isEditing && approval.status !== 'Closed' && (
+                <button onClick={() => setIsEditing(true)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors" title="Edit Request">
+                  <Edit className="w-5 h-5" />
+                </button>
+              )}
+              <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Body */}
           <div className="flex-1 p-6 space-y-7">
-            {/* Description */}
-            {approval.description && (
-              <div>
-                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <FileText className="w-4 h-4" /> Request Details
+            {/* Edit Form or Description */}
+            {isEditing ? (
+              <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-200 shadow-sm space-y-4">
+                <h3 className="font-bold text-lg mb-2 text-slate-800 flex items-center gap-2">
+                  <Edit className="w-5 h-5 text-blue-600" /> Edit Approval Request
                 </h3>
-                <div className="bg-slate-50  rounded-lg p-4 border border-border">
-                  <p className="text-sm text-slate-700  leading-relaxed">{approval.description}</p>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">Title <span className="text-red-500">*</span></label>
+                  <input required type="text" className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.title} onChange={e => setEditData({...editData, title: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">Description</label>
+                  <textarea rows="3" className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" value={editData.description} onChange={e => setEditData({...editData, description: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-slate-700">Response Due Date</label>
+                  <input type="date" min={minDateStr} max={maxDateStr} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.dueDate} onChange={e => setEditData({...editData, dueDate: e.target.value})} />
+                  <p className="text-xs text-slate-500 mt-1">Must be within 1 week and project timeline.</p>
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button onClick={() => setIsEditing(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors">Cancel</button>
+                  <button onClick={handleSaveEdit} className="px-4 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors shadow-sm">Save Changes</button>
                 </div>
               </div>
+            ) : (
+              approval.description && (
+                <div>
+                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <FileText className="w-4 h-4" /> Request Details
+                  </h3>
+                  <div className="bg-slate-50  rounded-lg p-4 border border-border">
+                    <p className="text-sm text-slate-700  leading-relaxed">{approval.description}</p>
+                  </div>
+                </div>
+              )
             )}
 
             {attachments.length > 0 && (

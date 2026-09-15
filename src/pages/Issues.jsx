@@ -42,6 +42,17 @@ const Issues = () => {
   });
 
   const [expandedId, setExpandedId] = useState(null);
+
+  const handleExpand = (issue) => {
+    if (expandedId !== issue.id) {
+      setExpandedId(issue.id);
+      if (issue.status === 'Open' || issue.status === 'OPEN') {
+        updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
+      }
+    } else {
+      setExpandedId(null);
+    }
+  };
   const [activeTab, setActiveTab] = useState(currentUser?.role === 'ceo' ? 'pm' : 'se'); // 'se' or 'pm'
 
   const myProjects = projects;
@@ -271,7 +282,7 @@ const Issues = () => {
                     </div>
                     <div className="flex items-center gap-4 shrink-0">
                       <button
-                        onClick={() => setExpandedId(expandedId === issue.id ? null : issue.id)}
+                        onClick={() => handleExpand(issue)}
                         className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md transition-colors"
                       >
                         {expandedId === issue.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}

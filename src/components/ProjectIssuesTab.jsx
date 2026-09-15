@@ -51,6 +51,17 @@ const ProjectIssuesTab = ({ project }) => {
   const activeIssues = activeTab === 'se' ? seIssues : pmIssues;
 
   const [expandedId, setExpandedId] = useState(null);
+
+  const handleExpand = (issue) => {
+    if (expandedId !== issue.id) {
+      setExpandedId(issue.id);
+      if (issue.status === 'Open' || issue.status === 'OPEN') {
+        updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
+      }
+    } else {
+      setExpandedId(null);
+    }
+  };
   const [isAdding, setIsAdding] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
@@ -59,6 +70,7 @@ const ProjectIssuesTab = ({ project }) => {
   });
 
   const openCount = activeIssues.filter(i => i.status === 'Open' || i.status === 'OPEN').length;
+  const inProgressCount = activeIssues.filter(i => i.status === 'In Progress' || i.status === 'IN_PROGRESS').length;
   const resolvedCount = activeIssues.filter(i => i.status === 'Resolved' || i.status === 'RESOLVED').length;
 
   const advanceStatus = (id) => {
@@ -127,7 +139,7 @@ const ProjectIssuesTab = ({ project }) => {
         <div>
           <h2 className="text-xl font-bold">Issues & Problems</h2>
           <p className="text-sm text-slate-500">
-            {openCount} open · {resolvedCount} resolved
+            {openCount} open · {inProgressCount} in progress · {resolvedCount} resolved
           </p>
         </div>
         {!isCEO && (
@@ -144,7 +156,7 @@ const ProjectIssuesTab = ({ project }) => {
       {/* Summary chips */}
       <div className="flex gap-3 flex-wrap">
         {['Open', 'In Progress', 'Resolved'].map(s => {
-          const count = activeIssues.filter(i => i.status === s || i.status?.toUpperCase() === s.toUpperCase()).length;
+          const count = activeIssues.filter(i => i.status?.replace('_', ' ').toUpperCase() === s.toUpperCase()).length;
           return (
             <div key={s} className={`px-3 py-1.5 rounded-full text-sm font-medium border ${STATUS_STYLES[s] || STATUS_STYLES.Open} border-current/20`}>
               {s}: {count}
@@ -313,17 +325,9 @@ const ProjectIssuesTab = ({ project }) => {
                     <p className="text-sm text-slate-600  mt-1">{issue.description}</p>
                   </div>
                   <div className="flex items-center gap-4 shrink-0">
-                      {!isCEO && issue.status !== 'Resolved' && (
-                        <button
-                          onClick={() => advanceStatus(issue.id)}
-                          title={`Move to ${STATUS_NEXT[issue.status]}`}
-                          className="px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 rounded-md transition-colors whitespace-nowrap"
-                        >
-                          → {STATUS_NEXT[issue.status]}
-                        </button>
-                      )}
+
                       <button
-                        onClick={() => setExpandedId(expandedId === issue.id ? null : issue.id)}
+                        onClick={() => handleExpand(issue)}
                         className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md transition-colors"
                       >
                         {expandedId === issue.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}

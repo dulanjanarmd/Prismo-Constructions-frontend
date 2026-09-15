@@ -25,12 +25,37 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
   const { approvals, updateApproval, addApprovalRequest, deleteApprovalRequest, logs } = useData();
   const { currentUser } = useAuth();
 
+  const getApprovalDates = (proj) => {
+    const today = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const toDateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+    const minDateStr = toDateStr(today);
+    const sevenDaysFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    let maxDateStr = toDateStr(sevenDaysFromNow);
+
+    if (proj?.endDate) {
+      const projEnd = new Date(proj.endDate);
+      if (!isNaN(projEnd.getTime()) && projEnd < sevenDaysFromNow) {
+        maxDateStr = toDateStr(projEnd);
+      }
+    }
+    
+    if (new Date(maxDateStr) < new Date(minDateStr)) {
+      maxDateStr = minDateStr;
+    }
+
+    return { minDateStr, maxDateStr };
+  };
+
+  const { minDateStr, maxDateStr } = getApprovalDates(project);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    dueDate: '',
+    dueDate: maxDateStr,
     linkedLogIds: [],
     attachedDocuments: [],
     attachedPhotos: []
@@ -90,7 +115,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
         }]
       });
       setIsModalOpen(false);
-      setFormData({ title: '', description: '', dueDate: '', linkedLogIds: [], attachedDocuments: [], attachedPhotos: [] });
+      setFormData({ title: '', description: '', dueDate: maxDateStr, linkedLogIds: [], attachedDocuments: [], attachedPhotos: [] });
     } catch (error) {
       alert(error.message || 'Could not create approval request.');
     }
@@ -270,10 +295,15 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                   <label className="block text-sm font-medium mb-1">Response Due Date</label>
                   <input
                     type="date"
+                    min={minDateStr}
+                    max={maxDateStr}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                     value={formData.dueDate}
                     onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
                   />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Must be within 1 week and project timeline.
+                  </p>
                 </div>
 
                 {/* Document Attachments */}
@@ -388,6 +418,8 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
         <ApprovalDetailModal
           approval={selectedApproval}
           project={project}
+          minDateStr={minDateStr}
+          maxDateStr={maxDateStr}
           onClose={() => setSelectedApproval(null)}
           onUpdate={handleUpdate}
         />
