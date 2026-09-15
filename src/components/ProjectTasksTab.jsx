@@ -65,6 +65,43 @@ const ProjectTasksTab = ({ projectId, project }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.dueDate) {
+      const taskDate = new Date(formData.dueDate);
+      taskDate.setHours(0, 0, 0, 0);
+
+      if (project?.startDate) {
+        const projStart = new Date(project.startDate);
+        projStart.setHours(0, 0, 0, 0);
+        if (taskDate <= projStart) {
+          alert("Task due date must be strictly after the project's start date.");
+          return;
+        }
+      }
+
+      if (project?.endDate) {
+        const projEnd = new Date(project.endDate);
+        projEnd.setHours(0, 0, 0, 0);
+        if (taskDate > projEnd) {
+          alert("Task due date cannot be after the project's end date.");
+          return;
+        }
+      }
+
+      if (formData.milestoneId) {
+        const milestoneIdStr = String(formData.milestoneId).replace('m', '');
+        const milestone = milestones.find(m => String(m.id) === milestoneIdStr);
+        if (milestone && (milestone.dueDate || milestone.date)) {
+          const msDate = new Date(milestone.dueDate || milestone.date);
+          msDate.setHours(0, 0, 0, 0);
+          if (taskDate > msDate) {
+            alert("Task due date cannot be after its linked milestone's delivery date.");
+            return;
+          }
+        }
+      }
+    }
+
     setSubmitting(true);
 
     // Extract raw user ID (strip the 'u' prefix added by DataContext)
@@ -178,6 +215,19 @@ const ProjectTasksTab = ({ projectId, project }) => {
     acc[s] = projectTasks.filter(t => t.status === s).length;
     return acc;
   }, {});
+
+  // Determine min and max dates for the task due date input
+  let minDate = project?.startDate 
+    ? new Date(new Date(project.startDate).getTime() + 86400000).toISOString().split('T')[0]
+    : undefined;
+  let maxDate = project?.endDate || undefined;
+  if (formData.milestoneId) {
+    const milestoneIdStr = String(formData.milestoneId).replace('m', '');
+    const milestone = milestones.find(m => String(m.id) === milestoneIdStr);
+    if (milestone && (milestone.dueDate || milestone.date)) {
+      maxDate = milestone.dueDate || milestone.date;
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -380,7 +430,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">Due Date</label>
-                  <input type="date" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.dueDate} onChange={e => setFormData({ ...formData, dueDate: e.target.value })} />
+                  <input type="date" min={minDate} max={maxDate} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.dueDate} onChange={e => setFormData({ ...formData, dueDate: e.target.value })} />
                 </div>
 
                 <div className="pt-4 flex justify-end space-x-3">

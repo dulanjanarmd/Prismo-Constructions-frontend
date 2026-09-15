@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 import { Plus, X, Calendar } from 'lucide-react';
 
-const MilestoneFormList = ({ milestones, setMilestones }) => {
+const MilestoneFormList = ({ milestones, setMilestones, projectStartDate }) => {
   const [newTitle, setNewTitle] = useState('');
   const [newDate, setNewDate] = useState('');
 
   const handleAdd = (e) => {
     e.preventDefault();
     if (!newTitle || !newDate) return;
+    
+    if (projectStartDate) {
+      const msDate = new Date(newDate);
+      const projStart = new Date(projectStartDate);
+      msDate.setHours(0, 0, 0, 0);
+      projStart.setHours(0, 0, 0, 0);
+      if (msDate <= projStart) {
+        alert("Milestone due date must be strictly after the project's start date.");
+        return;
+      }
+    }
     
     setMilestones([
       ...milestones, 
@@ -21,6 +32,10 @@ const MilestoneFormList = ({ milestones, setMilestones }) => {
   const handleRemove = (indexToRemove) => {
     setMilestones(milestones.filter((_, index) => index !== indexToRemove));
   };
+
+  const minDateStr = projectStartDate 
+    ? new Date(new Date(projectStartDate).getTime() + 86400000).toISOString().split('T')[0]
+    : undefined;
 
   return (
     <div className="space-y-4">
@@ -61,6 +76,7 @@ const MilestoneFormList = ({ milestones, setMilestones }) => {
           />
           <input 
             type="date" 
+            min={minDateStr}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
             value={newDate}
             onChange={(e) => setNewDate(e.target.value)}

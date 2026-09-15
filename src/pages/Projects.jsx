@@ -290,11 +290,6 @@ const Projects = () => {
                     <option value="Completed">Completed</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Overall Progress (%)</label>
-                  <input type="range" min="0" max="100" className="w-full accent-primary" value={statusData.progress} onChange={e => setStatusData({...statusData, progress: e.target.value})} />
-                  <div className="text-center font-bold text-primary mt-2">{statusData.progress}%</div>
-                </div>
                 <div className="pt-4 flex justify-end space-x-3">
                   <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
                   <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Update</button>

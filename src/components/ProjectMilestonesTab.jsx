@@ -27,17 +27,31 @@ const ProjectMilestonesTab = ({ project }) => {
     'Content-Type': 'application/json'
   };
 
-  // Sort: incomplete first, then by due date
+  // Sort: incomplete first, then by due date (earliest first, no date at the bottom)
   const sorted = [...milestones].sort((a, b) => {
     if ((a.status === 'Completed') !== (b.status === 'Completed')) {
       return a.status === 'Completed' ? 1 : -1;
     }
-    return new Date(a.dueDate || a.date || 0) - new Date(b.dueDate || b.date || 0);
+    const dateA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+    const dateB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+    return dateA - dateB;
   });
 
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!newForm.name) return;
+
+    if (newForm.dueDate && project.startDate) {
+      const msDate = new Date(newForm.dueDate);
+      const projStart = new Date(project.startDate);
+      msDate.setHours(0, 0, 0, 0);
+      projStart.setHours(0, 0, 0, 0);
+      if (msDate <= projStart) {
+        alert("Milestone due date must be strictly after the project's start date.");
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones`, {
@@ -160,6 +174,17 @@ const ProjectMilestonesTab = ({ project }) => {
   };
 
   const handleEditSave = async (id) => {
+    if (editForm.dueDate && project.startDate) {
+      const msDate = new Date(editForm.dueDate);
+      const projStart = new Date(project.startDate);
+      msDate.setHours(0, 0, 0, 0);
+      projStart.setHours(0, 0, 0, 0);
+      if (msDate <= projStart) {
+        alert("Milestone due date must be strictly after the project's start date.");
+        return;
+      }
+    }
+
     try {
       const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones/${id}`, {
         method: 'PUT',
@@ -184,6 +209,10 @@ const ProjectMilestonesTab = ({ project }) => {
 
   const completedCount = milestones.filter(m => m.status === 'Completed').length;
   const pct = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
+
+  const minDateStr = project?.startDate 
+    ? new Date(new Date(project.startDate).getTime() + 86400000).toISOString().split('T')[0]
+    : undefined;
 
   return (
     <div className="space-y-6">
@@ -248,6 +277,7 @@ const ProjectMilestonesTab = ({ project }) => {
                 />
                 <input
                   type="date"
+                  min={minDateStr}
                   className="w-full sm:w-auto rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                   value={newForm.dueDate}
                   onChange={e => setNewForm({ ...newForm, dueDate: e.target.value })}
@@ -339,6 +369,7 @@ const ProjectMilestonesTab = ({ project }) => {
                           />
                           <input
                             type="date"
+                            min={minDateStr}
                             className="w-full sm:w-40 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
                             value={editForm.dueDate}
                             onChange={e => setEditForm({ ...editForm, dueDate: e.target.value })}
