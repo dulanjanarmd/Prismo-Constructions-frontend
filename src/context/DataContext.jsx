@@ -791,7 +791,7 @@ export const DataProvider = ({ children }) => {
         const saved = await res.json();
         setApprovals(prev => [...prev, {
           ...saved,
-          projectId: `p${saved.project?.id}`,
+          projectId: request.projectId || (saved.project?.id ? `p${saved.project.id}` : null),
           clientId: saved.client?.id ? `u${saved.client.id}` : null,
           auditTrail: typeof saved.auditTrail === 'string' ? JSON.parse(saved.auditTrail) : (saved.auditTrail || []),
           status: mapApprovalStatusFromBackend(saved.status),
