@@ -6,8 +6,9 @@ const test = async () => {
             body: JSON.stringify({ email: 'client@company.com', password: 'password123' })
         });
         const data = await loginRes.json();
+        console.log("Login data:", data);
         const token = data.token;
-        console.log("Token:", token.substring(0, 10));
+        if (!token) return;
 
         const putRes = await fetch('http://localhost:8080/api/client/approvals/1', {
             method: 'PUT',

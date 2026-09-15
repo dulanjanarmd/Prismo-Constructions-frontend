@@ -282,8 +282,9 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Description</label>
+                  <label className="block text-sm font-medium mb-1">Description <span className="text-red-500">*</span></label>
                   <textarea
+                    required
                     rows="3"
                     placeholder="Additional context for the client..."
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none"
@@ -292,8 +293,9 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Response Due Date</label>
+                  <label className="block text-sm font-medium mb-1">Response Due Date <span className="text-red-500">*</span></label>
                   <input
+                    required
                     type="date"
                     min={minDateStr}
                     max={maxDateStr}

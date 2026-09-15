@@ -120,7 +120,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
     ? (() => { try { return JSON.parse(approval.attachments); } catch { return []; } })()
     : (approval.attachments || []);
 
-  const handleClientResponse = () => {
+  const handleClientResponse = async () => {
     if (!clientDecision) return;
     const entry = {
       actor: currentUser?.name || 'Client',
@@ -130,13 +130,20 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
     };
     const newTrail = [...auditTrail, entry];
     setAuditTrail(newTrail);
-    onUpdate(approval.id, {
-      status: clientDecision,
-      feedback: clientComment,
-      auditTrail: newTrail
-    });
-    setClientDecision('');
-    setClientComment('');
+    try {
+      await onUpdate(approval.id, {
+        status: clientDecision,
+        feedback: clientComment,
+        pmReply: '',
+        auditTrail: newTrail
+      });
+      setClientDecision('');
+      setClientComment('');
+    } catch (err) {
+      alert(err.message || 'Failed to submit response');
+      // Revert audit trail if failed
+      setAuditTrail(auditTrail);
+    }
   };
 
   const handlePmReply = () => {
@@ -234,12 +241,12 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
                   <input required type="text" className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.title} onChange={e => setEditData({...editData, title: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-700">Description</label>
-                  <textarea rows="3" className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" value={editData.description} onChange={e => setEditData({...editData, description: e.target.value})} />
+                  <label className="block text-sm font-medium mb-1 text-slate-700">Description <span className="text-red-500">*</span></label>
+                  <textarea required rows="3" className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" value={editData.description} onChange={e => setEditData({...editData, description: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-700">Response Due Date</label>
-                  <input type="date" min={minDateStr} max={maxDateStr} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.dueDate} onChange={e => setEditData({...editData, dueDate: e.target.value})} />
+                  <label className="block text-sm font-medium mb-1 text-slate-700">Response Due Date <span className="text-red-500">*</span></label>
+                  <input required type="date" min={minDateStr} max={maxDateStr} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.dueDate} onChange={e => setEditData({...editData, dueDate: e.target.value})} />
                   <p className="text-xs text-slate-500 mt-1">Must be within 1 week and project timeline.</p>
                 </div>
 
@@ -417,7 +424,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
           {/* Footer — Actions */}
           <div className="sticky bottom-0 z-20 bg-slate-50/80 backdrop-blur-md px-6 py-5 border-t border-border space-y-3">
             {/* CLIENT: Respond */}
-            {isClient && approval.status === 'Pending' && (
+            {isClient && (approval.status === 'Pending' || (approval.status === 'Changes Requested' && approval.pmReply)) && (
               <div className="space-y-3">
                 <h3 className="text-sm font-bold text-slate-600 ">Your Response</h3>
                 <div className="grid grid-cols-3 gap-2">

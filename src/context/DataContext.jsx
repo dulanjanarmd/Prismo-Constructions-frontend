@@ -131,7 +131,8 @@ export const DataProvider = ({ children }) => {
             clientId: a.client?.id ? `u${a.client.id}` : null,
             auditTrail: typeof a.auditTrail === 'string' ? JSON.parse(a.auditTrail) : (a.auditTrail || []),
             status: mapApprovalStatusFromBackend(a.status),
-            attachments: typeof a.attachments === 'string' ? JSON.parse(a.attachments) : (a.attachments || [])
+            attachments: typeof a.attachments === 'string' ? JSON.parse(a.attachments) : (a.attachments || []),
+            linkedLogIds: typeof a.linkedLogIds === 'string' ? JSON.parse(a.linkedLogIds) : (a.linkedLogIds || [])
           })));
         }
 
@@ -732,7 +733,8 @@ export const DataProvider = ({ children }) => {
         id: saved.id,
         status: saved.status ? mapApprovalStatusFromBackend(saved.status) : a.status,
         auditTrail: typeof saved.auditTrail === 'string' ? JSON.parse(saved.auditTrail) : (saved.auditTrail || []),
-        attachments: typeof saved.attachments === 'string' ? JSON.parse(saved.attachments) : (saved.attachments || [])
+        attachments: typeof saved.attachments === 'string' ? JSON.parse(saved.attachments) : (saved.attachments || []),
+        linkedLogIds: typeof saved.linkedLogIds === 'string' ? JSON.parse(saved.linkedLogIds) : (saved.linkedLogIds || [])
       } : a));
       return saved;
     } catch (err) {
@@ -793,7 +795,8 @@ export const DataProvider = ({ children }) => {
           clientId: saved.client?.id ? `u${saved.client.id}` : null,
           auditTrail: typeof saved.auditTrail === 'string' ? JSON.parse(saved.auditTrail) : (saved.auditTrail || []),
           status: mapApprovalStatusFromBackend(saved.status),
-          attachments: typeof saved.attachments === 'string' ? JSON.parse(saved.attachments) : (saved.attachments || [])
+          attachments: typeof saved.attachments === 'string' ? JSON.parse(saved.attachments) : (saved.attachments || []),
+          linkedLogIds: typeof saved.linkedLogIds === 'string' ? JSON.parse(saved.linkedLogIds) : (saved.linkedLogIds || [])
         }]);
         return saved;
       }
