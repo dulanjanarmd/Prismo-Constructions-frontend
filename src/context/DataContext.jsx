@@ -127,7 +127,22 @@ export const DataProvider = ({ children }) => {
         const iRes = await fetch('http://localhost:8080/api/issues', { headers });
         if (iRes.ok) {
           const rawI = await iRes.json();
-          setIssues(rawI.map(i => ({
+          
+          const filteredRawI = rawI.filter(i => {
+            const reporterRole = i.reportedBy?.role?.toLowerCase() || '';
+            const reporterId = String(i.reportedBy?.id || '').replace('u', '');
+            const currentUserId = String(currentUser.id).replace('u', '');
+            
+            if (currentUser.role === 'site_engineer') {
+              return reporterId === currentUserId;
+            }
+            if (currentUser.role === 'ceo') {
+              return reporterRole === 'project_manager' || reporterRole === 'pm';
+            }
+            return true;
+          });
+
+          setIssues(filteredRawI.map(i => ({
             ...i,
             projectId: `p${i.project?.id}`,
             reportedBy: `u${i.reportedBy?.id}`

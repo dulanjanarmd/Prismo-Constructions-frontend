@@ -42,9 +42,22 @@ const Issues = () => {
   });
 
   const [expandedId, setExpandedId] = useState(null);
+  const [activeTab, setActiveTab] = useState(currentUser?.role === 'ceo' ? 'pm' : 'se'); // 'se' or 'pm'
 
   const myProjects = projects;
-  const myIssues = (issues || []).sort((a, b) => new Date(b.reportedDate || b.createdAt) - new Date(a.reportedDate || a.createdAt));
+  
+  const getReporterRole = (issue) => {
+    const reporterStr = String(issue.reportedBy || issue.reportedById || '');
+    const reporter = users.find(u => String(u.id) === reporterStr);
+    return reporter ? reporter.role.toLowerCase() : '';
+  };
+
+  const sortedIssues = (issues || []).sort((a, b) => new Date(b.reportedDate || b.createdAt) - new Date(a.reportedDate || a.createdAt));
+  
+  const seIssues = sortedIssues.filter(i => getReporterRole(i) === 'site_engineer');
+  const pmIssues = sortedIssues.filter(i => getReporterRole(i) === 'project_manager' || getReporterRole(i) === 'pm');
+
+  const myIssues = activeTab === 'se' ? seIssues : pmIssues;
 
   const openCount = myIssues.filter(i => i.status !== 'RESOLVED').length;
 
@@ -100,6 +113,28 @@ const Issues = () => {
           Report Issue
         </button>
       </div>
+
+      {/* Tabs */}
+      {(currentUser?.role === 'project_manager' || currentUser?.role === 'pm') && (
+        <div className="flex space-x-1 bg-slate-100 p-1 rounded-lg w-fit">
+          <button
+            onClick={() => setActiveTab('se')}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              activeTab === 'se' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Site Engineer Issues ({seIssues.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('pm')}
+            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              activeTab === 'pm' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            My Escalated Issues ({pmIssues.length})
+          </button>
+        </div>
+      )}
 
       {/* Add form */}
       <AnimatePresence>
@@ -235,10 +270,6 @@ const Issues = () => {
                       <p className="text-sm text-slate-600 mt-1 line-clamp-1">{issue.description}</p>
                     </div>
                     <div className="flex items-center gap-4 shrink-0">
-                      <div className="text-right hidden sm:block">
-                        <p className="text-xs text-slate-400">Assignee</p>
-                        <p className="text-sm font-medium text-slate-700">{assignedUser.name}</p>
-                      </div>
                       <button
                         onClick={() => setExpandedId(expandedId === issue.id ? null : issue.id)}
                         className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md transition-colors"

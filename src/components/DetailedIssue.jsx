@@ -182,13 +182,6 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
             </div>
           </div>
         )}
-        <div className="flex items-start gap-2">
-          <UserIcon className="w-4 h-4 text-slate-400 mt-0.5" />
-          <div>
-            <p className="font-semibold text-slate-700">Assignee</p>
-            <p className="text-slate-600">{assignedUser.name}</p>
-          </div>
-        </div>
       </div>
 
       <div className="flex gap-6 mb-8 flex-col lg:flex-row">
