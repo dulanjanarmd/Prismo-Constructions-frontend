@@ -57,6 +57,19 @@ export const DataProvider = ({ children }) => {
   const [issues, setIssues] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
+  const fetchNotifications = async () => {
+    if (!currentUser) return;
+    try {
+      const headers = { 'Authorization': `Bearer ${currentUser.token}` };
+      const notifRes = await fetch('http://localhost:8080/api/notifications', { headers });
+      if (notifRes.ok) {
+        setNotifications(await notifRes.json());
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
   useEffect(() => {
     if (!currentUser) return;
     
@@ -160,17 +173,21 @@ export const DataProvider = ({ children }) => {
             reportedBy: `u${i.reportedBy?.id}`
           })));
         }
-
-        const notifRes = await fetch('http://localhost:8080/api/notifications', { headers });
-        if (notifRes.ok) {
-          setNotifications(await notifRes.json());
-        }
       } catch (err) {
         console.error('Error fetching data:', err);
       }
     };
 
     loadData();
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    fetchNotifications();
+    const notifInterval = setInterval(fetchNotifications, 15000);
+    return () => {
+      clearInterval(notifInterval);
+    };
   }, [currentUser]);
 
   const addProject = async (projectData) => {
