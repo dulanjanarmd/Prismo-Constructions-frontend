@@ -73,19 +73,19 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto mb-24 mt-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-extrabold text-[#1e293b] mb-2">500+</motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-4xl md:text-5xl font-extrabold text-[#1e2a35] mb-2">500+</motion.div>
               <div className="text-[#64748b] font-medium uppercase tracking-wide text-sm">Projects Completed</div>
             </div>
             <div className="text-center">
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-4xl md:text-5xl font-extrabold text-[#1e293b] mb-2">20+</motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-4xl md:text-5xl font-extrabold text-[#1e2a35] mb-2">20+</motion.div>
               <div className="text-[#64748b] font-medium uppercase tracking-wide text-sm">Years Experience</div>
             </div>
             <div className="text-center">
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-4xl md:text-5xl font-extrabold text-[#1e293b] mb-2">100%</motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-4xl md:text-5xl font-extrabold text-[#1e2a35] mb-2">100%</motion.div>
               <div className="text-[#64748b] font-medium uppercase tracking-wide text-sm">Safety Record</div>
             </div>
             <div className="text-center">
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="text-4xl md:text-5xl font-extrabold text-[#1e293b] mb-2">$2B+</motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="text-4xl md:text-5xl font-extrabold text-[#1e2a35] mb-2">$2B+</motion.div>
               <div className="text-[#64748b] font-medium uppercase tracking-wide text-sm">Value Delivered</div>
             </div>
           </div>
@@ -94,23 +94,23 @@ const LandingPage = () => {
         {/* Services Highlight */}
         <div className="max-w-7xl mx-auto mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1e293b] mb-4">Our Expertise</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1e2a35] mb-4">Our Expertise</h2>
             <p className="text-lg text-[#64748b] max-w-2xl mx-auto">We bring decades of experience across multiple sectors, ensuring your project is handled by specialists.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-[#f8fafc] p-10 rounded-2xl border border-[#e2e8f0] hover:shadow-lg transition-shadow">
               <Home className="w-12 h-12 text-primary mb-6" />
-              <h3 className="text-2xl font-bold text-[#1e293b] mb-4">Residential</h3>
+              <h3 className="text-2xl font-bold text-[#1e2a35] mb-4">Residential</h3>
               <p className="text-[#64748b] leading-relaxed">From luxury custom homes to multi-family complexes, we build living spaces that combine elegance with structural integrity.</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="bg-[#f8fafc] p-10 rounded-2xl border border-[#e2e8f0] hover:shadow-lg transition-shadow">
               <Building2 className="w-12 h-12 text-primary mb-6" />
-              <h3 className="text-2xl font-bold text-[#1e293b] mb-4">Commercial</h3>
+              <h3 className="text-2xl font-bold text-[#1e2a35] mb-4">Commercial</h3>
               <p className="text-[#64748b] leading-relaxed">State-of-the-art office buildings, retail centers, and industrial facilities designed for modern business needs.</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="bg-[#f8fafc] p-10 rounded-2xl border border-[#e2e8f0] hover:shadow-lg transition-shadow">
               <Wrench className="w-12 h-12 text-primary mb-6" />
-              <h3 className="text-2xl font-bold text-[#1e293b] mb-4">Infrastructure</h3>
+              <h3 className="text-2xl font-bold text-[#1e2a35] mb-4">Infrastructure</h3>
               <p className="text-[#64748b] leading-relaxed">Heavy civil projects, renovations, and public works executed with precision and uncompromising safety standards.</p>
             </motion.div>
           </div>
@@ -120,10 +120,10 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto mb-32">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-[#1e293b] mb-4">Featured Work</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-[#1e2a35] mb-4">Featured Work</h2>
               <p className="text-lg text-[#64748b] max-w-xl">A glimpse into our recent award-winning projects.</p>
             </div>
-            <Link to="/portfolio" className="mt-6 md:mt-0 text-[#1e293b] font-bold hover:text-primary transition-colors flex items-center">
+            <Link to="/portfolio" className="mt-6 md:mt-0 text-[#1e2a35] font-bold hover:text-primary transition-colors flex items-center">
               View All Projects <span className="ml-2">→</span>
             </Link>
           </div>
@@ -137,7 +137,7 @@ const LandingPage = () => {
               </div>
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-2xl font-bold text-[#1e293b] mb-2 group-hover:text-primary transition-colors">Skyline Tower</h3>
+                  <h3 className="text-2xl font-bold text-[#1e2a35] mb-2 group-hover:text-primary transition-colors">Skyline Tower</h3>
                   <p className="text-[#64748b]">Commercial Office Complex</p>
                 </div>
                 <div className="bg-[#f1f5f9] px-4 py-2 rounded-lg text-sm font-bold text-[#475569]">2025</div>
@@ -152,7 +152,7 @@ const LandingPage = () => {
               </div>
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-2xl font-bold text-[#1e293b] mb-2 group-hover:text-primary transition-colors">Oasis Residences</h3>
+                  <h3 className="text-2xl font-bold text-[#1e2a35] mb-2 group-hover:text-primary transition-colors">Oasis Residences</h3>
                   <p className="text-[#64748b]">Luxury Condominiums</p>
                 </div>
                 <div className="bg-[#f1f5f9] px-4 py-2 rounded-lg text-sm font-bold text-[#475569]">2024</div>
@@ -165,7 +165,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto mb-32 bg-[#f8fafc] border border-slate-200 rounded-[2rem] p-10 md:p-16 text-slate-900 relative overflow-hidden shadow-sm">
           
           <div className="text-center mb-16 relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#1e293b]">Client Success Stories</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#1e2a35]">Client Success Stories</h2>
             <p className="text-slate-600 text-lg">Don't just take our word for it.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10">
@@ -195,7 +195,7 @@ const LandingPage = () => {
         <div id="contact" className="max-w-7xl mx-auto bg-[#f8fafc] border border-slate-200 p-10 md:p-16 rounded-[2rem] shadow-xl relative overflow-hidden">
           
           <div className="text-center mb-10 relative z-10">
-            <h2 className="text-3xl font-bold text-[#1e293b] mb-3">Request a Consultation</h2>
+            <h2 className="text-3xl font-bold text-[#1e2a35] mb-3">Request a Consultation</h2>
             <p className="text-slate-600">Tell us about your project, and our experts will get back to you with a proposal.</p>
           </div>
 
@@ -204,7 +204,7 @@ const LandingPage = () => {
               <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               </div>
-              <h3 className="text-2xl font-bold text-[#1e293b] mb-2">Request Received!</h3>
+              <h3 className="text-2xl font-bold text-[#1e2a35] mb-2">Request Received!</h3>
               <p className="text-slate-600">Our team will review your requirements and contact you shortly.</p>
               <button onClick={() => setSubmitSuccess(false)} className="mt-4 text-primary font-bold hover:underline">Submit Another Inquiry</button>
             </motion.div>
@@ -318,10 +318,10 @@ const LandingPage = () => {
       </main>
 
       {/* Exact Match Footer from Screenshot */}
-      <footer className="bg-[#1c2431] text-[#9ca3af] pt-16 pb-12 px-6 sm:px-12 w-full border-t border-[#374151]">
+      <footer className="bg-[#1c2431] text-[#9ca3af] pt-16 pb-12 px-6 sm:px-12 w-full border-t border-[#2c3e50]">
         
         {/* Bottom CTA Section */}
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-16 pb-12 border-b border-[#374151]">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-16 pb-12 border-b border-[#2c3e50]">
           <div>
             <h3 className="text-3xl md:text-4xl text-white font-bold mb-3">
               Ready to start your next project?
@@ -373,9 +373,9 @@ const LandingPage = () => {
         </div>
 
         {/* Footer Bottom Logo */}
-        <div className="w-full mt-16 pt-8 border-t border-[#374151] flex justify-center items-end overflow-hidden">
-          <h1 className="text-[6vw] leading-[1] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#374151] to-[#1c2431] uppercase tracking-wider w-full text-center select-none whitespace-nowrap">
-            PRISMO CONSTRUCTIONS
+        <div className="w-full mt-16 pt-8 border-t border-[#2c3e50] flex justify-center items-end overflow-hidden">
+          <h1 className="text-[6vw] leading-[1] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#2c3e50] to-[#1c2431] uppercase tracking-wider w-full text-center select-none whitespace-nowrap">
+            PRISMO CONSTRUCTION
           </h1>
         </div>
       </footer>

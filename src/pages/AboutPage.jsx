@@ -30,19 +30,19 @@ const AboutPage = () => {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-8 py-20 text-lg leading-relaxed text-slate-600">
-        <h2 className="text-3xl font-bold text-[#1e293b] mb-6">Our Story</h2>
+        <h2 className="text-3xl font-bold text-[#1e2a35] mb-6">Our Story</h2>
         <p className="mb-8">
           Founded on the principle that modern construction requires more than just bricks and mortar, Prismo has grown into an industry leader over the past two decades. We leverage cutting-edge project management tools to ensure our clients always know exactly where their project stands.
         </p>
 
-        <h2 className="text-3xl font-bold text-[#1e293b] mb-6">Our Core Values</h2>
+        <h2 className="text-3xl font-bold text-[#1e2a35] mb-6">Our Core Values</h2>
         <ul className="list-disc pl-6 mb-12 space-y-4">
           <li><strong>Absolute Transparency:</strong> Our clients get real-time access to logs, approvals, and timelines via our dedicated Client Portal.</li>
           <li><strong>Uncompromising Safety:</strong> We adhere to the strictest industry safety standards, protecting our workers and your investment.</li>
           <li><strong>Sustainable Building:</strong> We prioritize eco-friendly materials and energy-efficient designs whenever possible.</li>
         </ul>
 
-        <div className="bg-[#1e293b] text-white rounded-3xl p-10 text-center">
+        <div className="bg-[#1e2a35] text-white rounded-3xl p-10 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to build?</h2>
           <p className="text-slate-300 mb-8 max-w-xl mx-auto">
             Contact our team today to get a quote on your next residential, commercial, or infrastructure project.

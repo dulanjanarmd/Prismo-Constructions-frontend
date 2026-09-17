@@ -5,10 +5,10 @@ import { Home, Building2, Wrench, ShieldCheck } from 'lucide-react';
 
 const ServicesPage = () => {
   const services = [
-    { title: 'Residential Construction', desc: 'Custom luxury homes built to your exact specifications with premium materials.', icon: <Home className="w-8 h-8 text-[#1e293b]" /> },
-    { title: 'Commercial Development', desc: 'Office buildings, retail spaces, and industrial facilities delivered on time and under budget.', icon: <Building2 className="w-8 h-8 text-[#1e293b]" /> },
-    { title: 'Renovation & Remodeling', desc: 'Transforming existing spaces into modern, functional, and beautiful environments.', icon: <Wrench className="w-8 h-8 text-[#1e293b]" /> },
-    { title: 'Project Management', desc: 'End-to-end oversight ensuring absolute safety, quality control, and transparency.', icon: <ShieldCheck className="w-8 h-8 text-[#1e293b]" /> },
+    { title: 'Residential Construction', desc: 'Custom luxury homes built to your exact specifications with premium materials.', icon: <Home className="w-8 h-8 text-[#1e2a35]" /> },
+    { title: 'Commercial Development', desc: 'Office buildings, retail spaces, and industrial facilities delivered on time and under budget.', icon: <Building2 className="w-8 h-8 text-[#1e2a35]" /> },
+    { title: 'Renovation & Remodeling', desc: 'Transforming existing spaces into modern, functional, and beautiful environments.', icon: <Wrench className="w-8 h-8 text-[#1e2a35]" /> },
+    { title: 'Project Management', desc: 'End-to-end oversight ensuring absolute safety, quality control, and transparency.', icon: <ShieldCheck className="w-8 h-8 text-[#1e2a35]" /> },
   ];
 
   return (

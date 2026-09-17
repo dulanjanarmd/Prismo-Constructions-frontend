@@ -98,7 +98,7 @@ const Register = () => {
             <button 
               disabled={isLoading}
               type="submit" 
-              className="w-full flex items-center justify-center px-4 py-4 bg-[#1e293b] text-white rounded-xl font-bold text-lg hover:bg-primary hover:text-[#022c22] transition-colors disabled:opacity-70 mt-6 shadow-md"
+              className="w-full flex items-center justify-center px-4 py-4 bg-[#1e2a35] text-white rounded-xl font-bold text-lg hover:bg-primary hover:text-[#022c22] transition-colors disabled:opacity-70 mt-6 shadow-md"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>

@@ -56,7 +56,7 @@ const PortfolioPage = () => {
                 <span className="text-primary text-sm font-bold uppercase tracking-wider mb-2 block">{project.type}</span>
                 <h3 className="text-2xl font-bold mb-4">{project.name}</h3>
                 <p className="text-slate-500 text-lg leading-relaxed">{project.desc}</p>
-                <div className="mt-8 flex items-center text-[#1e293b] font-bold group-hover:text-primary transition-colors">
+                <div className="mt-8 flex items-center text-[#1e2a35] font-bold group-hover:text-primary transition-colors">
                   View Project Details <span className="ml-2 group-hover:translate-x-2 transition-transform">→</span>
                 </div>
               </div>

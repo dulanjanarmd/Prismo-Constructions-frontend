@@ -2,21 +2,21 @@
 
 @theme {
   --color-background: #f1f5f9; /* Light slate/gray from screenshot */
-  --color-foreground: #0f172a; /* Dark slate */
+  --color-foreground: #16202c; /* Dark slate */
   
   --color-card: #ffffff;
-  --color-card-foreground: #0f172a;
+  --color-card-foreground: #16202c;
   
-  --color-primary: #1363a8; /* Dark blue from gradient */
+  --color-primary: #f5a623; /* Yellow/Orange from new logo */
   --color-primary-foreground: #ffffff; /* White text */
   
   --color-secondary: #e2e8f0;
-  --color-secondary-foreground: #0f172a;
+  --color-secondary-foreground: #16202c;
   
   --color-muted: #e2e8f0;
   --color-muted-foreground: #64748b;
   
-  --color-accent: #1e293b; /* Dark slate from footer */
+  --color-accent: #1e2a35; /* Dark Slate/Navy from logo */
   --color-accent-foreground: #f8fafc;
   
   --color-destructive: #ef4444;
@@ -24,7 +24,7 @@
 
   --color-border: #cbd5e1;
   --color-input: #cbd5e1;
-  --color-ring: #2563eb;
+  --color-ring: #f5a623;
 
   --radius-lg: 0.5rem;
   --radius-md: calc(0.5rem - 2px);
@@ -38,15 +38,15 @@
   body {
     background-color: var(--color-background);
     background-image: 
-      radial-gradient(circle at 15% 50%, rgba(19, 99, 168, 0.08), transparent 25%),
-      radial-gradient(circle at 85% 30%, rgba(13, 188, 240, 0.08), transparent 25%),
+      radial-gradient(circle at 15% 50%, rgba(245, 166, 35, 0.08), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(30, 42, 53, 0.08), transparent 25%),
       linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
     background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
     background-position: 0 0, 0 0, -1px -1px, -1px -1px;
     background-attachment: fixed;
     color: var(--color-foreground);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Montserrat', system-ui, sans-serif;
     position: relative;
     overflow-x: hidden;
   }
@@ -73,7 +73,7 @@
 }
 
 .btn-primary, .bg-primary {
-  background: linear-gradient(135deg, #1363a8 0%, #0dbcf0 100%) !important;
+  background: linear-gradient(135deg, #f5a623 0%, #fca311 100%) !important;
   color: var(--color-primary-foreground) !important;
   border: none !important;
 }

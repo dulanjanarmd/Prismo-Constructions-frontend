@@ -84,8 +84,8 @@ const Navbar = () => {
         
         {/* Left Side: Logo and Nav */}
         <div className="flex items-center space-x-2">
-          <Link to="/portal" className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12 hover:opacity-90 transition-opacity">
-            <span className="text-primary font-bold text-xl tracking-tight">Prismo.</span>
+          <Link to="/portal" className="flex items-center h-12 hover:opacity-90 transition-opacity">
+            <img src="/prismo-logo.png" alt="Prismo Construction" className="h-full object-contain" />
           </Link>
           <nav className="hidden md:flex bg-[#d1d5db] h-12 rounded-lg px-2 items-center space-x-1 text-sm font-medium text-[#4b5563]">
             {roleNav.map((item) => (
@@ -94,8 +94,8 @@ const Navbar = () => {
                 to={item.path}
                 className={`flex items-center px-4 py-2 text-sm font-medium transition-colors rounded ${
                   location.pathname === item.path 
-                    ? 'bg-[#9ca3af]/20 text-[#1e293b]' 
-                    : 'hover:bg-[#9ca3af]/20 hover:text-[#1e293b]'
+                    ? 'bg-[#9ca3af]/20 text-[#1e2a35]' 
+                    : 'hover:bg-[#9ca3af]/20 hover:text-[#1e2a35]'
                 }`}
               >
                 {item.icon}
