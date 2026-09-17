@@ -6,12 +6,6 @@ const PublicNavbar = () => {
 
   return (
     <>
-      {/* Unique Architectural Background Shape for Public Pages */}
-      <div 
-        className="fixed top-0 right-0 w-[60vw] h-[100vh] bg-slate-300 opacity-20 pointer-events-none z-0" 
-        style={{ clipPath: 'polygon(30% 0%, 100% 0%, 100% 100%, 0% 100%)' }}
-      ></div>
-      
       <header className="py-6 px-4 mx-auto w-full max-w-7xl flex flex-col md:flex-row md:items-center justify-between z-50 relative">
         <div className="flex items-center justify-between w-full md:w-auto">
         <div className="flex items-center space-x-2">
@@ -36,7 +30,7 @@ const PublicNavbar = () => {
             Sign In
           </Link>
         )}
-        <a href={location.pathname === '/' ? '#contact' : '/#contact'} className="px-6 py-2 bg-primary text-[#022c22] rounded-md transition-colors h-full flex items-center hover:opacity-90">
+        <a href={location.pathname === '/' ? '#contact' : '/#contact'} className="btn-primary h-full flex items-center">
           Request Consultation
         </a>
       </div>

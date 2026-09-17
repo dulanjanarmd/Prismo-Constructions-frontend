@@ -170,52 +170,50 @@ const LandingPage = () => {
         </div>
 
         {/* Testimonials */}
-        <div className="max-w-5xl mx-auto mb-32 bg-[#1e293b] rounded-[2rem] p-10 md:p-16 text-white relative overflow-hidden">
-          {/* Removed AI-style glowing orbs */}
+        <div className="max-w-5xl mx-auto mb-32 bg-[#f8fafc] border border-slate-200 rounded-[2rem] p-10 md:p-16 text-slate-900 relative overflow-hidden shadow-sm">
           
           <div className="text-center mb-16 relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Client Success Stories</h2>
-            <p className="text-slate-300 text-lg">Don't just take our word for it.</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#1e293b]">Client Success Stories</h2>
+            <p className="text-slate-600 text-lg">Don't just take our word for it.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10">
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-[#0f172a] p-8 rounded-2xl border border-slate-800 h-full flex flex-col">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm h-full flex flex-col">
               <div className="flex text-primary mb-6">
                 <Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" />
               </div>
-              <p className="text-lg leading-relaxed mb-8 text-slate-200 flex-1">"Prismo delivered our commercial complex two months ahead of schedule. Their client portal gave us complete visibility into the process, removing all the usual anxiety of large-scale construction."</p>
+              <p className="text-lg leading-relaxed mb-8 text-slate-700 flex-1">"Prismo delivered our commercial complex two months ahead of schedule. Their client portal gave us complete visibility into the process, removing all the usual anxiety of large-scale construction."</p>
               <div className="mt-auto">
-                <div className="font-bold text-white text-lg">Sarah Jenkins</div>
-                <div className="text-slate-400 text-sm">CEO, Apex Properties</div>
+                <div className="font-bold text-slate-900 text-lg">Sarah Jenkins</div>
+                <div className="text-slate-500 text-sm">CEO, Apex Properties</div>
               </div>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="bg-[#0f172a] p-8 rounded-2xl border border-slate-800 h-full flex flex-col">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm h-full flex flex-col">
               <div className="flex text-primary mb-6">
                 <Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" /><Star className="w-5 h-5 fill-current" />
               </div>
-              <p className="text-lg leading-relaxed mb-8 text-slate-200 flex-1">"From the foundation to the final touches, the attention to detail was extraordinary. They truly lived up to their promise of uncompromising safety and quality."</p>
+              <p className="text-lg leading-relaxed mb-8 text-slate-700 flex-1">"From the foundation to the final touches, the attention to detail was extraordinary. They truly lived up to their promise of uncompromising safety and quality."</p>
               <div className="mt-auto">
-                <div className="font-bold text-white text-lg">Michael Chen</div>
-                <div className="text-slate-400 text-sm">Director, Metro Development</div>
+                <div className="font-bold text-slate-900 text-lg">Michael Chen</div>
+                <div className="text-slate-500 text-sm">Director, Metro Development</div>
               </div>
             </motion.div>
           </div>
         </div>
         
-        <div id="contact" className="max-w-5xl mx-auto bg-[#0f172a] p-10 md:p-16 rounded-[2rem] shadow-2xl relative overflow-hidden">
-          {/* Removed AI-style glowing orbs */}
+        <div id="contact" className="max-w-5xl mx-auto bg-[#f8fafc] border border-slate-200 p-10 md:p-16 rounded-[2rem] shadow-xl relative overflow-hidden">
           
           <div className="text-center mb-10 relative z-10">
-            <h2 className="text-3xl font-bold text-white mb-3">Request a Consultation</h2>
-            <p className="text-slate-400">Tell us about your project, and our experts will get back to you with a proposal.</p>
+            <h2 className="text-3xl font-bold text-[#1e293b] mb-3">Request a Consultation</h2>
+            <p className="text-slate-600">Tell us about your project, and our experts will get back to you with a proposal.</p>
           </div>
 
           {submitSuccess ? (
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-12 relative z-10">
-              <div className="w-20 h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Request Received!</h3>
-              <p className="text-slate-400">Our team will review your requirements and contact you shortly.</p>
+              <h3 className="text-2xl font-bold text-[#1e293b] mb-2">Request Received!</h3>
+              <p className="text-slate-600">Our team will review your requirements and contact you shortly.</p>
               <button onClick={() => setSubmitSuccess(false)} className="mt-4 text-primary font-bold hover:underline">Submit Another Inquiry</button>
             </motion.div>
           ) : (
@@ -247,34 +245,34 @@ const LandingPage = () => {
             }}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300 mb-2">Full Name</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
                   <input type="text" required
                     value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#1e293b] border border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white placeholder-slate-500" 
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400" 
                     placeholder="John Doe" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300 mb-2">Work Email</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Work Email</label>
                   <input type="email" required
                     value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#1e293b] border border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white placeholder-slate-500" 
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400" 
                     placeholder="john@company.com" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300 mb-2">Phone Number</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
                   <input type="tel" 
                     value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#1e293b] border border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white placeholder-slate-500" 
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400" 
                     placeholder="+1 (555) 000-0000" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300 mb-2">Project Type</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Project Type</label>
                   <select 
                     value={formData.projectType} onChange={e => setFormData({...formData, projectType: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#1e293b] border border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none text-white"
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none text-slate-900"
                   >
                     <option>Commercial Build</option>
                     <option>Residential Complex</option>
@@ -285,25 +283,25 @@ const LandingPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-300 mb-2">Project Location</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Project Location</label>
                 <input type="text" 
                   value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#1e293b] border border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white placeholder-slate-500" 
+                  className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400" 
                   placeholder="City, State or Address" />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-300 mb-2">Project Details</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Project Details</label>
                 <textarea rows="4" 
                   value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})}
-                  className="w-full px-4 py-3 bg-[#1e293b] border border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none text-white placeholder-slate-500" 
+                  className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none text-slate-900 placeholder-slate-400" 
                   placeholder="Tell us about your requirements, timeline, and budget..."></textarea>
               </div>
 
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full bg-primary text-[#022c22] font-bold py-4 rounded-xl hover:bg-primary/90 transition-all text-lg shadow-lg shadow-primary/20 disabled:opacity-50"
+                className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:opacity-90 transition-all text-lg shadow-lg shadow-primary/20 disabled:opacity-50"
               >
                 {isSubmitting ? 'Sending...' : 'Submit Request'}
               </button>
@@ -337,61 +335,41 @@ const LandingPage = () => {
           <div>
             <h4 className="text-white font-medium mb-4">Platform</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-white transition-colors">Inspection & Test Plans</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Document Management</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Punch List Management</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Snag Management</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Defect Management</a></li>
+              <li><Link to="/portal" className="hover:text-white transition-colors">Client Portal</Link></li>
+              <li><Link to="/services" className="hover:text-white transition-colors">Services Overview</Link></li>
+              <li><Link to="/portfolio" className="hover:text-white transition-colors">Project Portfolio</Link></li>
+              <li><a href="#contact" className="hover:text-white transition-colors">Request a Quote</a></li>
             </ul>
           </div>
           <div>
             <h4 className="text-white font-medium mb-4">Resources</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-white transition-colors">News & Insights</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Customer Stories</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Events</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Implementation</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Explore</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><a href="#contact" className="hover:text-white transition-colors">Contact Sales</a></li>
             </ul>
           </div>
           <div>
             <h4 className="text-white font-medium mb-4">Company</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-white transition-colors">Locations</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Security & Legal</a></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">Our Team</Link></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">Locations</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-medium mb-4">Support</h4>
+            <h4 className="text-white font-medium mb-4">Portal Access</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-white transition-colors">Onboarding Requests</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Help Centre</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-              <li><a href="#" className="hover:text-white transition-colors underline">+61 1800 319 395</a></li>
+              <li><Link to="/login" className="hover:text-white transition-colors">Employee Login</Link></li>
+              <li><Link to="/login" className="hover:text-white transition-colors">Client Login</Link></li>
+              <li><Link to="/register" className="hover:text-white transition-colors">Create Account</Link></li>
             </ul>
           </div>
         </div>
 
-        {/* Footer Bottom Logo & Graphic */}
-        <div className="max-w-7xl mx-auto flex items-end justify-between relative mt-24">
-          <h1 className="text-6xl md:text-8xl font-bold text-[#9ca3af]/40 tracking-tighter">
-            prismo
+        {/* Footer Bottom Logo */}
+        <div className="w-full mt-16 pt-8 border-t border-[#374151] flex justify-center items-end overflow-hidden">
+          <h1 className="text-[6vw] leading-[1] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#374151] to-[#1c2431] uppercase tracking-wider w-full text-center select-none whitespace-nowrap">
+            PRISMO CONSTRUCTIONS
           </h1>
-          
-          {/* Decorative Dot Graphic (approximating the screenshot's bottom right graphic) */}
-          <div className="absolute right-0 bottom-[-20px] opacity-20 pointer-events-none grid grid-cols-3 gap-2 p-2">
-             <div className="w-6 h-6 bg-white rounded-full"></div>
-             <div className="w-6 h-6 bg-white rounded-full"></div>
-             <div className="w-6 h-6 bg-white rounded-full"></div>
-             <div className="w-6 h-6 bg-white rounded-full"></div>
-             <div className="w-6 h-6 bg-white rounded-lg col-start-2 row-start-2 scale-150 transform"></div>
-             <div className="w-6 h-6 bg-white rounded-full"></div>
-             <div className="w-6 h-6 bg-white rounded-full"></div>
-             <div className="w-6 h-6 bg-white rounded-full"></div>
-             <div className="w-6 h-6 bg-white rounded-full"></div>
-          </div>
         </div>
       </footer>
 

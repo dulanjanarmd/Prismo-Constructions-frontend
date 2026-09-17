@@ -7,8 +7,8 @@
   --color-card: #ffffff;
   --color-card-foreground: #0f172a;
   
-  --color-primary: #00fa9a; /* Bright mint green from screenshot */
-  --color-primary-foreground: #022c22; /* Dark green for text on primary */
+  --color-primary: #1363a8; /* Dark blue from gradient */
+  --color-primary-foreground: #ffffff; /* White text */
   
   --color-secondary: #e2e8f0;
   --color-secondary-foreground: #0f172a;
@@ -24,7 +24,7 @@
 
   --color-border: #cbd5e1;
   --color-input: #cbd5e1;
-  --color-ring: #00fa9a;
+  --color-ring: #2563eb;
 
   --radius-lg: 0.5rem;
   --radius-md: calc(0.5rem - 2px);
@@ -61,5 +61,11 @@
 
 /* Specific component overrides for the Visibuild theme */
 .btn-primary {
-  @apply bg-primary text-primary-foreground font-semibold px-4 py-2 rounded shadow-sm hover:opacity-90 transition-opacity;
+  @apply text-primary-foreground font-semibold px-4 py-2 rounded shadow-sm hover:opacity-90 transition-opacity;
+}
+
+.btn-primary, .bg-primary {
+  background: linear-gradient(135deg, #1363a8 0%, #0dbcf0 100%) !important;
+  color: var(--color-primary-foreground) !important;
+  border: none !important;
 }
