@@ -37,6 +37,14 @@
   }
   body {
     background-color: var(--color-background);
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(19, 99, 168, 0.08), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(13, 188, 240, 0.08), transparent 25%),
+      linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+    background-position: 0 0, 0 0, -1px -1px, -1px -1px;
+    background-attachment: fixed;
     color: var(--color-foreground);
     font-family: 'Inter', system-ui, sans-serif;
     position: relative;
