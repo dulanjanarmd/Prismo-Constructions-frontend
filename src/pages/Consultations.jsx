@@ -11,6 +11,12 @@ const Consultations = () => {
   const navigate = useNavigate();
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [proposalUrl, setProposalUrl] = useState('');
+  const [meetingSchedule, setMeetingSchedule] = useState({
+    date: '',
+    time: '',
+    link: '',
+    details: ''
+  });
 
   const isPM = currentUser?.role === 'project_manager';
   const isCEO = currentUser?.role === 'ceo';
@@ -31,6 +37,20 @@ const Consultations = () => {
     });
     setSelectedConsultation({ ...selectedConsultation, proposalUrl, status: 'Proposal Sent' });
     setProposalUrl('');
+  };
+
+  const handleSendSchedule = (e) => {
+    e.preventDefault();
+    const { date, time, link, details } = meetingSchedule;
+    if (!date || !time) return;
+
+    const subject = encodeURIComponent(`Consultation Meeting - ${selectedConsultation.service} - Prismo Construction`);
+    const body = encodeURIComponent(`Hello ${selectedConsultation.clientName},\n\nWe would like to schedule a consultation meeting regarding your inquiry.\n\nDate: ${date}\nTime: ${time}\n${link ? `Meeting Link: ${link}\n\n` : ''}${details ? `Details: ${details}\n\n` : ''}Best regards,\nPrismo Construction Team`);
+    
+    window.open(`mailto:${selectedConsultation.email}?subject=${subject}&body=${body}`);
+    
+    updateConsultation(selectedConsultation.id, { status: 'Meeting Scheduled' });
+    setSelectedConsultation({ ...selectedConsultation, status: 'Meeting Scheduled' });
   };
 
   const handleConvertToProject = (consultation) => {
@@ -55,7 +75,7 @@ const Consultations = () => {
     navigate('/portal/projects');
   };
 
-  const columns = ['New Inquiry', 'Proposal Sent', 'Accepted', 'Pending CEO Approval', 'CEO Approved', 'Converted'];
+  const columns = ['New Inquiry', 'Meeting Scheduled', 'Proposal Sent', 'Accepted', 'Pending CEO Approval', 'CEO Approved', 'Converted'];
 
   return (
     <div className="space-y-6 relative h-full">
@@ -169,22 +189,59 @@ const Consultations = () => {
                 </div>
               )}
 
-              {selectedConsultation.status === 'New Inquiry' && (
-                <form onSubmit={handleAttachProposal} className="mb-6 border-t border-border pt-6">
-                  <h4 className="text-sm font-bold text-slate-900  uppercase tracking-wider mb-2">Attach Proposal & Budget</h4>
-                  <div className="flex space-x-2">
-                    <input 
-                      required type="url" 
-                      placeholder="Google Drive link or PDF URL" 
-                      className="flex-1 rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                      value={proposalUrl}
-                      onChange={e => setProposalUrl(e.target.value)}
-                    />
-                    <button type="submit" className="px-4 py-2 bg-slate-800 text-white rounded text-sm font-bold hover:bg-slate-700 transition-colors flex items-center">
-                      <UploadCloud className="w-4 h-4 mr-2" /> Attach & Send
-                    </button>
-                  </div>
-                </form>
+              {(selectedConsultation.status === 'New Inquiry' || selectedConsultation.status === 'Meeting Scheduled') && (
+                <div className="space-y-6 border-t border-border pt-6 mt-6">
+                  {selectedConsultation.status === 'New Inquiry' && (
+                    <form onSubmit={handleSendSchedule} className="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm">
+                      <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center">
+                        <Send className="w-4 h-4 mr-2 text-primary" /> Schedule Meeting
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1">Date</label>
+                          <input type="date" required className="w-full rounded border border-input bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none transition-all" 
+                            value={meetingSchedule.date} onChange={e => setMeetingSchedule({...meetingSchedule, date: e.target.value})} />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1">Time</label>
+                          <input type="time" required className="w-full rounded border border-input bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none transition-all" 
+                            value={meetingSchedule.time} onChange={e => setMeetingSchedule({...meetingSchedule, time: e.target.value})} />
+                        </div>
+                      </div>
+                      <div className="mb-4">
+                        <label className="block text-xs font-semibold text-slate-600 mb-1">Meeting Link (Optional)</label>
+                        <input type="url" placeholder="Zoom/Meet URL" className="w-full rounded border border-input bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none transition-all" 
+                          value={meetingSchedule.link} onChange={e => setMeetingSchedule({...meetingSchedule, link: e.target.value})} />
+                      </div>
+                      <div className="mb-4">
+                        <label className="block text-xs font-semibold text-slate-600 mb-1">Additional Details</label>
+                        <textarea rows="2" placeholder="Agenda or notes..." className="w-full rounded border border-input bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none transition-all" 
+                          value={meetingSchedule.details} onChange={e => setMeetingSchedule({...meetingSchedule, details: e.target.value})}></textarea>
+                      </div>
+                      <button type="submit" className="w-full py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-blue-600 transition-colors flex justify-center items-center shadow-md">
+                        <Mail className="w-4 h-4 mr-2" /> Open in Email App
+                      </button>
+                    </form>
+                  )}
+
+                  <form onSubmit={handleAttachProposal} className="pt-2">
+                    <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center">
+                      <FileText className="w-4 h-4 mr-2 text-slate-500" /> Attach Proposal & Budget
+                    </h4>
+                    <div className="flex space-x-2">
+                      <input 
+                        required type="url" 
+                        placeholder="Google Drive link or PDF URL" 
+                        className="flex-1 rounded border border-input bg-slate-50 px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+                        value={proposalUrl}
+                        onChange={e => setProposalUrl(e.target.value)}
+                      />
+                      <button type="submit" className="px-5 py-2 bg-slate-800 text-white rounded text-sm font-bold hover:bg-slate-700 transition-colors flex items-center whitespace-nowrap shadow-md">
+                        <UploadCloud className="w-4 h-4 mr-2" /> Attach & Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
               )}
 
               {selectedConsultation.status === 'Proposal Sent' && isPM && (

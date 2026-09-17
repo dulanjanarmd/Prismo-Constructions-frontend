@@ -1,40 +1,76 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const PublicNavbar = () => {
   const location = useLocation();
 
+  const navLinks = [
+    { path: '/services', label: 'Services' },
+    { path: '/portfolio', label: 'Portfolio' },
+    { path: '/about', label: 'About Us' },
+  ];
+
   return (
     <>
-      <header className="py-6 px-4 mx-auto w-full max-w-7xl flex flex-col md:flex-row md:items-center justify-between z-50 relative">
+      <motion.header 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="py-6 px-4 mx-auto w-full max-w-7xl flex flex-col md:flex-row md:items-center justify-between z-50 relative"
+      >
         <div className="flex items-center justify-between w-full md:w-auto">
-        <div className="flex items-center space-x-2">
-          <Link to="/" className="bg-[#1e293b] px-4 py-2 rounded-lg flex items-center h-12 hover:opacity-90 transition-opacity">
-            <span className="text-primary font-bold text-xl tracking-tight">Prismo.</span>
-          </Link>
-          <nav className="hidden md:flex bg-[#d1d5db] h-12 rounded-lg px-2 items-center space-x-1 text-sm font-bold uppercase text-[#4b5563]">
-            <Link to="/services" className={`px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center ${location.pathname === '/services' ? 'bg-[#9ca3af]/20 text-[#1e293b]' : ''}`}>Services</Link>
-            <Link to="/portfolio" className={`px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center ${location.pathname === '/portfolio' ? 'bg-[#9ca3af]/20 text-[#1e293b]' : ''}`}>Portfolio</Link>
-            <Link to="/about" className={`px-4 py-2 hover:bg-[#9ca3af]/20 rounded cursor-pointer transition-colors flex items-center ${location.pathname === '/about' ? 'bg-[#9ca3af]/20 text-[#1e293b]' : ''}`}>About Us</Link>
-          </nav>
+          <div className="flex items-center space-x-3">
+            <Link to="/" className="group relative bg-[#0f172a] px-5 py-2.5 rounded-xl flex items-center h-12 shadow-lg overflow-hidden transition-transform hover:scale-[1.02] active:scale-[0.98]">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1363a8] to-[#0dbcf0] font-bold text-2xl tracking-tighter relative z-10">Prismo.</span>
+            </Link>
+            
+            <nav className="hidden md:flex bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 items-center space-x-1 text-sm font-semibold uppercase text-slate-600">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link 
+                    key={link.path}
+                    to={link.path} 
+                    className="relative px-5 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full"
+                  >
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeTab"
+                        className="absolute inset-0 bg-white shadow-sm rounded-lg"
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      />
+                    )}
+                    <span className={`relative z-10 transition-colors duration-200 ${isActive ? 'text-slate-900 font-bold' : 'hover:text-slate-900'}`}>
+                      {link.label}
+                    </span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
         </div>
-      </div>
-      
-      <div className="hidden md:flex items-center bg-[#d1d5db] h-12 rounded-lg p-1 space-x-1 text-sm font-bold uppercase">
-        {location.pathname === '/login' ? (
-          <Link to="/register" className="px-6 py-2 text-[#4b5563] hover:text-[#1e293b] transition-colors">
-            Sign Up
-          </Link>
-        ) : (
-          <Link to="/login" className="px-6 py-2 text-[#4b5563] hover:text-[#1e293b] transition-colors">
-            Sign In
-          </Link>
-        )}
-        <a href={location.pathname === '/' ? '#contact' : '/#contact'} className="btn-primary h-full flex items-center">
-          Request Consultation
-        </a>
-      </div>
-    </header>
+        
+        <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 space-x-1 text-sm font-bold uppercase">
+          {location.pathname === '/login' ? (
+            <Link to="/register" className="px-6 py-2 text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all duration-200 h-full flex items-center">
+              Sign Up
+            </Link>
+          ) : (
+            <Link to="/login" className="px-6 py-2 text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all duration-200 h-full flex items-center">
+              Sign In
+            </Link>
+          )}
+          <a 
+            href={location.pathname === '/' ? '#contact' : '/#contact'} 
+            className="relative group h-full flex items-center bg-gradient-to-r from-[#1363a8] to-[#0dbcf0] text-white px-6 rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out skew-x-12" />
+            <span className="relative z-10">Request Consultation</span>
+          </a>
+        </div>
+      </motion.header>
     </>
   );
 };

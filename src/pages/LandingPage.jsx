@@ -42,32 +42,24 @@ const LandingPage = () => {
         {/* Navbar */}
         <PublicNavbar />
 
-        {/* Hero Content matching the screenshot layout */}
-        <div className="max-w-4xl mx-auto text-center pt-8 pb-10 relative z-10">
-
-          {/* Hero Title with Bolder Font */}
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-[#1e293b] mb-6 leading-[1.1] tracking-tight">
-            Building Your Vision <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-500">With Excellence</span>
-          </h1>
-          
-          <p className="text-lg sm:text-xl text-slate-600 font-semibold mb-10 max-w-2xl mx-auto leading-relaxed">
-            From luxury residential homes to massive commercial complexes, Prismo Construction delivers unmatched quality, safety, and transparency.
-          </p>
-
-        </div>
+        {/* Hero Content moved inside the image box */}
 
         {/* Hero Image overlapping the bottom curve */}
         <div className="max-w-7xl mx-auto relative px-4 z-10">
-          <div className="relative h-[300px] md:h-[400px] lg:h-[500px] w-full rounded-t-3xl overflow-hidden shadow-2xl">
+          <div className="relative h-[400px] md:h-[500px] lg:h-[600px] w-full rounded-t-3xl overflow-hidden shadow-2xl mt-8">
             <ImageCarousel className="absolute inset-0 w-full h-full" />
+            <div className="absolute inset-0 bg-slate-900/40 z-10"></div> {/* Dark overlay for readability */}
             
             {/* Text Overlay (placed above carousel) */}
-            <div className="absolute bottom-12 left-12 z-20 pointer-events-none">
-              <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 leading-tight drop-shadow-lg">
-                Construction Site<br/>Management
-              </h2>
-              <p className="text-2xl text-white/90 drop-shadow-md">Insights</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20 pointer-events-none px-6">
+              <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight drop-shadow-2xl">
+                Building Your Vision <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">With Excellence</span>
+              </h1>
+              
+              <p className="text-lg sm:text-xl text-white/90 font-semibold max-w-2xl mx-auto leading-relaxed drop-shadow-lg">
+                From luxury residential homes to massive commercial complexes, Prismo Construction delivers unmatched quality, safety, and transparency.
+              </p>
             </div>
           </div>
         </div>
@@ -234,6 +226,21 @@ const LandingPage = () => {
                   })
                 });
                 if (res.ok) {
+                  const savedInquiry = await res.json();
+                  
+                  // Add it to frontend context so it appears immediately if the PM navigates to the dashboard without refreshing
+                  addConsultation({
+                    id: savedInquiry.id,
+                    clientName: savedInquiry.customerName,
+                    service: savedInquiry.projectType,
+                    dateSubmitted: savedInquiry.createdAt,
+                    description: savedInquiry.description,
+                    status: 'New Inquiry',
+                    email: savedInquiry.email,
+                    phone: savedInquiry.phone,
+                    assignedToId: savedInquiry.assignedTo?.id
+                  });
+
                   setSubmitSuccess(true);
                   setFormData({ name: '', email: '', phone: '', projectType: 'Commercial Build', location: '', notes: '' });
                 }

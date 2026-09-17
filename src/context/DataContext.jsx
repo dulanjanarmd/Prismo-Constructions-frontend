@@ -173,6 +173,43 @@ export const DataProvider = ({ children }) => {
             reportedBy: `u${i.reportedBy?.id}`
           })));
         }
+        
+        const inqRes = await fetch('http://localhost:8080/api/inquiries', { headers });
+        if (inqRes.ok) {
+          const rawInq = await inqRes.json();
+          
+          const filteredInq = rawInq.filter(inq => {
+            if (currentUser.role === 'ceo' || currentUser.role === 'admin') return true;
+            if (currentUser.role === 'project_manager' || currentUser.role === 'pm') {
+              return inq.assignedTo?.id === parseInt(String(currentUser.id).replace('u', ''));
+            }
+            return false;
+          });
+
+          const mapInquiryStatus = (s) => {
+            if (s === 'NEW') return 'New Inquiry';
+            if (s === 'MEETING_SCHEDULED') return 'Meeting Scheduled';
+            if (s === 'PROPOSAL_SENT') return 'Proposal Sent';
+            if (s === 'ACCEPTED') return 'Accepted';
+            if (s === 'PENDING_CEO_APPROVAL') return 'Pending CEO Approval';
+            if (s === 'CEO_APPROVED') return 'CEO Approved';
+            if (s === 'CONVERTED') return 'Converted';
+            if (s === 'REJECTED') return 'Rejected';
+            return 'New Inquiry';
+          };
+
+          setConsultations(filteredInq.map(inq => ({
+            id: inq.id,
+            clientName: inq.customerName,
+            service: inq.projectType,
+            dateSubmitted: inq.createdAt,
+            description: inq.description,
+            status: mapInquiryStatus(inq.status),
+            email: inq.email,
+            phone: inq.phone,
+            proposalUrl: null // Wait, backend doesn't seem to have proposalUrl on Inquiry yet, but frontend expects it for state
+          })));
+        }
       } catch (err) {
         console.error('Error fetching data:', err);
       }
@@ -839,7 +876,40 @@ export const DataProvider = ({ children }) => {
   };
 
   const addConsultation = (consultation) => setConsultations([...consultations, { ...consultation, id: `c${Date.now()}` }]);
-  const updateConsultation = (id, updates) => setConsultations(consultations.map(c => c.id === id ? { ...c, ...updates } : c));
+  const updateConsultation = async (id, updates) => {
+    try {
+      const mapStatusToBackend = (s) => {
+        if (s === 'New Inquiry') return 'NEW';
+        if (s === 'Meeting Scheduled') return 'MEETING_SCHEDULED';
+        if (s === 'Proposal Sent') return 'PROPOSAL_SENT';
+        if (s === 'Accepted') return 'ACCEPTED';
+        if (s === 'Pending CEO Approval') return 'PENDING_CEO_APPROVAL';
+        if (s === 'CEO Approved') return 'CEO_APPROVED';
+        if (s === 'Converted') return 'CONVERTED';
+        if (s === 'Rejected') return 'REJECTED';
+        return 'NEW';
+      };
+
+      if (updates.status) {
+        const payload = {
+          status: mapStatusToBackend(updates.status)
+        };
+        const res = await fetch(`http://localhost:8080/api/inquiries/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${currentUser.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Failed to update inquiry');
+      }
+      
+      setConsultations(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+    } catch (err) {
+      console.error('Failed to update consultation:', err);
+    }
+  };
 
   const getGlobalMessages = async (projectId) => {
     try {
