@@ -67,6 +67,21 @@
   border-radius: var(--radius-lg);
 }
 
+@font-face {
+  font-family: 'Ethnocentric';
+  src: url('/fonts/Ethnocentric-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-ethnocentric {
+  font-family: 'Ethnocentric', system-ui, sans-serif !important;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', serif !important;
+}
+
 /* Specific component overrides for the Visibuild theme */
 .btn-primary {
   @apply text-primary-foreground font-semibold px-4 py-2 rounded shadow-sm hover:opacity-90 transition-opacity;

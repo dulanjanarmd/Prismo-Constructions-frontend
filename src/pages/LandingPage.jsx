@@ -46,15 +46,15 @@ const LandingPage = () => {
 
         {/* Hero Image overlapping the bottom curve */}
         <div className="max-w-7xl mx-auto relative px-4 z-10">
-          <div className="relative h-[300px] md:h-[400px] lg:h-[480px] w-full rounded-t-3xl overflow-hidden shadow-2xl mt-8">
+          <div className="relative h-[350px] md:h-[450px] lg:h-[520px] w-full rounded-t-3xl overflow-hidden shadow-2xl mt-4">
             <ImageCarousel className="absolute inset-0 w-full h-full" />
             <div className="absolute inset-0 bg-slate-900/40 z-10"></div> {/* Dark overlay for readability */}
             
             {/* Text Overlay (placed above carousel) */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20 pointer-events-none px-6">
-              <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight drop-shadow-2xl">
+              <h1 className="font-playfair text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight drop-shadow-2xl">
                 Building Your Vision <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">With Excellence</span>
+                <span className="font-playfair text-transparent bg-clip-text bg-gradient-to-r from-[#f5a623] to-[#ffc107]">With Excellence</span>
               </h1>
               
               <p className="text-lg sm:text-xl text-white/90 font-semibold max-w-2xl mx-auto leading-relaxed drop-shadow-lg">
@@ -67,14 +67,14 @@ const LandingPage = () => {
       </div>
 
       {/* Main Content below the curved top section */}
-      <main className="flex-1 bg-white pt-12 pb-24 px-4 sm:px-8 overflow-hidden">
+      <main className="flex-1 bg-white pt-6 pb-24 px-4 sm:px-8 overflow-hidden">
         
         {/* Welcome Section */}
-        <div className="max-w-4xl mx-auto text-center mb-20 mt-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1e2a35] mb-6">
-            Welcome to <br className="md:hidden" />
-            <span className="font-black uppercase tracking-widest text-[#1e2a35] ml-2">PRISMO</span>
-            <span className="font-semibold uppercase tracking-[0.2em] text-[#f5a623] ml-2 text-xl md:text-2xl">CONSTRUCTION</span>
+        <div className="max-w-4xl mx-auto text-center mb-16">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1e2a35] mb-6 leading-tight whitespace-nowrap w-full overflow-hidden text-ellipsis">
+            Welcome to
+            <span className="font-ethnocentric font-black uppercase tracking-widest text-[#1e2a35] ml-2">PRISMO</span>
+            <span className="font-ethnocentric font-semibold uppercase tracking-[0.1em] text-[#f5a623] ml-2">CONSTRUCTION</span>
           </h2>
           <p className="text-lg text-slate-600 leading-relaxed">
             We are dedicated to building your dreams into reality. With a passion for excellence and a commitment to quality, our team of experts ensures that every project is delivered on time, within budget, and to the highest standards. Experience the difference of working with a construction partner who truly cares about your vision.
@@ -386,7 +386,7 @@ const LandingPage = () => {
 
         {/* Footer Bottom Logo */}
         <div className="w-full mt-16 pt-8 border-t border-[#2c3e50] flex justify-center items-end overflow-hidden">
-          <h1 className="text-[6vw] leading-[1] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#2c3e50] to-[#1c2431] uppercase tracking-wider w-full text-center select-none whitespace-nowrap">
+          <h1 className="font-ethnocentric text-[4.5vw] leading-[1] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#2c3e50] to-[#1c2431] uppercase tracking-wider w-full text-center select-none whitespace-nowrap">
             PRISMO CONSTRUCTION
           </h1>
         </div>
