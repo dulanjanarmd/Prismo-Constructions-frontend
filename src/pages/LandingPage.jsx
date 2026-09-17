@@ -170,7 +170,7 @@ const LandingPage = () => {
         </div>
 
         {/* Testimonials */}
-        <div className="max-w-5xl mx-auto mb-32 bg-[#f8fafc] border border-slate-200 rounded-[2rem] p-10 md:p-16 text-slate-900 relative overflow-hidden shadow-sm">
+        <div className="max-w-7xl mx-auto mb-32 bg-[#f8fafc] border border-slate-200 rounded-[2rem] p-10 md:p-16 text-slate-900 relative overflow-hidden shadow-sm">
           
           <div className="text-center mb-16 relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#1e293b]">Client Success Stories</h2>
@@ -200,7 +200,7 @@ const LandingPage = () => {
           </div>
         </div>
         
-        <div id="contact" className="max-w-5xl mx-auto bg-[#f8fafc] border border-slate-200 p-10 md:p-16 rounded-[2rem] shadow-xl relative overflow-hidden">
+        <div id="contact" className="max-w-7xl mx-auto bg-[#f8fafc] border border-slate-200 p-10 md:p-16 rounded-[2rem] shadow-xl relative overflow-hidden">
           
           <div className="text-center mb-10 relative z-10">
             <h2 className="text-3xl font-bold text-[#1e293b] mb-3">Request a Consultation</h2>
