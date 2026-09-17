@@ -366,9 +366,26 @@ const LandingPage = () => {
       </main>
 
       {/* Exact Match Footer from Screenshot */}
-      <footer className="bg-[#1c2431] text-[#9ca3af] pt-16 pb-12 px-6 sm:px-12 w-full border-t border-[#2c3e50] rounded-t-[3rem] mt-auto">
+      <footer className="bg-[#0b1121] text-[#9ca3af] pt-16 pb-12 px-6 sm:px-12 w-full border-t border-[#2c3e50] rounded-t-[3rem] mt-auto relative overflow-hidden">
         
-        {/* Bottom CTA Section */}
+        {/* Custom Wavy Background (CSS/SVG) */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-t-[3rem]">
+          {/* Top Left Waves */}
+          <svg className="absolute -top-10 -left-10 w-[200px] h-[200px] md:w-[350px] md:h-[350px] opacity-20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#1e3a8a" d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.3,-46.3C90.8,-33.5,96.9,-17.9,96.2,-2.7C95.5,12.5,88,27.3,77.3,39.1C66.6,50.9,52.7,59.7,38,66.6C23.3,73.5,7.8,78.5,-6.9,78.2C-21.6,77.9,-35.4,72.3,-49.4,65.3C-63.4,58.3,-77.6,49.9,-84.9,37C-92.2,24.1,-92.6,6.7,-88.4,-8.9C-84.2,-24.5,-75.4,-38.3,-64.1,-49.2C-52.8,-60.1,-39,-68.1,-25.1,-73.4C-11.2,-78.7,2.8,-81.3,16.5,-80C30.2,-78.7,43.6,-73.5,44.7,-76.4Z" transform="translate(100 100) scale(1.1)" />
+            <path fill="#2563eb" d="M38.1,-63.9C50.2,-57.4,61.4,-49.3,69.5,-38.6C77.6,-27.9,82.6,-14.5,81.4,-1.8C80.2,10.9,72.8,22.9,64.1,33.5C55.4,44.1,45.4,53.3,33.4,61.1C21.4,68.9,7.4,75.3,-6.2,74C-19.8,72.7,-33,63.7,-43.8,53.2C-54.6,42.7,-63,30.7,-68.5,17.4C-74,4.1,-76.6,-10.5,-72.1,-23C-67.6,-35.5,-56,-45.9,-43.5,-52.1C-31,-58.3,-17.6,-60.3,-3.1,-61C11.4,-61.7,26,-61.1,38.1,-63.9Z" transform="translate(80 80) scale(1)" />
+          </svg>
+          
+          {/* Bottom Right Waves */}
+          <svg className="absolute -bottom-10 -right-10 w-[250px] h-[250px] md:w-[450px] md:h-[450px] opacity-15" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#1e3a8a" d="M48.4,-73.6C62.8,-66.1,74.7,-52.9,81.6,-37.6C88.5,-22.3,90.4,-4.9,86.2,10.7C82,26.3,71.7,40.1,59.2,50.7C46.7,61.3,32,68.7,16.2,73.4C0.4,78.1,-16.5,80.1,-31.6,75.4C-46.7,70.7,-60.1,59.3,-68.9,45.3C-77.7,31.3,-81.9,14.7,-80.1,-1C-78.3,-16.7,-70.5,-31.5,-60.3,-43.3C-50.1,-55.1,-37.5,-63.9,-23.7,-70.4C-9.9,-76.9,5.1,-81.1,19.8,-79C34.5,-76.9,48.9,-68.5,48.4,-73.6Z" transform="translate(100 100) scale(1.2)" />
+            <path fill="#1d4ed8" d="M42.7,-61.3C55.4,-52.5,65.8,-40.4,72.6,-26.3C79.4,-12.2,82.6,3.9,78.5,18.3C74.4,32.7,63.1,45.4,49.5,53.4C35.9,61.4,20,64.7,4.3,64.9C-11.4,65.1,-27,62.2,-41.2,54.4C-55.4,46.6,-68.2,33.9,-73.5,19.1C-78.8,4.3,-76.6,-12.6,-69.6,-26.4C-62.6,-40.2,-50.8,-50.9,-37.8,-59.5C-24.8,-68.1,-10.6,-74.6,2.7,-74C16,-73.4,30,-65.7,42.7,-61.3Z" transform="translate(120 120) scale(1)" />
+          </svg>
+        </div>
+        
+        {/* Content wrapper to stay above the absolute background */}
+        <div className="relative z-10">
+          {/* Bottom CTA Section */}
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-16 pb-12 border-b border-[#2c3e50]">
           <div>
             <h3 className="text-3xl md:text-4xl text-white font-bold mb-3">
@@ -425,6 +442,7 @@ const LandingPage = () => {
           <h1 className="font-ethnocentric text-[4.5vw] leading-[1] font-black text-transparent bg-clip-text bg-gradient-to-b from-[#2c3e50] to-[#1c2431] uppercase tracking-wider w-full text-center select-none whitespace-nowrap">
             PRISMO CONSTRUCTION
           </h1>
+        </div>
         </div>
       </footer>
 

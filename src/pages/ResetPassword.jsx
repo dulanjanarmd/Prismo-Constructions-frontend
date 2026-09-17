@@ -48,18 +48,28 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#e5e7eb] text-slate-900 relative font-sans overflow-y-auto">
+    <div className="min-h-screen flex flex-col bg-transparent text-slate-900 relative font-sans overflow-y-auto">
       {/* Exact Header matching Landing Page */}
       <div className="relative px-4 sm:px-8">
         <PublicNavbar />
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 relative z-10">
+      <main className="flex-1 flex flex-col items-center justify-start pt-12 md:pt-16 px-4 relative z-10 pb-12">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-5xl h-[600px] flex bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden"
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 150, 
+            damping: 20, 
+            mass: 0.8 
+          }}
+          whileHover={{ 
+            y: -8,
+            boxShadow: "0 25px 60px -12px rgba(0, 0, 0, 0.2)"
+          }}
+          className="w-full max-w-5xl h-[520px] flex bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden transition-shadow duration-300"
         >
           {/* Left Side: Carousel */}
           <div className="hidden md:block w-1/2 h-full relative border-r border-slate-100">

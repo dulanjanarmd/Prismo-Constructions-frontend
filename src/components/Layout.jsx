@@ -221,10 +221,17 @@ const Navbar = () => {
 const Layout = () => {
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-slate-100 transition-colors duration-300 flex flex-col font-sans">
+      <div className="min-h-screen bg-slate-100 transition-colors duration-300 flex flex-col font-sans relative">
+        
+        {/* Custom Dashboard Bottom Background */}
+        <div 
+          className="fixed inset-0 z-[-1] pointer-events-none opacity-40 bg-no-repeat bg-cover bg-bottom mix-blend-multiply" 
+          style={{ backgroundImage: "url('/dashboard-bg.png')" }} 
+        />
+
         <Navbar />
         
-        <main className="flex-1 p-4 md:p-6 w-full max-w-7xl mx-auto mt-2 md:mt-4">
+        <main className="flex-1 p-4 md:p-6 w-full max-w-7xl mx-auto mt-2 md:mt-4 z-10">
           <Outlet />
         </main>
 
