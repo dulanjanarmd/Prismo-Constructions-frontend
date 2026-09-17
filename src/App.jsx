@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import { useAuth } from './context/AuthContext';
+import AnimatedBackground from './components/AnimatedBackground';
 
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
@@ -49,52 +50,55 @@ function App() {
   }
 
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/services" element={<ServicesPage />} />
-      <Route path="/portfolio" element={<PortfolioPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/login" element={currentUser ? <Navigate to="/portal" replace /> : <Login />} />
-      <Route path="/register" element={currentUser ? <Navigate to="/portal" replace /> : <Register />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      
-      {/* Protected Portal Routes */}
-      <Route path="/portal" element={
-        <RequireAuth>
-          <Layout />
-        </RequireAuth>
-      }>
-        <Route index element={
-          currentUser?.role === 'admin' ? <Navigate to="/portal/admin" replace /> : <Dashboard />
-        } />
-        <Route path="projects" element={<Projects />} />
-        <Route path="projects/new" element={
-          <RequireAuth allowedRoles={['project_manager', 'admin']}>
-            <CreateProjectPage />
+    <>
+      <AnimatedBackground />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/portfolio" element={<PortfolioPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/login" element={currentUser ? <Navigate to="/portal" replace /> : <Login />} />
+        <Route path="/register" element={currentUser ? <Navigate to="/portal" replace /> : <Register />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        
+        {/* Protected Portal Routes */}
+        <Route path="/portal" element={
+          <RequireAuth>
+            <Layout />
           </RequireAuth>
-        } />
-        <Route path="projects/:id" element={<ProjectDetailPage />} />
-        <Route path="tasks" element={<Tasks />} />
-        <Route path="logs" element={<Logs />} />
-        <Route path="approvals" element={<Approvals />} />
-        <Route path="consultations" element={
-          <RequireAuth allowedRoles={['ceo', 'project_manager']}>
-            <Consultations />
-          </RequireAuth>
-        } />
-        <Route path="issues" element={<Issues />} />
-        <Route path="activity" element={<RecentActivityPage />} />
-        <Route path="admin" element={
-          <RequireAuth allowedRoles={['admin']}>
-            <AdminPortal />
-          </RequireAuth>
-        } />
-      </Route>
-      
-      {/* Catch all redirect to public page */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        }>
+          <Route index element={
+            currentUser?.role === 'admin' ? <Navigate to="/portal/admin" replace /> : <Dashboard />
+          } />
+          <Route path="projects" element={<Projects />} />
+          <Route path="projects/new" element={
+            <RequireAuth allowedRoles={['project_manager', 'admin']}>
+              <CreateProjectPage />
+            </RequireAuth>
+          } />
+          <Route path="projects/:id" element={<ProjectDetailPage />} />
+          <Route path="tasks" element={<Tasks />} />
+          <Route path="logs" element={<Logs />} />
+          <Route path="approvals" element={<Approvals />} />
+          <Route path="consultations" element={
+            <RequireAuth allowedRoles={['ceo', 'project_manager']}>
+              <Consultations />
+            </RequireAuth>
+          } />
+          <Route path="issues" element={<Issues />} />
+          <Route path="activity" element={<RecentActivityPage />} />
+          <Route path="admin" element={
+            <RequireAuth allowedRoles={['admin']}>
+              <AdminPortal />
+            </RequireAuth>
+          } />
+        </Route>
+        
+        {/* Catch all redirect to public page */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
 

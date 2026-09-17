@@ -14,6 +14,8 @@ const LandingPage = () => {
     phone: '',
     projectType: 'Commercial Build',
     location: '',
+    budget: '10M - 50M LKR',
+    timeline: '3 - 6 Months',
     notes: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,10 +37,10 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 flex flex-col">
+    <div className="min-h-screen bg-transparent font-sans text-slate-900 flex flex-col">
       
       {/* Top Section with light grey background and rounded bottom */}
-      <div className="bg-[#e5e7eb] rounded-b-[3rem] pb-0 relative px-4 sm:px-8">
+      <div className="bg-[#e5e7eb]/80 backdrop-blur-md rounded-b-[3rem] pb-0 relative px-4 sm:px-8">
         {/* Navbar */}
         <PublicNavbar />
 
@@ -67,7 +69,7 @@ const LandingPage = () => {
       </div>
 
       {/* Main Content below the curved top section */}
-      <main className="flex-1 bg-white pt-6 pb-24 px-4 sm:px-8 overflow-hidden">
+      <main className="flex-1 bg-transparent pt-6 pb-24 px-4 sm:px-8 overflow-hidden">
         
         {/* Welcome Section */}
         <div className="max-w-4xl mx-auto text-center mb-16">
@@ -110,20 +112,32 @@ const LandingPage = () => {
             <p className="text-lg text-[#64748b] max-w-2xl mx-auto">We bring decades of experience across multiple sectors, ensuring your project is handled by specialists.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-[#f8fafc] p-10 rounded-2xl border border-[#e2e8f0] hover:shadow-lg transition-shadow">
-              <Home className="w-12 h-12 text-primary mb-6" />
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
+              <div className="h-48 w-full overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800" alt="Residential Construction" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              </div>
+              <div className="p-8 flex-1">
               <h3 className="text-2xl font-bold text-[#1e2a35] mb-4">Residential</h3>
               <p className="text-[#64748b] leading-relaxed">From luxury custom homes to multi-family complexes, we build living spaces that combine elegance with structural integrity.</p>
+              </div>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="bg-[#f8fafc] p-10 rounded-2xl border border-[#e2e8f0] hover:shadow-lg transition-shadow">
-              <Building2 className="w-12 h-12 text-primary mb-6" />
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
+              <div className="h-48 w-full overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800" alt="Commercial Construction" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              </div>
+              <div className="p-8 flex-1">
               <h3 className="text-2xl font-bold text-[#1e2a35] mb-4">Commercial</h3>
               <p className="text-[#64748b] leading-relaxed">State-of-the-art office buildings, retail centers, and industrial facilities designed for modern business needs.</p>
+              </div>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="bg-[#f8fafc] p-10 rounded-2xl border border-[#e2e8f0] hover:shadow-lg transition-shadow">
-              <Wrench className="w-12 h-12 text-primary mb-6" />
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
+              <div className="h-48 w-full overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=800" alt="Infrastructure Construction" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              </div>
+              <div className="p-8 flex-1">
               <h3 className="text-2xl font-bold text-[#1e2a35] mb-4">Infrastructure</h3>
               <p className="text-[#64748b] leading-relaxed">Heavy civil projects, renovations, and public works executed with precision and uncompromising safety standards.</p>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -143,9 +157,7 @@ const LandingPage = () => {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="group cursor-pointer">
               <div className="h-80 bg-slate-300 rounded-2xl mb-6 overflow-hidden relative">
                 <div className="absolute inset-0 bg-slate-800/10 group-hover:bg-transparent transition-colors duration-500"></div>
-                <div className="w-full h-full bg-slate-200 group-hover:scale-105 transition-transform duration-700 flex items-center justify-center">
-                   <span className="text-slate-400 font-bold uppercase tracking-widest">Skyline Image</span>
-                </div>
+                <img src="https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?auto=format&fit=crop&q=80&w=800" alt="Skyline Tower" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               </div>
               <div className="flex justify-between items-start">
                 <div>
@@ -158,9 +170,7 @@ const LandingPage = () => {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="group cursor-pointer">
               <div className="h-80 bg-slate-300 rounded-2xl mb-6 overflow-hidden relative">
                 <div className="absolute inset-0 bg-slate-800/10 group-hover:bg-transparent transition-colors duration-500"></div>
-                <div className="w-full h-full bg-slate-400 group-hover:scale-105 transition-transform duration-700 flex items-center justify-center">
-                   <span className="text-slate-200 font-bold uppercase tracking-widest">Oasis Image</span>
-                </div>
+                <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=800" alt="Oasis Residences" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               </div>
               <div className="flex justify-between items-start">
                 <div>
@@ -174,7 +184,7 @@ const LandingPage = () => {
         </div>
 
         {/* Testimonials */}
-        <div className="max-w-7xl mx-auto mb-32 bg-[#f8fafc] border border-slate-200 rounded-[2rem] p-10 md:p-16 text-slate-900 relative overflow-hidden shadow-sm">
+        <div className="max-w-7xl mx-auto mb-32 text-slate-900 relative px-4 sm:px-8">
           
           <div className="text-center mb-16 relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#1e2a35]">Client Success Stories</h2>
@@ -204,11 +214,11 @@ const LandingPage = () => {
           </div>
         </div>
         
-        <div id="contact" className="max-w-7xl mx-auto bg-[#f8fafc] border border-slate-200 p-10 md:p-16 rounded-[2rem] shadow-xl relative overflow-hidden">
+        <div id="contact" className="max-w-7xl mx-auto bg-[#f8fafc] border border-slate-200 p-6 md:p-10 rounded-[2rem] shadow-xl relative overflow-hidden">
           
-          <div className="text-center mb-10 relative z-10">
-            <h2 className="text-3xl font-bold text-[#1e2a35] mb-3">Request a Consultation</h2>
-            <p className="text-slate-600">Tell us about your project, and our experts will get back to you with a proposal.</p>
+          <div className="text-center mb-6 relative z-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-[#1e2a35] mb-2">Request a Consultation</h2>
+            <p className="text-slate-600 text-sm md:text-base">Tell us about your project, and our experts will get back to you with a proposal.</p>
           </div>
 
           {submitSuccess ? (
@@ -221,7 +231,7 @@ const LandingPage = () => {
               <button onClick={() => setSubmitSuccess(false)} className="mt-4 text-primary font-bold hover:underline">Submit Another Inquiry</button>
             </motion.div>
           ) : (
-            <form className="space-y-6 relative z-10" onSubmit={async (e) => {
+            <form className="space-y-3 relative z-10" onSubmit={async (e) => {
               e.preventDefault();
               setIsSubmitting(true);
               try {
@@ -234,7 +244,7 @@ const LandingPage = () => {
                     customerPhone: formData.phone,
                     projectType: formData.projectType,
                     location: formData.location,
-                    initialNotes: formData.notes
+                    initialNotes: `Budget: ${formData.budget}\nTimeline: ${formData.timeline}\n\nDetails:\n${formData.notes}`
                   })
                 });
                 if (res.ok) {
@@ -254,7 +264,7 @@ const LandingPage = () => {
                   });
 
                   setSubmitSuccess(true);
-                  setFormData({ name: '', email: '', phone: '', projectType: 'Commercial Build', location: '', notes: '' });
+                  setFormData({ name: '', email: '', phone: '', projectType: 'Commercial Build', location: '', budget: '10M - 50M LKR', timeline: '3 - 6 Months', notes: '' });
                 }
               } catch (error) {
                 console.error("Failed to submit inquiry", error);
@@ -262,33 +272,43 @@ const LandingPage = () => {
                 setIsSubmitting(false);
               }
             }}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Full Name</label>
                   <input type="text" required
                     value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
                     className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400" 
-                    placeholder="John Doe" />
+                    placeholder="Nimal Perera" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Work Email</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Work Email</label>
                   <input type="email" required
                     value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
                     className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400" 
-                    placeholder="john@company.com" />
+                    placeholder="nimal@company.lk" />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Phone Number</label>
                   <input type="tel" 
                     value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})}
                     className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400" 
-                    placeholder="+1 (555) 000-0000" />
+                    placeholder="+94 77 123 4567" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Project Type</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Project Location</label>
+                  <input type="text" 
+                    value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})}
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400" 
+                    placeholder="Colombo, Sri Lanka" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Project Type</label>
                   <select 
                     value={formData.projectType} onChange={e => setFormData({...formData, projectType: e.target.value})}
                     className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none text-slate-900"
@@ -299,22 +319,38 @@ const LandingPage = () => {
                     <option>Renovation</option>
                   </select>
                 </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Estimated Budget</label>
+                  <select 
+                    value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})}
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none text-slate-900"
+                  >
+                    <option>Under 10M LKR</option>
+                    <option>10M - 50M LKR</option>
+                    <option>50M - 100M LKR</option>
+                    <option>100M+ LKR</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Expected Timeline</label>
+                  <select 
+                    value={formData.timeline} onChange={e => setFormData({...formData, timeline: e.target.value})}
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none text-slate-900"
+                  >
+                    <option>Less than 3 Months</option>
+                    <option>3 - 6 Months</option>
+                    <option>6 - 12 Months</option>
+                    <option>Over 12 Months</option>
+                  </select>
+                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Project Location</label>
-                <input type="text" 
-                  value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})}
-                  className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400" 
-                  placeholder="City, State or Address" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Project Details</label>
-                <textarea rows="4" 
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Project Details</label>
+                <textarea rows="2" 
                   value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})}
                   className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none text-slate-900 placeholder-slate-400" 
-                  placeholder="Tell us about your requirements, timeline, and budget..."></textarea>
+                  placeholder="Tell us about your requirements..."></textarea>
               </div>
 
               <button 
@@ -330,7 +366,7 @@ const LandingPage = () => {
       </main>
 
       {/* Exact Match Footer from Screenshot */}
-      <footer className="bg-[#1c2431] text-[#9ca3af] pt-16 pb-12 px-6 sm:px-12 w-full border-t border-[#2c3e50]">
+      <footer className="bg-[#1c2431] text-[#9ca3af] pt-16 pb-12 px-6 sm:px-12 w-full border-t border-[#2c3e50] rounded-t-[3rem] mt-auto">
         
         {/* Bottom CTA Section */}
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-16 pb-12 border-b border-[#2c3e50]">
