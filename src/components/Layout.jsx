@@ -231,7 +231,7 @@ const Layout = () => {
 
         <Navbar />
         
-        <main className="flex-1 p-4 md:p-6 w-full max-w-7xl mx-auto mt-2 md:mt-4 z-10">
+        <main className="flex-1 p-4 md:p-6 w-full max-w-7xl mx-auto mt-2 md:mt-4">
           <Outlet />
         </main>
 

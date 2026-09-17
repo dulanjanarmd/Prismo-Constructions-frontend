@@ -24,7 +24,23 @@ const Consultations = () => {
   const handleUpdateStatus = (id, newStatus) => {
     updateConsultation(id, { status: newStatus });
     if (selectedConsultation && selectedConsultation.id === id) {
-      setSelectedConsultation(null);
+      setSelectedConsultation({ ...selectedConsultation, status: newStatus });
+    }
+  };
+
+  const handleDragStart = (e, id) => {
+    e.dataTransfer.setData('consultationId', id);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Necessary to allow dropping
+  };
+
+  const handleDrop = (e, newStatus) => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('consultationId');
+    if (id) {
+      updateConsultation(id, { status: newStatus });
     }
   };
 
@@ -93,7 +109,12 @@ const Consultations = () => {
         {columns.map(status => {
           const colConsultations = consultations.filter(c => c.status === status);
           return (
-            <div key={status} className="bg-slate-100  rounded-xl p-4 min-h-[60vh] border border-border min-w-[300px] w-[320px] flex-shrink-0">
+            <div 
+              key={status} 
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, status)}
+              className="bg-slate-100 rounded-xl p-4 min-h-[60vh] border border-border min-w-[300px] w-[320px] flex-shrink-0 transition-colors hover:bg-slate-200/50"
+            >
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
                 <h3 className="font-bold text-sm uppercase tracking-wider text-slate-700 ">{status}</h3>
                 <span className="bg-slate-200  text-slate-600  text-xs px-2 py-1 rounded-full font-bold">
@@ -103,12 +124,18 @@ const Consultations = () => {
               
               <div className="space-y-3">
                 {colConsultations.map(c => (
-                  <motion.div 
-                    layoutId={c.id}
+                  <div 
                     key={c.id}
-                    onClick={() => setSelectedConsultation(c)}
-                    className="glass-card p-4 cursor-pointer hover:border-primary/50 transition-colors group"
+                    draggable={true}
+                    onDragStart={(e) => handleDragStart(e, c.id)}
+                    className="cursor-grab active:cursor-grabbing"
                   >
+                    <motion.div 
+                      layoutId={c.id}
+                      onClick={() => setSelectedConsultation(c)}
+                      className="glass-card p-4 hover:border-primary/50 transition-colors group"
+                      whileHover={{ scale: 1.02 }}
+                    >
                     <div className="flex justify-between items-start mb-2">
                       <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">
                         {c.service}
@@ -124,6 +151,7 @@ const Consultations = () => {
                       </div>
                     )}
                   </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
