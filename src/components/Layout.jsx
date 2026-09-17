@@ -84,8 +84,8 @@ const Navbar = () => {
         
         {/* Left Side: Logo and Nav */}
         <div className="flex items-center space-x-2">
-          <Link to="/portal" className="flex items-center h-12 hover:opacity-90 transition-opacity">
-            <img src="/prismo-logo.png" alt="Prismo Construction" className="h-full object-contain" />
+          <Link to="/portal" className="bg-white rounded-lg flex items-center justify-center h-12 px-2 shadow-sm hover:opacity-90 transition-opacity">
+            <img src="/prismo-logo.png" alt="Prismo Construction" className="h-10 w-auto object-contain" />
           </Link>
           <nav className="hidden md:flex bg-[#d1d5db] h-12 rounded-lg px-2 items-center space-x-1 text-sm font-medium text-[#4b5563]">
             {roleNav.map((item) => (

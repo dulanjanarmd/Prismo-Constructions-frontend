@@ -9,6 +9,7 @@ const PublicNavbar = () => {
     { path: '/services', label: 'Services' },
     { path: '/portfolio', label: 'Portfolio' },
     { path: '/about', label: 'About Us' },
+    { path: '/#contact', label: 'Contact' },
   ];
 
   return (
@@ -21,37 +22,49 @@ const PublicNavbar = () => {
       >
         <div className="flex items-center justify-between w-full md:w-auto">
           <div className="flex items-center space-x-3">
-            <Link to="/" className="flex items-center h-16 transition-transform hover:scale-[1.02] active:scale-[0.98]">
-              <img src="/prismo-logo.png" alt="Prismo Construction" className="h-full object-contain" />
+            <Link to="/" className="bg-white rounded-xl flex items-center justify-center h-12 px-3 shadow-md transition-transform hover:scale-[1.02] active:scale-[0.98]">
+              <img src="/prismo-logo.png" alt="Prismo Construction" className="h-10 w-auto object-contain" />
             </Link>
             
-            <nav className="hidden md:flex bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 items-center space-x-1 text-sm font-semibold uppercase text-slate-600">
+            <nav className="hidden md:flex bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 items-center space-x-1 text-sm font-bold text-slate-600">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
-                  <Link 
-                    key={link.path}
-                    to={link.path} 
-                    className="relative px-5 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full"
-                  >
-                    {isActive && (
-                      <motion.div 
-                        layoutId="activeTab"
-                        className="absolute inset-0 bg-white shadow-sm rounded-lg"
-                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      />
-                    )}
-                    <span className={`relative z-10 transition-colors duration-200 ${isActive ? 'text-slate-900 font-bold' : 'hover:text-slate-900'}`}>
-                      {link.label}
-                    </span>
-                  </Link>
+                  link.path.includes('#') ? (
+                    <a 
+                      key={link.path}
+                      href={location.pathname === '/' ? link.path.replace('/', '') : link.path} 
+                      className="relative px-5 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full hover:text-slate-900"
+                    >
+                      <span className="relative z-10 transition-colors duration-200">
+                        {link.label}
+                      </span>
+                    </a>
+                  ) : (
+                    <Link 
+                      key={link.path}
+                      to={link.path} 
+                      className="relative px-5 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full"
+                    >
+                      {isActive && (
+                        <motion.div 
+                          layoutId="activeTab"
+                          className="absolute inset-0 bg-white shadow-sm rounded-lg"
+                          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                        />
+                      )}
+                      <span className={`relative z-10 transition-colors duration-200 ${isActive ? 'text-slate-900 font-bold' : 'hover:text-slate-900'}`}>
+                        {link.label}
+                      </span>
+                    </Link>
+                  )
                 );
               })}
             </nav>
           </div>
         </div>
         
-        <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 space-x-1 text-sm font-bold uppercase">
+        <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 space-x-1 text-sm font-bold">
           {location.pathname === '/login' ? (
             <Link to="/register" className="px-6 py-2 text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all duration-200 h-full flex items-center">
               Sign Up
