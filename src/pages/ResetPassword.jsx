@@ -21,8 +21,8 @@ const ResetPassword = () => {
     setStatus({ type: '', message: '' });
     
     try {
-      await requestPasswordReset(email);
-      setStatus({ type: 'success', message: 'OTP sent to your email.' });
+      const msg = await requestPasswordReset(email);
+      setStatus({ type: 'success', message: msg });
       setStep(2);
     } catch (err) {
       setStatus({ type: 'error', message: err.message });
@@ -56,21 +56,7 @@ const ResetPassword = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-start pt-12 md:pt-16 px-4 relative z-10 pb-12">
-        <motion.div 
-          initial={{ opacity: 0, y: 40, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 150, 
-            damping: 20, 
-            mass: 0.8 
-          }}
-          whileHover={{ 
-            y: -8,
-            boxShadow: "0 25px 60px -12px rgba(0, 0, 0, 0.2)"
-          }}
-          className="w-full max-w-5xl h-[520px] flex bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden transition-shadow duration-300"
-        >
+        <div className="w-full max-w-5xl h-[520px] flex bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden">
           {/* Left Side: Carousel */}
           <div className="hidden md:block w-1/2 h-full relative border-r border-slate-100">
             <ImageCarousel className="absolute inset-0 w-full h-full" />
@@ -161,7 +147,7 @@ const ResetPassword = () => {
               Remember your password? <Link to="/login" className="text-primary font-bold hover:underline">Sign In</Link>
             </div>
           </div>
-        </motion.div>
+        </div>
       </main>
 
       <div className="absolute -bottom-32 -right-32 text-slate-200 opacity-50 pointer-events-none z-0">

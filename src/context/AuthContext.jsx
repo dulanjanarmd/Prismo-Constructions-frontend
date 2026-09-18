@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }) => {
         const errorMsg = await response.text();
         throw new Error(errorMsg || 'Failed to send OTP');
       }
-      return true;
+      return await response.text();
     } catch (err) {
       throw new Error(err.message);
     }

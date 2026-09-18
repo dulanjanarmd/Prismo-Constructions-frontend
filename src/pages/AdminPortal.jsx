@@ -92,7 +92,7 @@ const AdminPortal = () => {
       const response = await fetch(`http://localhost:8080/api/admin/users/${userId}/password`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${currentUser.token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ newPassword })
