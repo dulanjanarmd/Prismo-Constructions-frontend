@@ -34,7 +34,7 @@ const Register = () => {
   return (
     <div className="min-h-screen flex flex-col bg-transparent text-slate-900 relative font-sans overflow-y-auto">
       {/* Exact Header matching Landing Page */}
-      <div className="relative px-4 sm:px-8">
+      <div className="bg-[#e5e7eb] rounded-b-[3rem] pb-4 relative px-4 sm:px-8">
         <PublicNavbar />
       </div>
 
@@ -94,7 +94,7 @@ const Register = () => {
             <button 
               disabled={isLoading}
               type="submit" 
-              className="w-full flex items-center justify-center px-4 py-4 bg-[#1e2a35] text-white rounded-xl font-bold text-lg hover:bg-primary hover:text-[#022c22] transition-colors disabled:opacity-70 mt-6 shadow-md"
+              className="w-full flex items-center justify-center px-4 py-4 bg-[#1e2a35] text-white rounded-xl font-bold text-lg hover:bg-primary hover:text-[#022c22] transition-colors disabled:opacity-70 mt-2 shadow-md"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>

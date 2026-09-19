@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 
 const PortfolioPage = () => {
   const projects = [
-    { name: 'Skyline Tower', type: 'Commercial', desc: 'A 45-story premium office complex completed 2 months ahead of schedule.', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Oasis Residences', type: 'Residential', desc: 'Luxury condominium with sustainable energy systems and smart home integrations.', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Metro Transit Hub', type: 'Infrastructure', desc: 'Modern transit center connecting over 50,000 daily commuters.', image: 'https://images.unsplash.com/photo-1517598811128-08a0d0a519a4?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Apex Retail Park', type: 'Commercial', desc: 'A 200,000 sq ft shopping destination featuring open-air promenades.', image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Skyline Tower', type: 'Commercial', desc: 'A 45-story premium office complex completed 2 months ahead of schedule.', image: '/images/commercial.jpg' },
+    { name: 'Oasis Residences', type: 'Residential', desc: 'Luxury condominium with sustainable energy systems and smart home integrations.', image: '/images/residential.jpg' },
+    { name: 'Metro Transit Hub', type: 'Infrastructure', desc: 'Modern transit center connecting over 50,000 daily commuters.', image: 'https://placehold.co/800x600/e2e8f0/1e293b?text=Metro+Transit+Hub' },
+    { name: 'Apex Retail Park', type: 'Commercial', desc: 'A 200,000 sq ft shopping destination featuring open-air promenades.', image: 'https://placehold.co/800x600/e2e8f0/1e293b?text=Apex+Retail+Park' },
   ];
 
   return (

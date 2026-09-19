@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { CheckSquare, Camera, AlertTriangle, ChevronRight, Clock, Calendar, CheckCircle2 } from 'lucide-react';
+import { CheckSquare, AlertTriangle, FileText, Activity, Clock, LogOut } from 'lucide-react';
+import DashboardHeader from './DashboardHeader';
 import RecentActivity from './RecentActivity';
 import SubmitLogModal from './SubmitLogModal';
 import ReportIssueModal from './ReportIssueModal';
@@ -89,13 +90,8 @@ const SiteEngineerDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
-            Site Engineer Dashboard
-          </h1>
-          <p className="text-slate-500 mt-1">Welcome back, {currentUser?.name}</p>
-        </div>
+      <div className="mb-6">
+        <DashboardHeader />
       </div>
 
       {/* Summary Cards */}

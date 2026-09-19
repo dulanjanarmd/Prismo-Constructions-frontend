@@ -1,16 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Building2, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 
-const StatCard = ({ title, value, icon: Icon, delay, colorClass }) => (
+const StatCard = ({ title, value, imgSrc, delay, colorClass }) => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay }}
     className="glass-card p-6 flex items-center space-x-4"
   >
-    <div className={`p-3 rounded-xl ${colorClass}`}>
-      <Icon className="w-6 h-6" />
+    <div className={`w-12 h-12 flex items-center justify-center rounded-xl shadow-sm ${colorClass}`}>
+      <img src={imgSrc} alt={title} className="w-10 h-10 object-contain" />
     </div>
     <div>
       <p className="text-sm font-medium text-slate-500 ">{title}</p>
@@ -30,30 +29,31 @@ const PortfolioSummaryCards = ({ projects }) => {
       <StatCard 
         title="Total Projects" 
         value={totalProjects} 
-        icon={Building2} 
+        emoji="🏢" 
+        imgSrc="/icons/building.svg"
         delay={0.1} 
-        colorClass="bg-blue-100  text-blue-600 "
+        colorClass="bg-blue-50"
       />
       <StatCard 
         title="In Progress" 
         value={inProgress} 
-        icon={TrendingUp} 
+        imgSrc="/icons/trending.svg"
         delay={0.2} 
-        colorClass="bg-green-100  text-green-600 "
+        colorClass="bg-green-50"
       />
       <StatCard 
         title="On Hold / Delayed" 
         value={onHold} 
-        icon={AlertCircle} 
+        imgSrc="/icons/alert.svg"
         delay={0.3} 
-        colorClass="bg-orange-100  text-orange-600 "
+        colorClass="bg-orange-50"
       />
       <StatCard 
         title="Completed" 
         value={completed} 
-        icon={CheckCircle} 
+        imgSrc="/icons/check.svg"
         delay={0.4} 
-        colorClass="bg-slate-100  text-slate-600 "
+        colorClass="bg-slate-50"
       />
     </div>
   );

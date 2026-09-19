@@ -113,11 +113,11 @@ const Consultations = () => {
               key={status} 
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, status)}
-              className="bg-slate-100 rounded-xl p-4 min-h-[60vh] border border-border min-w-[300px] w-[320px] flex-shrink-0 transition-colors hover:bg-slate-200/50"
+              className="bg-slate-50/50 rounded-2xl p-4 min-h-[60vh] border border-slate-100 min-w-[300px] w-[320px] flex-shrink-0 transition-colors hover:bg-slate-50/80"
             >
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
-                <h3 className="font-bold text-sm uppercase tracking-wider text-slate-700 ">{status}</h3>
-                <span className="bg-slate-200  text-slate-600  text-xs px-2 py-1 rounded-full font-bold">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                <h3 className="font-semibold text-xs uppercase tracking-wider text-slate-500">{status}</h3>
+                <span className="bg-white border border-slate-100 text-slate-500 text-xs px-2.5 py-0.5 rounded-full font-bold shadow-sm">
                   {colConsultations.length}
                 </span>
               </div>
@@ -133,14 +133,14 @@ const Consultations = () => {
                     <motion.div 
                       layoutId={c.id}
                       onClick={() => setSelectedConsultation(c)}
-                      className="glass-card p-4 hover:border-primary/50 transition-colors group"
+                      className="glass-card p-5 hover:border-slate-200 transition-colors group"
                       whileHover={{ scale: 1.02 }}
                     >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">
+                    <div className="flex justify-between items-start mb-3">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 bg-sky-100 px-2 py-1 rounded-md">
                         {c.service}
                       </span>
-                      <span className="text-xs text-slate-500">{new Date(c.dateSubmitted).toLocaleDateString()}</span>
+                      <span className="text-xs text-slate-400 font-medium">{new Date(c.dateSubmitted).toLocaleDateString()}</span>
                     </div>
                     <h4 className="font-bold text-slate-900  mb-1 group-hover:text-primary transition-colors">{c.clientName}</h4>
                     <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">{c.description}</p>

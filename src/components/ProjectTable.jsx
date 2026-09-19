@@ -15,89 +15,83 @@ const ProjectTable = ({ projects }) => {
   });
 
   return (
-    <div className="glass-card overflow-hidden flex flex-col mt-6">
-      <div className="p-4 border-b border-border flex flex-col md:flex-row justify-between gap-4">
-        <h2 className="text-xl font-bold">Projects List</h2>
-        <div className="flex space-x-2">
-          <div className="relative">
+    <div className="glass-card flex flex-col mt-6 p-6">
+      <div className="flex flex-col lg:flex-row justify-between gap-6 mb-6">
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-slate-900">Projects</h2>
+          <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-0.5 rounded-full">{projects.length}</span>
+        </div>
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center">
+          <div className="flex space-x-1 bg-slate-50 p-1 rounded-full">
+            {['All', 'Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(status => {
+              const count = status === 'All' ? projects.length : projects.filter(p => p.status === status).length;
+              return (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all ${
+                    statusFilter === status 
+                      ? 'bg-white shadow-sm text-slate-900' 
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {status} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="relative w-full md:w-auto">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
               type="text" 
               placeholder="Search projects..." 
-              className="pl-9 pr-4 py-2 rounded-md border border-input bg-background text-sm focus:ring-2 focus:ring-primary outline-none"
+              className="pl-9 pr-4 py-2 w-full md:w-64 rounded-full border-0 bg-slate-50 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-          </div>
-          <div className="relative">
-            <Filter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <select 
-              className="pl-9 pr-4 py-2 rounded-md border border-input bg-background text-sm focus:ring-2 focus:ring-primary outline-none appearance-none"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="All">All Statuses</option>
-              <option value="Planning">Planning</option>
-              <option value="In Progress">In Progress</option>
-              <option value="On Hold">On Hold</option>
-              <option value="Delayed">Delayed</option>
-              <option value="Completed">Completed</option>
-            </select>
           </div>
         </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50  text-slate-500 border-b border-border">
-            <tr>
-              <th className="px-6 py-4 font-medium">Project Name</th>
-              <th className="px-6 py-4 font-medium">Client</th>
-              <th className="px-6 py-4 font-medium">Status</th>
-              <th className="px-6 py-4 font-medium">Progress</th>
-              <th className="px-6 py-4 font-medium">Start Date</th>
-              <th className="px-6 py-4 font-medium">End Date</th>
-              <th className="px-6 py-4 font-medium text-right">Action</th>
+          <thead>
+            <tr className="text-xs text-slate-400 border-b border-slate-100">
+              <th className="px-4 py-3 font-medium">Project Name</th>
+              <th className="px-4 py-3 font-medium">Client</th>
+              <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium">Progress</th>
+              <th className="px-4 py-3 font-medium">Start Date</th>
+              <th className="px-4 py-3 font-medium">End Date</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-slate-50">
             {filteredProjects.map(project => (
               <tr 
                 key={project.id} 
-                className="hover:bg-slate-50/50 :bg-slate-800/50 transition-colors cursor-pointer"
+                className="hover:bg-slate-50/50 transition-colors cursor-pointer group"
                 onClick={() => navigate(`/portal/projects/${project.id}`)}
               >
-                <td className="px-6 py-4 font-bold text-slate-900 ">{project.name}</td>
-                <td className="px-6 py-4 text-slate-600 ">{project.client}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2.5 py-1 text-xs font-semibold rounded-full w-fit whitespace-nowrap ${
-                    project.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                    project.status === 'In Progress' ? 'bg-blue-100 text-blue-700' : 
-                    project.status === 'Planning' ? 'bg-purple-100 text-purple-700' : 'bg-amber-100 text-amber-700'
+                <td className="px-4 py-5 font-bold text-slate-900 group-hover:text-primary transition-colors">{project.name}</td>
+                <td className="px-4 py-5 text-slate-600 font-medium">{project.client}</td>
+                <td className="px-4 py-5">
+                  <span className={`px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-lg w-fit whitespace-nowrap ${
+                    project.status === 'Completed' ? 'bg-[#dcfce7] text-[#166534]' :
+                    project.status === 'In Progress' ? 'bg-[#ffedd5] text-[#9a3412]' : 
+                    project.status === 'Planning' ? 'bg-[#f3e8ff] text-[#6b21a8]' : 'bg-[#fee2e2] text-[#991b1b]'
                   }`}>
                     {project.status}
                   </span>
                 </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-24 bg-slate-200  rounded-full h-2">
-                      <div className="bg-primary h-2 rounded-full" style={{ width: `${project.progress}%` }}></div>
+                <td className="px-4 py-5">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-24 bg-slate-100 rounded-full h-1.5">
+                      <div className="bg-slate-900 h-1.5 rounded-full" style={{ width: `${project.progress}%` }}></div>
                     </div>
-                    <span className="text-xs text-slate-500 font-medium">{project.progress}%</span>
+                    <span className="text-xs text-slate-500 font-bold">{project.progress}%</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-slate-600  whitespace-nowrap">{project.startDate}</td>
-                <td className="px-6 py-4 text-slate-600  whitespace-nowrap">{project.endDate}</td>
-                <td className="px-6 py-4 text-right">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/portal/projects/${project.id}`);
-                    }}
-                    className="text-primary hover:text-blue-600 font-medium text-sm transition-colors"
-                  >
-                    View
-                  </button>
-                </td>
+                <td className="px-4 py-5 text-slate-500 font-medium whitespace-nowrap">{project.startDate}</td>
+                <td className="px-4 py-5 text-slate-500 font-medium whitespace-nowrap">{project.endDate}</td>
               </tr>
             ))}
             {filteredProjects.length === 0 && (

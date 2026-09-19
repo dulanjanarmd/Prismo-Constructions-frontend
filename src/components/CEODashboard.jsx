@@ -6,6 +6,7 @@ import {
   Briefcase, AlertTriangle, CheckSquare, BarChart3, 
   ArrowRight, Search, Filter, ShieldAlert, ChevronDown, ChevronUp 
 } from 'lucide-react';
+import DashboardHeader from './DashboardHeader';
 import { motion, AnimatePresence } from 'framer-motion';
 import DetailedIssue from './DetailedIssue';
 
@@ -55,13 +56,8 @@ const CEODashboard = () => {
     <div className="space-y-8 animate-in fade-in duration-500">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
-            Executive Dashboard
-          </h1>
-          <p className="text-slate-500 mt-1">Welcome back, {currentUser?.name || 'Executive'}</p>
-        </div>
+      <div className="mb-6">
+        <DashboardHeader />
       </div>
 
       {/* Summary Cards */}
@@ -86,7 +82,7 @@ const CEODashboard = () => {
           <p className="text-sm font-medium text-red-600  mb-1">Critical Issues</p>
           <p className="text-3xl font-bold text-red-600  flex items-center gap-2">
             {criticalIssuesCount}
-            {criticalIssuesCount > 0 && <ShieldAlert className="w-6 h-6 animate-pulse" />}
+            {criticalIssuesCount > 0 && <span className="animate-pulse">🚨</span>}
           </p>
         </motion.div>
       </div>

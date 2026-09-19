@@ -145,32 +145,32 @@ const Projects = () => {
       <div className="glass-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50  text-slate-500 border-b border-border">
+            <thead className="border-b border-slate-100">
               <tr>
-                <th className="px-6 py-4 font-medium">Project Name</th>
-                <th className="px-6 py-4 font-medium">Timeline</th>
-                <th className="px-6 py-4 font-medium">Status & Progress</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Project Name</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Timeline</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status & Progress</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {visibleProjects.map((project) => (
-                <tr key={project.id} className="hover:bg-slate-50/50 :bg-slate-800/50 transition-colors">
-                  <td className="px-6 py-4">
+                <tr key={project.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <td className="px-6 py-5">
                     <p className="font-bold text-base text-slate-900 ">{project.name}</p>
                     <p className="text-slate-500 text-xs mt-1">{project.client} • {project.location}</p>
                   </td>
-                  <td className="px-6 py-4 text-slate-600 ">
+                  <td className="px-6 py-5 text-slate-600 ">
                     <div className="flex items-center text-xs">
                       <Calendar className="w-4 h-4 mr-2" />
                       {project.startDate} to {project.endDate}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-5">
                     <div className="flex flex-col space-y-2">
                       <span className={`px-2.5 py-1 text-xs font-semibold rounded-full w-fit ${
-                        project.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                        project.status === 'In Progress' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
+                        project.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' :
+                        project.status === 'In Progress' ? 'bg-sky-100 text-sky-700' : 'bg-amber-100 text-amber-700'
                       }`}>
                         {project.status}
                       </span>
@@ -182,7 +182,7 @@ const Projects = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-5 text-right">
                     <div className="flex justify-end space-x-2">
                       <button 
                         onClick={() => navigate(`/portal/projects/${project.id}`)} 

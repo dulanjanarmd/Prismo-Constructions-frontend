@@ -44,6 +44,7 @@ const Navbar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const unreadCount = notifications?.filter(n => !n.read)?.length || 0;
 
@@ -79,38 +80,41 @@ const Navbar = () => {
   const roleNav = currentUser ? navItems[currentUser.role] : [];
 
   return (
-    <div className="bg-[#e5e7eb] relative px-4 sm:px-8 z-50 shadow-sm">
-      <header className="py-6 mx-auto w-full max-w-7xl flex items-center justify-between">
+    <div className="bg-[#e5e7eb] rounded-b-[3rem] pb-4 relative px-4 sm:px-8 z-50">
+      <header className="py-6 px-4 mx-auto w-full max-w-7xl flex items-center justify-between">
         
         {/* Left Side: Logo and Nav */}
         <div className="flex items-center space-x-2">
-          <Link to="/portal" className="bg-white rounded-lg flex items-center justify-center h-12 px-2 shadow-sm hover:opacity-90 transition-opacity">
+          <Link to="/portal" className="bg-white rounded-xl flex items-center justify-center h-12 px-3 shadow-md hover:opacity-90 transition-opacity">
             <img src="/prismo-logo.png" alt="Prismo Construction" className="h-10 w-auto object-contain" />
           </Link>
-          <nav className="hidden md:flex bg-[#d1d5db] h-12 rounded-lg px-2 items-center space-x-1 text-sm font-medium text-[#4b5563]">
-            {roleNav.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`flex items-center px-4 py-2 text-sm font-medium transition-colors rounded ${
-                  location.pathname === item.path 
-                    ? 'bg-[#9ca3af]/20 text-[#1e2a35]' 
-                    : 'hover:bg-[#9ca3af]/20 hover:text-[#1e2a35]'
-                }`}
-              >
-                {item.icon}
-                {item.name}
-              </Link>
-            ))}
+          <nav className="hidden md:flex bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 items-center space-x-1 text-sm font-bold text-slate-600">
+            {roleNav.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className={`relative px-5 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full ${
+                    isActive 
+                      ? 'bg-white shadow-sm text-slate-900 font-bold' 
+                      : 'hover:text-slate-900'
+                  }`}
+                >
+                  <span className="relative z-10 transition-colors duration-200">
+                    {item.name}
+                  </span>
+                </Link>
+              );
+            })}
           </nav>
         </div>
 
-        {/* Right Side: Profile and Actions */}
         <div className="flex items-center space-x-2">
-          <div className="hidden md:flex items-center bg-[#d1d5db] h-12 rounded-lg p-1 space-x-1 text-sm font-bold relative">
+          <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 gap-0.5 text-sm font-bold relative">
             <button
               onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="relative p-2 text-slate-600 hover:text-slate-900 transition-colors"
+              className="relative w-9 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
@@ -153,10 +157,27 @@ const Navbar = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-            <div className="flex items-center text-[#4b5563] px-2 py-2">
-              <User className="w-4 h-4 mr-2" />
-              <span className="font-medium">{currentUser?.name}</span>
-            </div>
+            <button 
+              onClick={() => setProfileOpen(!profileOpen)}
+              className="relative w-9 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all"
+            >
+              <User className="w-5 h-5 -mt-[2px]" />
+            </button>
+            <AnimatePresence>
+              {profileOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute top-full right-24 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50"
+                >
+                  <div className="p-3 bg-slate-50">
+                    <p className="font-bold text-slate-800 truncate">{currentUser?.name}</p>
+                    <p className="text-xs text-slate-500 capitalize">{currentUser?.role?.replace('_', ' ')}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <button 
               onClick={logout}
               className="px-6 py-2 bg-primary text-[#022c22] rounded-md transition-colors uppercase h-full flex items-center hover:opacity-90"
@@ -166,7 +187,7 @@ const Navbar = () => {
             </button>
           </div>
           <button 
-            className="md:hidden text-slate-600 bg-[#d1d5db] h-12 w-12 flex items-center justify-center rounded-lg"
+            className="md:hidden text-slate-600 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 w-12 flex items-center justify-center rounded-xl"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -193,7 +214,6 @@ const Navbar = () => {
                       : 'text-slate-600'
                   }`}
                 >
-                  {item.icon}
                   {item.name}
                 </Link>
               ))}
@@ -222,13 +242,6 @@ const Layout = () => {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-slate-100 transition-colors duration-300 flex flex-col font-sans relative">
-        
-        {/* Custom Dashboard Bottom Background */}
-        <div 
-          className="fixed inset-0 z-[-1] pointer-events-none opacity-40 bg-no-repeat bg-cover bg-bottom mix-blend-multiply" 
-          style={{ backgroundImage: "url('/dashboard-bg.png')" }} 
-        />
-
         <Navbar />
         
         <main className="flex-1 p-4 md:p-6 w-full max-w-7xl mx-auto mt-2 md:mt-4">

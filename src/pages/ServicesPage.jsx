@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 
 const ServicesPage = () => {
   const services = [
-    { title: 'Residential Construction', desc: 'Custom luxury homes built to your exact specifications with premium materials.', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=800' },
-    { title: 'Commercial Development', desc: 'Office buildings, retail spaces, and industrial facilities delivered on time and under budget.', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800' },
-    { title: 'Renovation & Remodeling', desc: 'Transforming existing spaces into modern, functional, and beautiful environments.', image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=800' },
-    { title: 'Project Management', desc: 'End-to-end oversight ensuring absolute safety, quality control, and transparency.', image: 'https://images.unsplash.com/photo-1541888086425-d81bb19240f5?auto=format&fit=crop&q=80&w=800' },
+    { title: 'Residential Construction', desc: 'Custom luxury homes built to your exact specifications with premium materials.', image: '/images/residential.jpg' },
+    { title: 'Commercial Development', desc: 'Office buildings, retail spaces, and industrial facilities delivered on time and under budget.', image: '/images/commercial.jpg' },
+    { title: 'Renovation & Remodeling', desc: 'Transforming existing spaces into modern, functional, and beautiful environments.', image: '/images/renovation.jpg' },
+    { title: 'Project Management', desc: 'End-to-end oversight ensuring absolute safety, quality control, and transparency.', image: 'https://placehold.co/800x600/e2e8f0/1e293b?text=Project+Management' },
   ];
 
   return (

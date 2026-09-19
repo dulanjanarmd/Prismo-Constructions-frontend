@@ -1,6 +1,13 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 const AnimatedBackground = () => {
+  const location = useLocation();
+  
+  if (location.pathname.startsWith('/portal')) {
+    return null;
+  }
+  
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden bg-white pointer-events-none">
       {/* Base Gradient Layer */}

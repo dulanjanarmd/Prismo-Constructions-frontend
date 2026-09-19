@@ -7,17 +7,17 @@ import { motion } from 'framer-motion';
 import TaskDetailModal from '../components/TaskDetailModal';
 
 const PRIORITY_STYLES = {
-  High: 'bg-red-100 text-red-700',
+  High: 'bg-rose-100 text-rose-700',
   Medium: 'bg-amber-100 text-amber-700',
-  Low: 'bg-green-100 text-green-700'
+  Low: 'bg-teal-100 text-teal-700'
 };
 
 const STATUS_STYLES = {
   'To Do': 'bg-slate-100 text-slate-600',
-  'In Progress': 'bg-amber-100 text-amber-700',
-  'Completed': 'bg-blue-100 text-blue-700',
-  'Reopened': 'bg-red-100 text-red-700',
-  'Closed': 'bg-green-100 text-green-700'
+  'In Progress': 'bg-sky-100 text-sky-700',
+  'Completed': 'bg-emerald-100 text-emerald-700',
+  'Reopened': 'bg-rose-100 text-rose-700',
+  'Closed': 'bg-slate-200 text-slate-700'
 };
 
 const Tasks = () => {
@@ -81,16 +81,23 @@ const Tasks = () => {
       </div>
 
       {/* Status summary chips */}
-      <div className="flex gap-3 flex-wrap">
+      <div className="flex gap-2 flex-wrap bg-white p-1.5 rounded-full w-fit shadow-sm border border-slate-100">
         {Object.entries(statusCounts).filter(([, v]) => v > 0).map(([status, count]) => (
           <button
             key={status}
             onClick={() => setStatusFilter(statusFilter === status ? 'All' : status)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${
-              statusFilter === status ? 'ring-2 ring-primary ring-offset-1' : ''
-            } ${STATUS_STYLES[status] || 'bg-slate-100 text-slate-600'}`}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
+              statusFilter === status 
+                ? 'bg-primary text-white shadow-md' 
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+            }`}
           >
-            {status}: {count}
+            {status}
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+              statusFilter === status ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+            }`}>
+              {count}
+            </span>
           </button>
         ))}
       </div>
@@ -155,16 +162,16 @@ const Tasks = () => {
         <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50  border-b border-border text-slate-500">
+              <thead className="border-b border-slate-100">
                 <tr>
-                  <th className="px-6 py-3 font-medium">Task</th>
-                  <th className="px-6 py-3 font-medium">Project</th>
-                  <th className="px-6 py-3 font-medium">Milestone</th>
-                  <th className="px-6 py-3 font-medium">Priority</th>
-                  {!isSiteEngineer && <th className="px-6 py-3 font-medium">Assignee</th>}
-                  <th className="px-6 py-3 font-medium">Status</th>
-                  <th className="px-6 py-3 font-medium">Due Date</th>
-                  <th className="px-6 py-3 font-medium text-right">Action</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Task</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Project</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Milestone</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Priority</th>
+                  {!isSiteEngineer && <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Assignee</th>}
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Due Date</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -188,9 +195,9 @@ const Tasks = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: idx * 0.03 }}
-                      className={`hover:bg-slate-50/50 :bg-slate-800/30 transition-colors ${needsReview ? 'bg-amber-50/40 ' : ''}`}
+                      className={`hover:bg-slate-50/50 transition-colors group ${needsReview ? 'bg-amber-50/40 ' : ''}`}
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-5">
                         <div className="flex items-start gap-2">
                           {needsReview && <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" title="Needs PM review" />}
                           {task.status === 'Closed' && <Lock className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />}
@@ -202,7 +209,7 @@ const Tasks = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-5">
                         {project ? (
                           <button
                             onClick={() => navigate(`/portal/projects/${project.id}`)}
@@ -212,16 +219,16 @@ const Tasks = () => {
                           </button>
                         ) : '—'}
                       </td>
-                      <td className="px-6 py-4 text-slate-500 text-sm">
+                      <td className="px-6 py-5 text-slate-500 text-sm">
                         {task.milestoneName || (projects?.find(p => String(p.id) === String(task.projectId).replace('p', ''))?.milestones?.find(m => String(m.id) === String(task.milestoneId)?.replace('m', ''))?.name) || '—'}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-5">
                         <span className={`px-2 py-0.5 text-xs font-semibold rounded ${PRIORITY_STYLES[task.priority] || ''}`}>
                           {task.priority}
                         </span>
                       </td>
                       {!isSiteEngineer && (
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-5">
                           <div className="flex items-center gap-1.5">
                             {assignee && (
                               <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
@@ -232,13 +239,13 @@ const Tasks = () => {
                           </div>
                         </td>
                       )}
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-5">
                         <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${STATUS_STYLES[task.status] || ''}`}>
                           {task.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-slate-500 whitespace-nowrap">{task.dueDate || '—'}</td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-5 text-slate-500 whitespace-nowrap">{task.dueDate || '—'}</td>
+                      <td className="px-6 py-5 text-right">
                         <button
                           onClick={() => setSelectedTask(task)}
                           className="flex items-center gap-1 text-primary hover:text-blue-600 font-medium text-sm transition-colors ml-auto"

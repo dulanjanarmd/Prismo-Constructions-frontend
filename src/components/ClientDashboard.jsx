@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import DashboardHeader from './DashboardHeader';
 import {
   Briefcase, ArrowRight, Bell, Calendar, CheckSquare, MessageSquare,
   FileText, Plus, X, Send
@@ -106,13 +107,8 @@ const ClientDashboard = () => {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            Client Dashboard
-          </h1>
-          <p className="text-slate-500 mt-1">Welcome back, {currentUser?.name || 'Client'}</p>
-        </div>
+      <div className="mb-6">
+        <DashboardHeader />
       </div>
 
       {/* Summary Cards */}
