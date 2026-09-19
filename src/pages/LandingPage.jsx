@@ -432,7 +432,6 @@ const LandingPage = () => {
             <ul className="space-y-2">
               <li><Link to="/login" className="hover:text-white transition-colors">Employee Login</Link></li>
               <li><Link to="/login" className="hover:text-white transition-colors">Client Login</Link></li>
-              <li><Link to="/register" className="hover:text-white transition-colors">Create Account</Link></li>
             </ul>
           </div>
         </div>

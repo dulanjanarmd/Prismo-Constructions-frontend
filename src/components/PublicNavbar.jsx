@@ -65,11 +65,7 @@ const PublicNavbar = () => {
         </div>
         
         <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 space-x-1 text-sm font-bold">
-          {location.pathname === '/login' ? (
-            <Link to="/register" className="px-6 py-2 text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all duration-200 h-full flex items-center">
-              Sign Up
-            </Link>
-          ) : (
+          {location.pathname !== '/login' && (
             <Link to="/login" className="px-6 py-2 text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all duration-200 h-full flex items-center">
               Sign In
             </Link>
