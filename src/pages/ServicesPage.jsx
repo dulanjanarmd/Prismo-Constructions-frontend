@@ -1,14 +1,13 @@
 import React from 'react';
 import PublicNavbar from '../components/PublicNavbar';
 import { motion } from 'framer-motion';
-import { Home, Building2, Wrench, ShieldCheck } from 'lucide-react';
 
 const ServicesPage = () => {
   const services = [
-    { title: 'Residential Construction', desc: 'Custom luxury homes built to your exact specifications with premium materials.', icon: <Home className="w-8 h-8 text-[#1e2a35]" /> },
-    { title: 'Commercial Development', desc: 'Office buildings, retail spaces, and industrial facilities delivered on time and under budget.', icon: <Building2 className="w-8 h-8 text-[#1e2a35]" /> },
-    { title: 'Renovation & Remodeling', desc: 'Transforming existing spaces into modern, functional, and beautiful environments.', icon: <Wrench className="w-8 h-8 text-[#1e2a35]" /> },
-    { title: 'Project Management', desc: 'End-to-end oversight ensuring absolute safety, quality control, and transparency.', icon: <ShieldCheck className="w-8 h-8 text-[#1e2a35]" /> },
+    { title: 'Residential Construction', desc: 'Custom luxury homes built to your exact specifications with premium materials.', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800' },
+    { title: 'Commercial Development', desc: 'Office buildings, retail spaces, and industrial facilities delivered on time and under budget.', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800' },
+    { title: 'Renovation & Remodeling', desc: 'Transforming existing spaces into modern, functional, and beautiful environments.', image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=800' },
+    { title: 'Project Management', desc: 'End-to-end oversight ensuring absolute safety, quality control, and transparency.', image: 'https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?auto=format&fit=crop&q=80&w=800' },
   ];
 
   return (
@@ -46,13 +45,15 @@ const ServicesPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-white p-10 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+              className="bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow overflow-hidden group"
             >
-              <div className="w-16 h-16 bg-primary/20 rounded-xl flex items-center justify-center mb-6">
-                {service.icon}
+              <div className="h-64 w-full overflow-hidden">
+                <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               </div>
-              <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
-              <p className="text-slate-500 text-lg leading-relaxed">{service.desc}</p>
+              <div className="p-8">
+                <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
+                <p className="text-slate-500 text-lg leading-relaxed">{service.desc}</p>
+              </div>
             </motion.div>
           ))}
         </div>

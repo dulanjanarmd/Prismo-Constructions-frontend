@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 
 const PortfolioPage = () => {
   const projects = [
-    { name: 'Skyline Tower', type: 'Commercial', desc: 'A 45-story premium office complex completed 2 months ahead of schedule.', imgColor: 'bg-slate-300' },
-    { name: 'Oasis Residences', type: 'Residential', desc: 'Luxury condominium with sustainable energy systems and smart home integrations.', imgColor: 'bg-slate-400' },
-    { name: 'Metro Transit Hub', type: 'Infrastructure', desc: 'Modern transit center connecting over 50,000 daily commuters.', imgColor: 'bg-slate-500' },
-    { name: 'Apex Retail Park', type: 'Commercial', desc: 'A 200,000 sq ft shopping destination featuring open-air promenades.', imgColor: 'bg-slate-600' },
+    { name: 'Skyline Tower', type: 'Commercial', desc: 'A 45-story premium office complex completed 2 months ahead of schedule.', image: 'https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Oasis Residences', type: 'Residential', desc: 'Luxury condominium with sustainable energy systems and smart home integrations.', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Metro Transit Hub', type: 'Infrastructure', desc: 'Modern transit center connecting over 50,000 daily commuters.', image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Apex Retail Park', type: 'Commercial', desc: 'A 200,000 sq ft shopping destination featuring open-air promenades.', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800' },
   ];
 
   return (
@@ -47,9 +47,9 @@ const PortfolioPage = () => {
               transition={{ delay: idx * 0.1 }}
               className="bg-white rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-lg transition-all group overflow-hidden cursor-pointer flex flex-col"
             >
-              {/* Image Placeholder */}
-              <div className={`h-64 w-full ${project.imgColor} flex items-center justify-center`}>
-                <span className="text-white/50 font-bold text-xl uppercase tracking-widest">{project.name} Image</span>
+              {/* Project Image */}
+              <div className="h-64 w-full overflow-hidden">
+                <img src={project.image} alt={project.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               </div>
               
               <div className="p-8">
