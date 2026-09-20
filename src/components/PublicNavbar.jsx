@@ -18,7 +18,7 @@ const PublicNavbar = () => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="py-6 px-4 mx-auto w-full max-w-7xl flex flex-col md:flex-row md:items-center justify-between z-50 sticky top-0"
+        className="py-6 px-4 mx-auto w-full max-w-7xl flex flex-col md:flex-row md:items-center justify-between z-50 relative"
       >
         <div className="flex items-center justify-between w-full md:w-auto">
           <div className="flex items-center space-x-3">
