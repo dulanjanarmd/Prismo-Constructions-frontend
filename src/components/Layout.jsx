@@ -54,11 +54,9 @@ const Navbar = () => {
     ],
     ceo: [
       { name: 'Portfolio', path: '/portal', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
-      { name: 'Consultations', path: '/portal/consultations', icon: <MessageSquare className="w-4 h-4 mr-2" /> },
     ],
     project_manager: [
       { name: 'Dashboard', path: '/portal', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
-      { name: 'Consultations', path: '/portal/consultations', icon: <MessageSquare className="w-4 h-4 mr-2" /> },
       { name: 'Projects', path: '/portal/projects', icon: <Briefcase className="w-4 h-4 mr-2" /> },
       { name: 'Tasks', path: '/portal/tasks', icon: <CheckSquare className="w-4 h-4 mr-2" /> },
       { name: 'Approvals', path: '/portal/approvals', icon: <MessageSquare className="w-4 h-4 mr-2" /> },

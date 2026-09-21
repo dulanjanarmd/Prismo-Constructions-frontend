@@ -474,23 +474,23 @@ const ProjectMilestonesTab = ({ project }) => {
                   {!isClient && (
                     <div className="flex items-center gap-1 shrink-0">
                       {isEditing ? (
-                        <>
-                          <button onClick={() => handleEditSave(m.id)} className="p-1.5 text-green-500 hover:bg-green-50 rounded-md transition-colors">
-                            <Check className="w-4 h-4" />
+                        <div className="flex gap-2">
+                          <button onClick={() => handleEditSave(m.id)} className="px-3 py-1.5 text-xs font-bold bg-primary text-slate-900 hover:brightness-105 rounded-md shadow-sm transition-all">
+                            Save
                           </button>
-                          <button onClick={() => setEditingId(null)} className="p-1.5 text-slate-400 hover:bg-slate-100 rounded-md transition-colors">
-                            <X className="w-4 h-4" />
+                          <button onClick={() => setEditingId(null)} className="px-3 py-1.5 text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 rounded-md shadow-sm transition-all">
+                            Cancel
                           </button>
-                        </>
+                        </div>
                       ) : (
-                        <>
-                          <button onClick={() => startEdit(m)} className="p-1.5 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 rounded-md transition-colors">
-                            <Edit2 className="w-4 h-4" />
+                        <div className="flex gap-2">
+                          <button onClick={() => startEdit(m)} className="px-3 py-1.5 text-xs font-bold bg-primary text-slate-900 hover:brightness-105 rounded-md shadow-sm transition-all">
+                            Edit
                           </button>
-                          <button onClick={() => handleDelete(m.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
-                            <Trash2 className="w-4 h-4" />
+                          <button onClick={() => handleDelete(m.id)} className="px-3 py-1.5 text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 rounded-md shadow-sm transition-all">
+                            Delete
                           </button>
-                        </>
+                        </div>
                       )}
                     </div>
                   )}

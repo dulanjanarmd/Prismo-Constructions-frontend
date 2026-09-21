@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useData } from '../context/DataContext';
 import { motion } from 'framer-motion';
 import ImageCarousel from '../components/ImageCarousel';
 import PublicNavbar from '../components/PublicNavbar';
 import { Home, Building2, Wrench, Star } from 'lucide-react';
 
 const LandingPage = () => {
-  const { addConsultation } = useData();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,22 +16,10 @@ const LandingPage = () => {
     timeline: '3 - 6 Months',
     notes: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addConsultation({
-      ...formData,
-      status: 'New Inquiry',
-      dateSubmitted: new Date().toISOString().split('T')[0],
-      proposalUrl: null
-    });
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ clientName: '', email: '', phone: '', service: 'Construction Management', description: '' });
-    }, 5000);
   };
 
   return (
@@ -213,7 +199,7 @@ const LandingPage = () => {
             </motion.div>
           </div>
         </div>
-        
+
         <div id="contact" className="max-w-7xl mx-auto bg-[#f8fafc] border border-slate-200 p-6 md:p-10 rounded-[2rem] shadow-xl relative overflow-hidden">
           
           <div className="text-center mb-6 relative z-10">
@@ -226,51 +212,34 @@ const LandingPage = () => {
               <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               </div>
-              <h3 className="text-2xl font-bold text-[#1e2a35] mb-2">Request Received!</h3>
-              <p className="text-slate-600">Our team will review your requirements and contact you shortly.</p>
+              <h3 className="text-2xl font-bold text-[#1e2a35] mb-2">Email Client Opened!</h3>
+              <p className="text-slate-600">Please send the pre-filled email to complete your inquiry.</p>
               <button onClick={() => setSubmitSuccess(false)} className="mt-4 text-primary font-bold hover:underline">Submit Another Inquiry</button>
             </motion.div>
           ) : (
-            <form className="space-y-3 relative z-10" onSubmit={async (e) => {
+            <form className="space-y-3 relative z-10" onSubmit={(e) => {
               e.preventDefault();
-              setIsSubmitting(true);
-              try {
-                const res = await fetch('http://localhost:8080/api/inquiries', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    customerName: formData.name,
-                    customerEmail: formData.email,
-                    customerPhone: formData.phone,
-                    projectType: formData.projectType,
-                    location: formData.location,
-                    initialNotes: `Budget: ${formData.budget}\nTimeline: ${formData.timeline}\n\nDetails:\n${formData.notes}`
-                  })
-                });
-                if (res.ok) {
-                  const savedInquiry = await res.json();
-                  
-                  // Add it to frontend context so it appears immediately if the PM navigates to the dashboard without refreshing
-                  addConsultation({
-                    id: savedInquiry.id,
-                    clientName: savedInquiry.customerName,
-                    service: savedInquiry.projectType,
-                    dateSubmitted: savedInquiry.createdAt,
-                    description: savedInquiry.description,
-                    status: 'New Inquiry',
-                    email: savedInquiry.email,
-                    phone: savedInquiry.phone,
-                    assignedToId: savedInquiry.assignedTo?.id
-                  });
+              
+              const subject = encodeURIComponent(`New Consultation Request - ${formData.projectType}`);
+              const body = encodeURIComponent(
+`Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Location: ${formData.location}
+Project Type: ${formData.projectType}
+Budget: ${formData.budget}
+Timeline: ${formData.timeline}
 
-                  setSubmitSuccess(true);
-                  setFormData({ name: '', email: '', phone: '', projectType: 'Commercial Build', location: '', budget: '10M - 50M LKR', timeline: '3 - 6 Months', notes: '' });
-                }
-              } catch (error) {
-                console.error("Failed to submit inquiry", error);
-              } finally {
-                setIsSubmitting(false);
-              }
+Details:
+${formData.notes}
+`
+              );
+              
+              // Open user's email client
+              window.location.href = `mailto:contact@prismoconstruction.com?subject=${subject}&body=${body}`;
+              
+              setSubmitSuccess(true);
+              setFormData({ name: '', email: '', phone: '', projectType: 'Commercial Build', location: '', budget: '10M - 50M LKR', timeline: '3 - 6 Months', notes: '' });
             }}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -355,14 +324,14 @@ const LandingPage = () => {
 
               <button 
                 type="submit" 
-                disabled={isSubmitting}
-                className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:opacity-90 transition-all text-lg shadow-lg shadow-primary/20 disabled:opacity-50"
+                className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:opacity-90 transition-all text-lg shadow-lg shadow-primary/20"
               >
-                {isSubmitting ? 'Sending...' : 'Submit Request'}
+                Send Request via Email
               </button>
             </form>
           )}
         </div>
+
       </main>
 
       {/* Exact Match Footer from Screenshot */}

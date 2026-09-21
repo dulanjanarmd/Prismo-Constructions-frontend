@@ -46,8 +46,8 @@ const ProjectDocumentsTab = ({ project }) => {
       setDocuments(data.map(doc => ({
         ...doc,
         url: `http://localhost:8080${doc.fileUrl}`,
-        uploadedBy: doc.uploadedBy?.name || 'Unknown',
-        uploadedAt: doc.createdAt || '—'
+        uploadedBy: doc.uploadedBy || 'Unknown',
+        uploadedAt: doc.createdAt ? new Date(doc.createdAt).toLocaleDateString() : '—'
       })));
     };
     if (projectId && currentUser?.token) loadDocuments();
@@ -75,8 +75,8 @@ const ProjectDocumentsTab = ({ project }) => {
       setDocuments(current => [{
         ...doc,
         url: `http://localhost:8080${doc.fileUrl}`,
-        uploadedBy: doc.uploadedBy?.name || currentUser.name,
-        uploadedAt: 'Today'
+        uploadedBy: doc.uploadedBy || currentUser.name,
+        uploadedAt: doc.createdAt ? new Date(doc.createdAt).toLocaleDateString() : 'Today'
       }, ...current]);
       setFormData({ name: '', category: 'design', file: null, note: '' });
       setIsUploading(false);
@@ -94,12 +94,7 @@ const ProjectDocumentsTab = ({ project }) => {
     if (response.ok) setDocuments(current => current.filter(d => d.id !== id));
   };
 
-  // Group documents by category
-  const grouped = documents.reduce((acc, doc) => {
-    if (!acc[doc.category]) acc[doc.category] = [];
-    acc[doc.category].push(doc);
-    return acc;
-  }, {});
+  // No longer grouping by category, rendering in a single table
 
   return (
     <div className="space-y-6">
@@ -199,69 +194,70 @@ const ProjectDocumentsTab = ({ project }) => {
         </div>
       )}
 
-      {/* Documents grouped by category */}
-      {Object.keys(grouped).map(category => (
-        <div key={category}>
-          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">
-            {CATEGORY_LABELS[category] || category}
-          </h3>
-          <div className="glass-card overflow-hidden">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50  border-b border-border">
-                <tr>
-                  <th className="px-6 py-3 font-medium text-slate-500">Name</th>
-                  <th className="px-6 py-3 font-medium text-slate-500">Note</th>
-                  <th className="px-6 py-3 font-medium text-slate-500">Uploaded By</th>
-                  <th className="px-6 py-3 font-medium text-slate-500">Date</th>
-                  <th className="px-6 py-3 font-medium text-slate-500 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {grouped[category].map(doc => (
-                  <motion.tr
-                    key={doc.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="hover:bg-slate-50/50 :bg-slate-800/30 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-3">
-                        <FileIcon name={doc.name} />
-                        <span className="font-medium text-slate-900 ">{doc.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-slate-500 text-xs max-w-[200px] truncate">{doc.note || '—'}</td>
-                    <td className="px-6 py-4 text-slate-600 ">{doc.uploadedBy}</td>
-                    <td className="px-6 py-4 text-slate-600  whitespace-nowrap">{doc.uploadedAt}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex justify-end space-x-2">
-                        <a
-                          href={doc.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 text-slate-500 hover:text-primary hover:bg-blue-50 :bg-blue-900/30 rounded-md transition-colors"
-                          title="Download"
+      {/* Documents Table */}
+      {documents.length > 0 && (
+        <div className="glass-card overflow-hidden">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-slate-50 border-b border-border">
+              <tr>
+                <th className="px-6 py-3 font-medium text-slate-500">Name</th>
+                <th className="px-6 py-3 font-medium text-slate-500">Category</th>
+                <th className="px-6 py-3 font-medium text-slate-500">Note</th>
+                <th className="px-6 py-3 font-medium text-slate-500">Uploaded By</th>
+                <th className="px-6 py-3 font-medium text-slate-500">Date</th>
+                <th className="px-6 py-3 font-medium text-slate-500 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {documents.map(doc => (
+                <motion.tr
+                  key={doc.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="hover:bg-slate-50/50 transition-colors"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center space-x-3">
+                      <FileIcon name={doc.fileName} />
+                      <span className="font-medium text-slate-900">{doc.fileName}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-700 capitalize">
+                      {CATEGORY_LABELS[doc.category] || doc.category}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-slate-500 text-xs max-w-[200px] truncate">{doc.note || '—'}</td>
+                  <td className="px-6 py-4 text-slate-600">{doc.uploadedBy}</td>
+                  <td className="px-6 py-4 text-slate-600 whitespace-nowrap">{doc.uploadedAt}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex justify-end space-x-2">
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 text-slate-500 hover:text-primary hover:bg-blue-50 rounded-md transition-colors"
+                        title="Download"
+                      >
+                        <Download className="w-4 h-4" />
+                      </a>
+                      {isPM && (
+                        <button
+                          onClick={() => handleDelete(doc.id)}
+                          className="p-1.5 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                          title="Delete"
                         >
-                          <Download className="w-4 h-4" />
-                        </a>
-                        {isPM && (
-                          <button
-                            onClick={() => handleDelete(doc.id)}
-                            className="p-1.5 text-slate-500 hover:text-red-500 hover:bg-red-50 :bg-red-900/20 rounded-md transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      ))}
+      )}
     </div>
   );
 };

@@ -147,29 +147,27 @@ const ProjectOverviewTab = ({ project }) => {
         {/* Left: Project details + status */}
         <div className="lg:col-span-2 space-y-6">
           {/* Details Card */}
-          <div className="glass-card p-6">
-            <div className="flex justify-between items-center border-b border-border pb-4 mb-4">
-              <h2 className="text-xl font-bold">Project Details</h2>
+          <div className="glass-card overflow-hidden">
+            <div className="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+              <h2 className="text-lg font-bold text-slate-800">Project Details</h2>
               {!isClient && (
                 <div className="flex gap-2">
                   <button
                     onClick={() => openModal('edit')}
-                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
-                    title="Edit Details"
+                    className="flex items-center px-3 py-1.5 text-xs font-bold bg-primary text-slate-900 hover:brightness-105 rounded-md shadow-sm transition-all"
                   >
-                    <Edit2 className="w-4 h-4" />
+                    Edit Details
                   </button>
                   <button
                     onClick={handleDeleteProject}
-                    className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                    title="Delete Project"
+                    className="flex items-center px-3 py-1.5 text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 rounded-md shadow-sm transition-all"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    Delete Project
                   </button>
                 </div>
               )}
             </div>
-            <div className="space-y-4">
+            <div className="p-6 space-y-4">
               <div>
                 <p className="text-sm text-slate-500 mb-1">Description</p>
                 <p className="text-slate-800  text-sm leading-relaxed">{project.description || 'No description provided.'}</p>
@@ -202,22 +200,21 @@ const ProjectOverviewTab = ({ project }) => {
           </div>
 
           {/* Status & Progress */}
-          <div className="glass-card p-6">
-            <div className="flex justify-between items-center border-b border-border pb-4 mb-4">
-              <h2 className="text-xl font-bold flex items-center">
-                <Activity className="w-5 h-5 mr-2 text-blue-500" /> Status &amp; Progress
+          <div className="glass-card overflow-hidden">
+            <div className="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+              <h2 className="text-lg font-bold text-slate-800">
+                Status &amp; Progress
               </h2>
               {!isClient && (
                 <button
                   onClick={() => openModal('status')}
-                  className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                  title="Update Status"
+                  className="flex items-center px-3 py-1.5 text-xs font-bold bg-primary text-slate-900 hover:brightness-105 rounded-md shadow-sm transition-all"
                 >
-                  <Edit2 className="w-4 h-4" />
+                  Update Status
                 </button>
               )}
             </div>
-            <div className="space-y-4">
+            <div className="p-6 space-y-4">
               <div>
                 <p className="text-sm text-slate-500 mb-2">Overall Progress</p>
                 <div className="flex items-center space-x-4">
@@ -237,11 +234,14 @@ const ProjectOverviewTab = ({ project }) => {
         </div>
 
         {/* Right: Recent Activity */}
-        <div className="glass-card p-6">
-          <h2 className="text-xl font-bold border-b border-border pb-4 mb-4 flex items-center">
-            <FileText className="w-5 h-5 mr-2 text-slate-400" /> Recent Activity
-          </h2>
-          {recentActivity.length === 0 ? (
+        <div className="glass-card overflow-hidden h-full flex flex-col">
+          <div className="bg-slate-100 px-6 py-4 border-b border-slate-200">
+            <h2 className="text-lg font-bold text-slate-800">
+              Recent Activity
+            </h2>
+          </div>
+          <div className="p-6 flex-1">
+            {recentActivity.length === 0 ? (
             <p className="text-sm text-slate-500 text-center py-4">No activity yet.</p>
           ) : (
             <div className="space-y-5">
@@ -266,7 +266,8 @@ const ProjectOverviewTab = ({ project }) => {
                 </div>
               ))}
             </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
