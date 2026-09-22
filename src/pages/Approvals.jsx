@@ -38,7 +38,7 @@ const Approvals = () => {
   const displayApprovals = useMemo(() => {
     let list = [...approvals].sort((a, b) => new Date(b.dateRequested) - new Date(a.dateRequested));
     if (statusFilter !== 'All') list = list.filter(a => a.status === statusFilter);
-    if (projectFilter !== 'All') list = list.filter(a => String(a.projectId) === String(projectFilter));
+    if (projectFilter !== 'All') list = list.filter(a => String(a.projectId).replace(/^p/, '') === String(projectFilter).replace(/^p/, ''));
     return list;
   }, [approvals, statusFilter, projectFilter]);
 
@@ -60,46 +60,36 @@ const Approvals = () => {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">
           {isClient ? 'Approval Requests' : 'Client Approvals'}
         </h1>
-        <p className="text-slate-500 mt-1">{displayApprovals.length} requests shown</p>
       </div>
 
-      {/* Status chips */}
-      <div className="flex gap-2 flex-wrap">
-        {Object.entries(statusCounts).filter(([, v]) => v > 0).map(([status, count]) => {
-          const StatusIcon = STATUS_ICON[status];
-          return (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(statusFilter === status ? 'All' : status)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
-                statusFilter === status ? 'ring-2 ring-primary ring-offset-1' : ''
-              } ${STATUS_STYLES[status] || 'bg-slate-100 text-slate-600'}`}
-            >
-              <StatusIcon className="w-3 h-3" />
-              {status}: {count}
-            </button>
-          );
-        })}
-      </div>
+
 
       {/* Table & Filters Card */}
       <div className="glass-card flex flex-col overflow-hidden">
         
         {/* Filters Section */}
-        <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-end items-center p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
-          <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
+        <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
+          <div className="flex items-center gap-3 ml-auto min-w-max">
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600">
+              {['All', 'Pending', 'Approved', 'Changes Requested', 'Rejected', 'Closed'].map(status => {
+                const count = status === 'All' ? displayApprovals.length : (statusCounts[status] || 0);
+                return (
+                  <button
+                    key={status}
+                    onClick={() => setStatusFilter(status)}
+                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                      statusFilter === status 
+                        ? 'bg-white shadow-sm text-slate-900 font-bold' 
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    {status} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
             <select
-              className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all w-full sm:w-auto"
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-            >
-              <option value="All">All Statuses</option>
-              {['Pending', 'Approved', 'Changes Requested', 'Rejected', 'Closed'].map(s => (
-                <option key={s} value={s}>{s} ({statusCounts[s]})</option>
-              ))}
-            </select>
-            <select
-              className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all w-full sm:w-auto"
+              className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={projectFilter}
               onChange={e => setProjectFilter(e.target.value)}
             >
@@ -158,7 +148,7 @@ const Approvals = () => {
                         {project ? (
                           <button
                             onClick={() => navigate(`/portal/projects/${project.id}`)}
-                            className="text-primary hover:underline text-xs font-medium"
+                            className="text-slate-700 hover:text-primary hover:underline text-xs font-medium transition-colors text-left"
                           >
                             {project.name}
                           </button>

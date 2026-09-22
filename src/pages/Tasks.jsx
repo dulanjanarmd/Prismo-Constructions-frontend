@@ -42,8 +42,8 @@ const Tasks = () => {
 
     if (search) list = list.filter(t => t.title?.toLowerCase().includes(search.toLowerCase()));
     if (statusFilter !== 'All') list = list.filter(t => t.status === statusFilter);
-    if (projectFilter !== 'All') list = list.filter(t => String(t.projectId) === String(projectFilter));
-    if (assigneeFilter !== 'All') list = list.filter(t => t.assignedTo === assigneeFilter);
+    if (projectFilter !== 'All') list = list.filter(t => String(t.projectId).replace(/^p/, '') === String(projectFilter).replace(/^p/, ''));
+    if (assigneeFilter !== 'All') list = list.filter(t => String(t.assignedTo).replace(/^u/, '') === String(assigneeFilter).replace(/^u/, ''));
 
     return list;
   }, [tasks, isSiteEngineer, currentUser, search, statusFilter, projectFilter, assigneeFilter]);
@@ -67,7 +67,6 @@ const Tasks = () => {
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             {isSiteEngineer ? 'My Tasks' : 'Task Management'}
           </h1>
-          <p className="text-slate-500 mt-1">{displayTasks.length} tasks shown</p>
         </div>
         {isPM && (
           <button
@@ -85,9 +84,9 @@ const Tasks = () => {
       <div className="glass-card flex flex-col overflow-hidden">
         
         {/* Filters Section */}
-        <div className="flex flex-col lg:flex-row gap-4 justify-end items-center p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
-          <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
-            <div className="flex flex-wrap md:flex-nowrap space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto">
+        <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
+          <div className="flex items-center gap-3 ml-auto min-w-max">
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600">
               {['All', 'To Do', 'In Progress', 'Completed', 'Reopened', 'Closed'].map(status => {
                 const count = status === 'All' ? displayTasks.length : (statusCounts[status] || 0);
                 return (
@@ -107,7 +106,7 @@ const Tasks = () => {
             </div>
 
             <select
-              className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+              className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={projectFilter}
               onChange={e => setProjectFilter(e.target.value)}
             >
@@ -117,7 +116,7 @@ const Tasks = () => {
 
             {isPM && (
               <select
-                className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
                 value={assigneeFilter}
                 onChange={e => setAssigneeFilter(e.target.value)}
               >
@@ -127,16 +126,17 @@ const Tasks = () => {
                 ))}
               </select>
             )}
-          </div>
-          <div className="relative w-full lg:w-64 shrink-0 h-12">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search tasks..."
-              className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
+
+            <div className="relative w-48 shrink-0 h-12">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search tasks..."
+                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
@@ -199,7 +199,7 @@ const Tasks = () => {
                         {project ? (
                           <button
                             onClick={() => navigate(`/portal/projects/${project.id}`)}
-                            className="text-primary hover:underline text-xs font-medium"
+                            className="text-slate-700 hover:text-primary hover:underline text-xs font-medium transition-colors text-left"
                           >
                             {project.name}
                           </button>

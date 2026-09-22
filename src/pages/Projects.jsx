@@ -151,84 +151,97 @@ const Projects = () => {
         )}
       </div>
 
-      <div className="glass-card overflow-hidden">
-        <div className="flex flex-col lg:flex-row gap-4 justify-end items-center p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
-          <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
-            <select
-              className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all w-full sm:w-auto"
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-            >
-              <option value="All">All Statuses</option>
-              {['Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
-          <div className="relative w-full lg:w-64 shrink-0 h-12">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
+      <div className="glass-card flex flex-col overflow-hidden">
+        <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
+          <div className="flex items-center gap-3 ml-auto min-w-max">
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600">
+              {['All', 'Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(status => {
+                const count = status === 'All' ? projects.length : projects.filter(p => p.status === status).length;
+                return (
+                  <button
+                    key={status}
+                    onClick={() => setStatusFilter(status)}
+                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                      statusFilter === status 
+                        ? 'bg-white shadow-sm text-slate-900 font-bold' 
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    {status} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+            
+            <div className="relative w-48 shrink-0 h-12">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search projects..."
+                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-100">
+            <thead className="border-b border-slate-100 text-xs text-slate-400">
               <tr>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Project Name</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Timeline</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Status & Progress</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Project Name</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Client</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Status</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Progress</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Start Date</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">End Date</th>
+                <th className="px-6 py-4 font-semibold tracking-wider text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
-              {visibleProjects.map((project) => (
-                <tr key={project.id} className="hover:bg-slate-50/50 transition-colors group">
+            <tbody className="divide-y divide-slate-50">
+              {visibleProjects.map(project => (
+                <tr 
+                  key={project.id} 
+                  className="hover:bg-slate-50/50 transition-colors group"
+                >
+                  <td className="px-6 py-5 font-bold text-slate-900">{project.name}</td>
+                  <td className="px-6 py-5 text-slate-600 font-medium">{project.client}</td>
                   <td className="px-6 py-5">
-                    <p className="font-bold text-base text-slate-900 ">{project.name}</p>
-                    <p className="text-slate-500 text-xs mt-1">{project.client} • {project.location}</p>
-                  </td>
-                  <td className="px-6 py-5 text-slate-600 ">
-                    <div className="flex items-center text-xs">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      {project.startDate} to {project.endDate}
-                    </div>
+                    <span className={`px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-lg w-fit whitespace-nowrap ${
+                      project.status === 'Completed' ? 'bg-[#dcfce7] text-[#166534]' :
+                      project.status === 'In Progress' ? 'bg-[#ffedd5] text-[#9a3412]' : 
+                      project.status === 'Planning' ? 'bg-[#f3e8ff] text-[#6b21a8]' : 'bg-[#fee2e2] text-[#991b1b]'
+                    }`}>
+                      {project.status}
+                    </span>
                   </td>
                   <td className="px-6 py-5">
-                    <div className="flex flex-col space-y-2">
-                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg w-fit ${
-                        project.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' :
-                        project.status === 'In Progress' ? 'bg-sky-100 text-sky-700' : 'bg-amber-100 text-amber-700'
-                      }`}>
-                        {project.status}
-                      </span>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-full bg-slate-200  rounded-lg h-2 max-w-[120px]">
-                          <div className="bg-primary h-2 rounded-lg" style={{ width: `${project.progress}%` }}></div>
-                        </div>
-                        <span className="text-xs text-slate-500 font-medium">{project.progress}%</span>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-24 bg-slate-100 rounded-full h-1.5">
+                        <div className="bg-slate-900 h-1.5 rounded-full" style={{ width: `${project.progress}%` }}></div>
                       </div>
+                      <span className="text-xs text-slate-500 font-bold">{project.progress}%</span>
                     </div>
                   </td>
+                  <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap">{project.startDate}</td>
+                  <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap">{project.endDate}</td>
                   <td className="px-6 py-5 text-right">
-                    <div className="flex justify-end space-x-2">
-                      <button 
-                        onClick={() => navigate(`/portal/projects/${project.id}`)} 
-                        className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
-                      >
-                        View
-                      </button>
-                      
-
-                    </div>
+                    <button 
+                      onClick={() => navigate(`/portal/projects/${project.id}`)} 
+                      className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
+                    >
+                      View
+                    </button>
                   </td>
                 </tr>
               ))}
+              {visibleProjects.length === 0 && (
+                <tr>
+                  <td colSpan="7" className="px-6 py-8 text-center text-slate-500">
+                    No projects found matching the criteria.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
