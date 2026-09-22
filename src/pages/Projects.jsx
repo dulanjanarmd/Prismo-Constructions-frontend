@@ -207,10 +207,10 @@ const Projects = () => {
                   <td className="px-6 py-5 font-bold text-slate-900">{project.name}</td>
                   <td className="px-6 py-5 text-slate-600 font-medium">{project.client}</td>
                   <td className="px-6 py-5">
-                    <span className={`px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-lg w-fit whitespace-nowrap ${
-                      project.status === 'Completed' ? 'bg-[#dcfce7] text-[#166534]' :
-                      project.status === 'In Progress' ? 'bg-[#ffedd5] text-[#9a3412]' : 
-                      project.status === 'Planning' ? 'bg-[#f3e8ff] text-[#6b21a8]' : 'bg-[#fee2e2] text-[#991b1b]'
+                    <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-28 inline-block text-center ${
+                      project.status === 'Completed' ? 'bg-emerald-500 text-white' :
+                      project.status === 'In Progress' ? 'bg-amber-500 text-white' : 
+                      project.status === 'Planning' ? 'bg-purple-500 text-white' : 'bg-red-500 text-white'
                     }`}>
                       {project.status}
                     </span>

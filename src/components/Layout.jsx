@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FloatingChatWidget from './FloatingChatWidget';
+import ProfileModal from './ProfileModal';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -45,6 +46,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const unreadCount = notifications?.filter(n => !n.read)?.length || 0;
 
@@ -157,9 +159,13 @@ const Navbar = () => {
             </AnimatePresence>
             <button 
               onClick={() => setProfileOpen(!profileOpen)}
-              className="relative w-9 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all"
+              className="relative w-9 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all overflow-hidden"
             >
-              <User className="w-5 h-5 -mt-[2px]" />
+              {currentUser?.profilePictureUrl ? (
+                <img src={currentUser.profilePictureUrl} alt="Profile" className="w-6 h-6 rounded-full object-cover" />
+              ) : (
+                <User className="w-5 h-5 -mt-[2px]" />
+              )}
             </button>
             <AnimatePresence>
               {profileOpen && (
@@ -169,9 +175,27 @@ const Navbar = () => {
                   exit={{ opacity: 0, y: 10 }}
                   className="absolute top-full right-24 mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50"
                 >
-                  <div className="p-3 bg-slate-50">
-                    <p className="font-bold text-slate-800 truncate">{currentUser?.name}</p>
-                    <p className="text-xs text-slate-500 capitalize">{currentUser?.role?.replace('_', ' ')}</p>
+                  <div className="p-3 bg-slate-50 border-b border-slate-100 flex items-center gap-3">
+                    {currentUser?.profilePictureUrl ? (
+                      <img src={currentUser.profilePictureUrl} alt="Profile" className="w-10 h-10 rounded-full object-cover border border-slate-200" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">
+                        {currentUser?.name?.charAt(0)}
+                      </div>
+                    )}
+                    <div className="overflow-hidden">
+                      <p className="font-bold text-slate-800 truncate">{currentUser?.name}</p>
+                      <p className="text-xs text-slate-500 capitalize">{currentUser?.role?.replace('_', ' ')}</p>
+                    </div>
+                  </div>
+                  <div className="p-1">
+                    <button
+                      onClick={() => { setProfileOpen(false); setShowProfileModal(true); }}
+                      className="w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-primary rounded transition-colors flex items-center"
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      Manage Profile
+                    </button>
                   </div>
                 </motion.div>
               )}
@@ -232,6 +256,10 @@ const Navbar = () => {
           )}
         </AnimatePresence>
       </header>
+
+      {showProfileModal && (
+        <ProfileModal onClose={() => setShowProfileModal(false)} />
+      )}
     </div>
   );
 };

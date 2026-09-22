@@ -7,17 +7,17 @@ import { motion } from 'framer-motion';
 import TaskDetailModal from '../components/TaskDetailModal';
 
 const PRIORITY_STYLES = {
-  High: 'bg-rose-100 text-rose-700',
-  Medium: 'bg-amber-100 text-amber-700',
-  Low: 'bg-teal-100 text-teal-700'
+  High: 'bg-red-500 text-white',
+  Medium: 'bg-amber-500 text-white',
+  Low: 'bg-emerald-500 text-white'
 };
 
 const STATUS_STYLES = {
-  'To Do': 'bg-slate-100 text-slate-600',
-  'In Progress': 'bg-sky-100 text-sky-700',
-  'Completed': 'bg-emerald-100 text-emerald-700',
-  'Reopened': 'bg-rose-100 text-rose-700',
-  'Closed': 'bg-slate-200 text-slate-700'
+  'To Do': 'bg-slate-500 text-white',
+  'In Progress': 'bg-sky-500 text-white',
+  'Completed': 'bg-emerald-500 text-white',
+  'Reopened': 'bg-red-500 text-white',
+  'Closed': 'bg-slate-600 text-white'
 };
 
 const Tasks = () => {
@@ -40,13 +40,29 @@ const Tasks = () => {
       ? tasks.filter(t => String(t.assignedTo || '').replace('u', '') === userId || String(t.assignedTo) === userId || `u${userId}` === String(t.assignedTo))
       : tasks;
 
-    if (search) list = list.filter(t => t.title?.toLowerCase().includes(search.toLowerCase()));
+    if (search) {
+      const s = search.toLowerCase();
+      list = list.filter(t => {
+        const titleMatch = t.title?.toLowerCase().includes(s);
+        
+        const project = projects.find(p => String(p.id) === String(t.projectId).replace(/^p/, '') || `p${p.id}` === String(t.projectId));
+        const projectMatch = project?.name?.toLowerCase().includes(s);
+
+        const assignee = users.find(u => String(u.id) === String(t.assignedTo).replace(/^u/, '') || `u${u.id}` === String(t.assignedTo));
+        const assigneeMatch = assignee?.name?.toLowerCase().includes(s);
+        
+        const milestoneName = t.milestoneName || (project?.milestones?.find(m => String(m.id) === String(t.milestoneId)?.replace(/^m/, ''))?.name);
+        const milestoneMatch = milestoneName?.toLowerCase().includes(s);
+
+        return titleMatch || projectMatch || assigneeMatch || milestoneMatch;
+      });
+    }
     if (statusFilter !== 'All') list = list.filter(t => t.status === statusFilter);
     if (projectFilter !== 'All') list = list.filter(t => String(t.projectId).replace(/^p/, '') === String(projectFilter).replace(/^p/, ''));
     if (assigneeFilter !== 'All') list = list.filter(t => String(t.assignedTo).replace(/^u/, '') === String(assigneeFilter).replace(/^u/, ''));
 
     return list;
-  }, [tasks, isSiteEngineer, currentUser, search, statusFilter, projectFilter, assigneeFilter]);
+  }, [tasks, projects, users, isSiteEngineer, currentUser, search, statusFilter, projectFilter, assigneeFilter]);
 
   const statusCounts = ['To Do', 'In Progress', 'Completed', 'Reopened', 'Closed'].reduce((acc, s) => {
     acc[s] = tasks.filter(t => {
@@ -209,24 +225,19 @@ const Tasks = () => {
                         {task.milestoneName || (projects?.find(p => String(p.id) === String(task.projectId).replace('p', ''))?.milestones?.find(m => String(m.id) === String(task.milestoneId)?.replace('m', ''))?.name) || '—'}
                       </td>
                       <td className="px-6 py-5">
-                        <span className={`px-2 py-0.5 text-xs font-semibold rounded ${PRIORITY_STYLES[task.priority] || ''}`}>
+                        <span className={`px-2 py-1 text-xs font-bold rounded shadow-sm w-20 inline-block text-center ${PRIORITY_STYLES[task.priority] || ''}`}>
                           {task.priority}
                         </span>
                       </td>
                       {!isSiteEngineer && (
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-1.5">
-                            {assignee && (
-                              <div className="w-6 h-6 rounded-lg bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
-                                {assignee.name?.charAt(0)}
-                              </div>
-                            )}
                             <span className="text-sm text-slate-700 ">{assignee?.name || '—'}</span>
                           </div>
                         </td>
                       )}
                       <td className="px-6 py-5">
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg ${STATUS_STYLES[task.status] || ''}`}>
+                        <span className={`px-2.5 py-1.5 text-xs font-bold rounded shadow-sm w-28 inline-block text-center ${STATUS_STYLES[task.status] || ''}`}>
                           {task.status}
                         </span>
                       </td>

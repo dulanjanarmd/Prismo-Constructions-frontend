@@ -120,6 +120,38 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (updates) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/users/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentUser.token}`
+        },
+        body: JSON.stringify(updates)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to update profile');
+      }
+
+      const updatedData = await response.json();
+      
+      // Merge updated data with existing token/id info
+      const newUserObj = {
+        ...currentUser,
+        ...updatedData
+      };
+
+      setCurrentUser(newUserObj);
+      localStorage.setItem('prismoUser', JSON.stringify(newUserObj));
+      return newUserObj;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  };
+
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('prismoUser');
@@ -131,6 +163,7 @@ export const AuthProvider = ({ children }) => {
     register,
     requestPasswordReset,
     resetPassword,
+    updateProfile,
     logout,
     loading
   };

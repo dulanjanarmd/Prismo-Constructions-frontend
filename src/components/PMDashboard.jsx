@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import PortfolioSummaryCards from './PortfolioSummaryCards';
+import PMDataAnalytics from './PMDataAnalytics';
 import ProjectTable from './ProjectTable';
 import RecentActivity from './RecentActivity';
 import CreateProjectButton from './CreateProjectButton';
@@ -9,7 +10,7 @@ import DashboardHeader from './DashboardHeader';
 import { MessageSquare, Send } from 'lucide-react';
 
 const PMDashboard = () => {
-  const { projects, tasks, logs, approvals, getGlobalMessages, sendGlobalMessage } = useData();
+  const { projects, tasks, logs, approvals, issues, getGlobalMessages, sendGlobalMessage } = useData();
   const { currentUser } = useAuth();
 
   const recentActivities = useMemo(() => {
@@ -67,6 +68,8 @@ const PMDashboard = () => {
       </div>
 
       <PortfolioSummaryCards projects={projects} />
+
+      <PMDataAnalytics projects={projects} tasks={tasks} approvals={approvals} issues={issues} logs={logs} />
 
       <ProjectTable projects={projects} />
 

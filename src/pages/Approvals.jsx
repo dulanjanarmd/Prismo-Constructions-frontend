@@ -7,11 +7,11 @@ import { motion } from 'framer-motion';
 import ApprovalDetailModal from '../components/ApprovalDetailModal';
 
 const STATUS_STYLES = {
-  Pending: 'bg-amber-100 text-amber-700',
-  Approved: 'bg-green-100 text-green-700',
-  Rejected: 'bg-red-100 text-red-700',
-  'Changes Requested': 'bg-orange-100 text-orange-700',
-  Closed: 'bg-slate-100 text-slate-600'
+  Pending: 'bg-amber-500 text-white',
+  Approved: 'bg-emerald-500 text-white',
+  Rejected: 'bg-red-500 text-white',
+  'Changes Requested': 'bg-orange-500 text-white',
+  Closed: 'bg-slate-500 text-white'
 };
 
 const STATUS_ICON = {
@@ -121,7 +121,7 @@ const Approvals = () => {
               <tbody className="divide-y divide-border">
                 {displayApprovals.map((approval, idx) => {
                   const project = projects.find(p =>
-                    String(p.id) === String(approval.projectId) || p.id === `p${approval.projectId}`
+                    String(p.id) === String(approval.projectId).replace(/^p/, '') || `p${p.id}` === String(approval.projectId)
                   );
                   const StatusIcon = STATUS_ICON[approval.status] || Clock;
                   const needsAction = (isPM && approval.status === 'Changes Requested') ||
@@ -155,8 +155,7 @@ const Approvals = () => {
                         ) : '—'}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg flex items-center gap-1 w-fit ${STATUS_STYLES[approval.status] || ''}`}>
-                          <StatusIcon className="w-3 h-3" />
+                        <span className={`px-2.5 py-1.5 text-xs font-bold rounded shadow-sm flex items-center justify-center w-36 ${STATUS_STYLES[approval.status] || ''}`}>
                           {approval.status}
                         </span>
                       </td>
@@ -189,7 +188,7 @@ const Approvals = () => {
         <ApprovalDetailModal
           approval={selectedApproval}
           project={projects.find(p =>
-            String(p.id) === String(selectedApproval.projectId) || p.id === `p${selectedApproval.projectId}`
+            String(p.id) === String(selectedApproval.projectId).replace(/^p/, '') || `p${p.id}` === String(selectedApproval.projectId)
           )}
           onClose={() => setSelectedApproval(null)}
           onUpdate={handleUpdate}
