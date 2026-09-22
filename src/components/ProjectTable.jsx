@@ -55,7 +55,7 @@ const ProjectTable = ({ projects }) => {
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="text-xs text-slate-400 border-b border-slate-100">
+            <tr className="text-xs bg-orange-50 text-orange-800 border-b border-orange-100">
               <th className="px-4 py-3 font-medium">Project Name</th>
               <th className="px-4 py-3 font-medium">Client</th>
               <th className="px-4 py-3 font-medium">Status</th>
