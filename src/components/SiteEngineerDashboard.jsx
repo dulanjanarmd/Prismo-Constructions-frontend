@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { CheckSquare, AlertTriangle, FileText, Activity, Clock, LogOut } from 'lucide-react';
+import { CheckSquare, AlertTriangle, FileText, Activity, Clock, LogOut, Calendar, Camera, ChevronRight, CheckCircle2 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import RecentActivity from './RecentActivity';
 import SubmitLogModal from './SubmitLogModal';

@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import PortfolioSummaryCards from './PortfolioSummaryCards';
 import PMDataAnalytics from './PMDataAnalytics';
 import ProjectTable from './ProjectTable';
-import RecentActivity from './RecentActivity';
 import CreateProjectButton from './CreateProjectButton';
 import DashboardHeader from './DashboardHeader';
 import { MessageSquare, Send } from 'lucide-react';
@@ -12,54 +11,6 @@ import { MessageSquare, Send } from 'lucide-react';
 const PMDashboard = () => {
   const { projects, tasks, logs, approvals, issues, getGlobalMessages, sendGlobalMessage } = useData();
   const { currentUser } = useAuth();
-
-  const recentActivities = useMemo(() => {
-    const activities = [];
-    
-    // Add logs
-    logs.forEach(log => {
-      const project = projects.find(p => p.id === log.projectId);
-      if (project) {
-        activities.push({
-          type: 'log',
-          description: `Site Engineer uploaded new progress log`,
-          projectName: project.name,
-          timestamp: log.date,
-          dateObj: new Date(log.date)
-        });
-      }
-    });
-
-    // Add tasks
-    tasks.forEach(task => {
-      const project = projects.find(p => p.id === task.projectId);
-      if (project && task.status === 'Completed') {
-        activities.push({
-          type: 'task',
-          description: `Task "${task.title}" marked as completed`,
-          projectName: project.name,
-          timestamp: task.dueDate || 'Recent',
-          dateObj: new Date(task.dueDate || new Date())
-        });
-      }
-    });
-
-    // Add approvals
-    approvals.forEach(app => {
-      const project = projects.find(p => p.id === app.projectId);
-      if (project) {
-        activities.push({
-          type: 'approval',
-          description: app.status === 'Pending' ? `Client approval requested: ${app.title}` : `Approval ${app.status.toLowerCase()}: ${app.title}`,
-          projectName: project.name,
-          timestamp: app.dateRequested,
-          dateObj: new Date(app.dateRequested)
-        });
-      }
-    });
-
-    return activities.sort((a, b) => b.dateObj - a.dateObj);
-  }, [projects, tasks, logs, approvals]);
 
   return (
     <div className="space-y-6">
@@ -69,11 +20,9 @@ const PMDashboard = () => {
 
       <PortfolioSummaryCards projects={projects} />
 
-      <PMDataAnalytics projects={projects} tasks={tasks} approvals={approvals} issues={issues} logs={logs} />
-
       <ProjectTable projects={projects} />
 
-      <RecentActivity activities={recentActivities} />
+      <PMDataAnalytics projects={projects} tasks={tasks} approvals={approvals} issues={issues} logs={logs} />
     </div>
   );
 };

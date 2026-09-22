@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import FloatingChatWidget from './FloatingChatWidget';
 import ProfileModal from './ProfileModal';
+import NotificationDrawer from './NotificationDrawer';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -44,9 +45,10 @@ const Navbar = () => {
   const { notifications, markNotificationAsRead } = useData();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const profileRef = useRef(null);
 
   const unreadCount = notifications?.filter(n => !n.read)?.length || 0;
 
@@ -77,7 +79,7 @@ const Navbar = () => {
     ]
   };
 
-  const roleNav = currentUser ? navItems[currentUser.role] : [];
+  const roleNav = currentUser ? (navItems[currentUser.role?.toLowerCase()] || []) : [];
 
   return (
     <div className="bg-[#e5e7eb] rounded-b-[3rem] pb-4 relative px-4 sm:px-8 z-50">
@@ -111,10 +113,10 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 gap-0.5 text-sm font-bold relative">
+          <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 gap-2 text-sm font-bold relative">
             <button
-              onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="relative w-9 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all"
+              onClick={() => setShowNotifications(true)}
+              className="relative w-10 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
@@ -123,83 +125,18 @@ const Navbar = () => {
                 </span>
               )}
             </button>
-            <AnimatePresence>
-              {notificationsOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50"
-                >
-                  <div className="p-3 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                    <h3 className="font-bold text-slate-800">Notifications</h3>
-                    <span className="text-xs text-slate-500">{unreadCount} unread</span>
-                  </div>
-                  <div className="max-h-80 overflow-y-auto">
-                    {notifications?.length === 0 ? (
-                      <p className="p-4 text-sm text-slate-500 text-center">No notifications yet</p>
-                    ) : (
-                      notifications?.map(notif => (
-                        <div 
-                          key={notif.id} 
-                          className={`p-3 border-b border-slate-50 text-sm cursor-pointer transition-colors ${!notif.read ? 'bg-blue-50/50 hover:bg-blue-50' : 'hover:bg-slate-50'}`}
-                          onClick={() => {
-                            if (!notif.read) markNotificationAsRead(notif.id);
-                            setNotificationsOpen(false);
-                          }}
-                        >
-                          <p className={`text-slate-800 ${!notif.read ? 'font-semibold' : ''}`}>{notif.message}</p>
-                          <p className="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleString()}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
             <button 
-              onClick={() => setProfileOpen(!profileOpen)}
-              className="relative w-9 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all overflow-hidden"
+              onClick={() => setShowProfileModal(true)}
+              className="relative w-10 h-10 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-full transition-all overflow-hidden border border-slate-200"
             >
               {currentUser?.profilePictureUrl ? (
-                <img src={currentUser.profilePictureUrl} alt="Profile" className="w-6 h-6 rounded-full object-cover" />
+                <img src={currentUser.profilePictureUrl} alt="Profile" className="w-full h-full rounded-full object-cover" />
               ) : (
-                <User className="w-5 h-5 -mt-[2px]" />
+                <div className="w-full h-full rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-sm uppercase">
+                  {currentUser?.name?.charAt(0) || 'U'}
+                </div>
               )}
             </button>
-            <AnimatePresence>
-              {profileOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full right-24 mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50"
-                >
-                  <div className="p-3 bg-slate-50 border-b border-slate-100 flex items-center gap-3">
-                    {currentUser?.profilePictureUrl ? (
-                      <img src={currentUser.profilePictureUrl} alt="Profile" className="w-10 h-10 rounded-full object-cover border border-slate-200" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">
-                        {currentUser?.name?.charAt(0)}
-                      </div>
-                    )}
-                    <div className="overflow-hidden">
-                      <p className="font-bold text-slate-800 truncate">{currentUser?.name}</p>
-                      <p className="text-xs text-slate-500 capitalize">{currentUser?.role?.replace('_', ' ')}</p>
-                    </div>
-                  </div>
-                  <div className="p-1">
-                    <button
-                      onClick={() => { setProfileOpen(false); setShowProfileModal(true); }}
-                      className="w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-primary rounded transition-colors flex items-center"
-                    >
-                      <User className="w-4 h-4 mr-2" />
-                      Manage Profile
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
             <button 
               onClick={logout}
               className="px-6 py-2 bg-primary text-[#022c22] rounded-lg transition-colors uppercase h-full flex items-center hover:opacity-90"
@@ -260,6 +197,11 @@ const Navbar = () => {
       {showProfileModal && (
         <ProfileModal onClose={() => setShowProfileModal(false)} />
       )}
+      
+      <NotificationDrawer 
+        isOpen={showNotifications} 
+        onClose={() => setShowNotifications(false)} 
+      />
     </div>
   );
 };

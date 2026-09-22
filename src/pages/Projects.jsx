@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle, ArrowRight, Trash2, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import ProjectAnalytics from '../components/ProjectAnalytics';
 
 const Projects = () => {
   const { projects, tasks, updateProject, deleteProject, users } = useData();
@@ -150,6 +151,8 @@ const Projects = () => {
           </button>
         )}
       </div>
+
+      <ProjectAnalytics projects={visibleProjects} />
 
       <div className="glass-card flex flex-col overflow-hidden">
         <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">

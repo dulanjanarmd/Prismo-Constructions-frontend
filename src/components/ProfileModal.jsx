@@ -24,7 +24,7 @@ const ProfileModal = ({ onClose }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
@@ -32,26 +32,20 @@ const ProfileModal = ({ onClose }) => {
         return;
       }
       setSelectedFile(file);
+      
+      // Preview it locally
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result);
-        setMessage(null);
       };
       reader.readAsDataURL(file);
-    }
-  };
 
-  const handleSaveDetails = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage(null);
-    try {
-      let finalUrl = previewUrl;
-
-      // If they selected a new file, upload it first
-      if (selectedFile) {
+      // Auto-upload immediately
+      setLoading(true);
+      setMessage(null);
+      try {
         const formData = new FormData();
-        formData.append('file', selectedFile);
+        formData.append('file', file);
 
         const uploadRes = await fetch('http://localhost:8080/api/files/upload', {
           method: 'POST',
@@ -66,16 +60,31 @@ const ProfileModal = ({ onClose }) => {
         }
 
         const uploadData = await uploadRes.json();
-        finalUrl = uploadData.fullUrl || uploadData.url;
-      }
+        const finalUrl = uploadData.fullUrl || uploadData.url;
 
+        await updateProfile({ profilePictureUrl: finalUrl });
+        setMessage({ type: 'success', text: 'Profile picture updated!' });
+        setSelectedFile(null);
+      } catch (err) {
+        setMessage({ type: 'error', text: err.message || 'Failed to update picture' });
+        // Revert preview on failure
+        setPreviewUrl(currentUser?.profilePictureUrl || '');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleSaveDetails = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+    try {
       await updateProfile({ 
         name, 
-        phone, 
-        profilePictureUrl: finalUrl !== currentUser?.profilePictureUrl ? finalUrl : undefined 
+        phone 
       });
-      setMessage({ type: 'success', text: 'Profile updated successfully!' });
-      setSelectedFile(null);
+      setMessage({ type: 'success', text: 'Profile details updated successfully!' });
     } catch (err) {
       setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
     } finally {
