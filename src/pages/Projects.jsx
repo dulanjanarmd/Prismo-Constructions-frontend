@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle, ArrowRight, Trash2 } from 'lucide-react';
+import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle, ArrowRight, Trash2, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,13 +13,22 @@ const Projects = () => {
   const isSiteEngineer = currentUser?.role === 'site_engineer';
   const isClient = currentUser?.role === 'client';
   const currentUserId = String(currentUser?.id || '');
-  const visibleProjects = isSiteEngineer
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+
+  const visibleProjects = (isSiteEngineer
     ? projects.filter(project => tasks.some(task => {
         const taskProjectId = String(task.projectId || '').replace(/^p/, '');
         const assignedTo = String(task.assignedTo || '').replace(/^u/, '');
         return taskProjectId === String(project.id) && assignedTo === currentUserId;
       }))
-    : projects;
+    : projects).filter(project => {
+      const matchesSearch = project.name?.toLowerCase().includes(search.toLowerCase()) ||
+                            project.client?.toLowerCase().includes(search.toLowerCase()) ||
+                            project.location?.toLowerCase().includes(search.toLowerCase());
+      const matchesStatus = statusFilter === 'All' || project.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
 
   // Modals state
   const [modalType, setModalType] = useState(null); // 'create', 'edit', 'milestones', 'status'
@@ -128,7 +137,7 @@ const Projects = () => {
   return (
     <div className="space-y-6 relative">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
           {isSiteEngineer ? 'My Projects' : 'Projects Management'}
         </h1>
         {!isSiteEngineer && !isClient && (
@@ -143,14 +152,38 @@ const Projects = () => {
       </div>
 
       <div className="glass-card overflow-hidden">
+        <div className="flex flex-col lg:flex-row gap-4 justify-end items-center p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
+            <select
+              className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all w-full sm:w-auto"
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+            >
+              <option value="All">All Statuses</option>
+              {['Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+          <div className="relative w-full lg:w-64 shrink-0 h-12">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <input
+              type="text"
+              placeholder="Search projects..."
+              className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-slate-100">
               <tr>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Project Name</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Timeline</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status & Progress</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Project Name</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Timeline</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Status & Progress</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -168,15 +201,15 @@ const Projects = () => {
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex flex-col space-y-2">
-                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full w-fit ${
+                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg w-fit ${
                         project.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' :
                         project.status === 'In Progress' ? 'bg-sky-100 text-sky-700' : 'bg-amber-100 text-amber-700'
                       }`}>
                         {project.status}
                       </span>
                       <div className="flex items-center space-x-2">
-                        <div className="w-full bg-slate-200  rounded-full h-2 max-w-[120px]">
-                          <div className="bg-primary h-2 rounded-full" style={{ width: `${project.progress}%` }}></div>
+                        <div className="w-full bg-slate-200  rounded-lg h-2 max-w-[120px]">
+                          <div className="bg-primary h-2 rounded-lg" style={{ width: `${project.progress}%` }}></div>
                         </div>
                         <span className="text-xs text-slate-500 font-medium">{project.progress}%</span>
                       </div>
@@ -186,27 +219,12 @@ const Projects = () => {
                     <div className="flex justify-end space-x-2">
                       <button 
                         onClick={() => navigate(`/portal/projects/${project.id}`)} 
-                        className="px-3 py-1.5 text-sm font-medium bg-slate-100 hover:bg-slate-200  :bg-slate-700 text-slate-700  rounded-md transition-colors flex items-center"
+                        className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
                       >
-                        View <ArrowRight className="w-4 h-4 ml-1" />
+                        View
                       </button>
                       
-                      {!isSiteEngineer && !isClient && (
-                        <>
-                          <button onClick={() => openModal('status', project)} className="p-2 text-slate-500 hover:text-primary hover:bg-blue-50 rounded-md transition-colors" title="Update Status">
-                            <Activity className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => openModal('milestones', project)} className="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-colors" title="Manage Milestones">
-                            <Flag className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => openModal('edit', project)} className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors" title="Edit Project">
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => handleDeleteProject(project)} className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Delete Project">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
+
                     </div>
                   </td>
                 </tr>
@@ -226,14 +244,14 @@ const Projects = () => {
               <form onSubmit={handleCreateEdit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Project Name</label>
-                  <input required type="text" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                  <input required type="text" className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Client</label>
                     <select
                       required
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                      className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                       value={formData.clientId || ''}
                       onChange={e => {
                         const selected = users.find(u => String(u.id) === e.target.value);
@@ -248,26 +266,26 @@ const Projects = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Location</label>
-                    <input required type="text" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
+                    <input required type="text" className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Start Date</label>
-                    <input required type="date" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} />
+                    <input required type="date" className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">End Date</label>
-                    <input required type="date" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} />
+                    <input required type="date" className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Description</label>
-                  <textarea rows="3" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+                  <textarea rows="3" className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
                 </div>
                 <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Save Changes</button>
+                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-lg transition-colors">Cancel</button>
+                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Save Changes</button>
                 </div>
               </form>
             </motion.div>
@@ -283,7 +301,7 @@ const Projects = () => {
               <form onSubmit={handleStatusUpdate} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Status</label>
-                  <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={statusData.status} onChange={e => setStatusData({...statusData, status: e.target.value})}>
+                  <select className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={statusData.status} onChange={e => setStatusData({...statusData, status: e.target.value})}>
                     <option value="Planning">Planning</option>
                     <option value="In Progress">In Progress</option>
                     <option value="On Hold">On Hold</option>
@@ -291,8 +309,8 @@ const Projects = () => {
                   </select>
                 </div>
                 <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Update</button>
+                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-lg transition-colors">Cancel</button>
+                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Update</button>
                 </div>
               </form>
             </motion.div>
@@ -336,20 +354,20 @@ const Projects = () => {
                     required
                     type="text"
                     placeholder="Milestone Title (e.g. Foundation Complete)"
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                     value={newMilestone.title}
                     onChange={e => setNewMilestone({...newMilestone, title: e.target.value})}
                   />
                   <input
                     required
                     type="date"
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                     value={newMilestone.date}
                     onChange={e => setNewMilestone({...newMilestone, date: e.target.value})}
                   />
                   <button
                     type="submit"
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-md hover:opacity-90 transition-opacity"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity"
                   >
                     <Plus className="w-4 h-4" /> Add Milestone
                   </button>

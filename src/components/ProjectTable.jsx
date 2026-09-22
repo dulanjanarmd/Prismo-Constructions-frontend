@@ -15,24 +15,24 @@ const ProjectTable = ({ projects }) => {
   });
 
   return (
-    <div className="glass-card flex flex-col mt-6 p-6">
-      <div className="flex flex-col lg:flex-row justify-between gap-6 mb-6">
+    <div className="glass-card flex flex-col mt-6 overflow-hidden">
+      <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-bold text-slate-900">Projects</h2>
-          <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-0.5 rounded-full">{projects.length}</span>
+          <span className="bg-slate-300/50 text-slate-700 text-xs font-bold px-2 py-0.5 rounded-lg">{projects.length}</span>
         </div>
-        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center">
-          <div className="flex space-x-1 bg-slate-50 p-1 rounded-full">
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center w-full justify-end">
+          <div className="flex flex-wrap md:flex-nowrap space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto">
             {['All', 'Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(status => {
               const count = status === 'All' ? projects.length : projects.filter(p => p.status === status).length;
               return (
                 <button
                   key={status}
                   onClick={() => setStatusFilter(status)}
-                  className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all ${
+                  className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
                     statusFilter === status 
-                      ? 'bg-white shadow-sm text-slate-900' 
-                      : 'text-slate-500 hover:text-slate-700'
+                      ? 'bg-white shadow-sm text-slate-900 font-bold' 
+                      : 'hover:text-slate-900'
                   }`}
                 >
                   {status} <span className="ml-1 opacity-60 font-normal">{count}</span>
@@ -40,22 +40,22 @@ const ProjectTable = ({ projects }) => {
               );
             })}
           </div>
-          <div className="relative w-full md:w-auto">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <div className="relative w-full md:w-auto h-12">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input 
               type="text" 
               placeholder="Search projects..." 
-              className="pl-9 pr-4 py-2 w-full md:w-64 rounded-full border-0 bg-slate-50 text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+              className="pl-9 pr-4 h-full w-full md:w-64 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto p-6 pt-0">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="text-xs bg-orange-50 text-orange-800 border-b border-orange-100">
+            <tr className="text-xs text-slate-400 border-b border-slate-100">
               <th className="px-4 py-3 font-medium">Project Name</th>
               <th className="px-4 py-3 font-medium">Client</th>
               <th className="px-4 py-3 font-medium">Status</th>

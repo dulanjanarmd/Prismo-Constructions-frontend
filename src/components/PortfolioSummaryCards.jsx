@@ -6,10 +6,10 @@ const StatCard = ({ title, value, imgSrc, delay, colorClass }) => (
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay }}
-    className="glass-card p-6 flex items-center space-x-4"
+    className="glass-card p-4 flex items-center space-x-4"
   >
-    <div className={`w-12 h-12 flex items-center justify-center rounded-xl shadow-sm ${colorClass}`}>
-      <img src={imgSrc} alt={title} className="w-10 h-10 object-contain" />
+    <div className={`w-10 h-10 flex items-center justify-center rounded-xl shadow-sm ${colorClass}`}>
+      <img src={imgSrc} alt={title} className="w-7 h-7 object-contain" />
     </div>
     <div>
       <p className="text-sm font-medium text-slate-500 ">{title}</p>

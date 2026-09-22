@@ -83,10 +83,10 @@ const Navbar = () => {
         
         {/* Left Side: Logo and Nav */}
         <div className="flex items-center space-x-2">
-          <Link to="/portal" className="bg-white rounded-xl flex items-center justify-center h-12 px-3 shadow-md hover:opacity-90 transition-opacity">
+          <Link to="/portal" className="bg-white rounded-lg flex items-center justify-center h-12 px-3 shadow-md hover:opacity-90 transition-opacity">
             <img src="/prismo-logo.png" alt="Prismo Construction" className="h-10 w-auto object-contain" />
           </Link>
-          <nav className="hidden md:flex bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 items-center space-x-1 text-sm font-bold text-slate-600">
+          <nav className="hidden md:flex bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center space-x-1 text-sm font-bold text-slate-600">
             {roleNav.map((item) => {
               const isActive = location.pathname === item.path;
               return (
@@ -109,7 +109,7 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-xl p-1 gap-0.5 text-sm font-bold relative">
+          <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 gap-0.5 text-sm font-bold relative">
             <button
               onClick={() => setNotificationsOpen(!notificationsOpen)}
               className="relative w-9 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all"
@@ -127,7 +127,7 @@ const Navbar = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50"
+                  className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50"
                 >
                   <div className="p-3 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                     <h3 className="font-bold text-slate-800">Notifications</h3>
@@ -167,7 +167,7 @@ const Navbar = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full right-24 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50"
+                  className="absolute top-full right-24 mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50"
                 >
                   <div className="p-3 bg-slate-50">
                     <p className="font-bold text-slate-800 truncate">{currentUser?.name}</p>
@@ -178,14 +178,14 @@ const Navbar = () => {
             </AnimatePresence>
             <button 
               onClick={logout}
-              className="px-6 py-2 bg-primary text-[#022c22] rounded-md transition-colors uppercase h-full flex items-center hover:opacity-90"
+              className="px-6 py-2 bg-primary text-[#022c22] rounded-lg transition-colors uppercase h-full flex items-center hover:opacity-90"
             >
               <LogOut className="w-4 h-4 mr-2" />
               SIGN OUT
             </button>
           </div>
           <button 
-            className="md:hidden text-slate-600 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 w-12 flex items-center justify-center rounded-xl"
+            className="md:hidden text-slate-600 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 w-12 flex items-center justify-center rounded-lg"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

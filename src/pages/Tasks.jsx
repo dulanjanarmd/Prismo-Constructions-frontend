@@ -64,7 +64,7 @@ const Tasks = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             {isSiteEngineer ? 'My Tasks' : 'Task Management'}
           </h1>
           <p className="text-slate-500 mt-1">{displayTasks.length} tasks shown</p>
@@ -80,56 +80,34 @@ const Tasks = () => {
         )}
       </div>
 
-      {/* Status summary chips */}
-      <div className="flex gap-2 flex-wrap bg-white p-1.5 rounded-full w-fit shadow-sm border border-slate-100">
-        {Object.entries(statusCounts).filter(([, v]) => v > 0).map(([status, count]) => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(statusFilter === status ? 'All' : status)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
-              statusFilter === status 
-                ? 'bg-primary text-white shadow-md' 
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
-            }`}
-          >
-            {status}
-            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-              statusFilter === status ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
-            }`}>
-              {count}
-            </span>
-          </button>
-        ))}
-      </div>
 
-      {/* Filters */}
-      <div className="glass-card p-4">
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="flex items-center gap-2 flex-1 min-w-[180px]">
-            <Search className="w-4 h-4 text-slate-400 shrink-0" />
-            <input
-              type="text"
-              placeholder="Search tasks..."
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Filter className="w-4 h-4 text-slate-400 shrink-0" />
-            <select
-              className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary outline-none"
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-            >
-              <option value="All">All Statuses</option>
-              {['To Do', 'In Progress', 'Completed', 'Reopened', 'Closed'].map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
+      {/* Table & Filters Card */}
+      <div className="glass-card flex flex-col overflow-hidden">
+        
+        {/* Filters Section */}
+        <div className="flex flex-col lg:flex-row gap-4 justify-end items-center p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
+            <div className="flex flex-wrap md:flex-nowrap space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto">
+              {['All', 'To Do', 'In Progress', 'Completed', 'Reopened', 'Closed'].map(status => {
+                const count = status === 'All' ? displayTasks.length : (statusCounts[status] || 0);
+                return (
+                  <button
+                    key={status}
+                    onClick={() => setStatusFilter(status)}
+                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                      statusFilter === status 
+                        ? 'bg-white shadow-sm text-slate-900 font-bold' 
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    {status} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
 
             <select
-              className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary outline-none"
+              className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={projectFilter}
               onChange={e => setProjectFilter(e.target.value)}
             >
@@ -139,7 +117,7 @@ const Tasks = () => {
 
             {isPM && (
               <select
-                className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary outline-none"
+                className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
                 value={assigneeFilter}
                 onChange={e => setAssigneeFilter(e.target.value)}
               >
@@ -150,28 +128,36 @@ const Tasks = () => {
               </select>
             )}
           </div>
+          <div className="relative w-full lg:w-64 shrink-0 h-12">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <input
+              type="text"
+              placeholder="Search tasks..."
+              className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
         </div>
-      </div>
 
       {/* Table */}
       {displayTasks.length === 0 ? (
-        <div className="glass-card p-12 text-center text-slate-500">
+        <div className="p-12 text-center text-slate-500">
           <p className="text-lg font-medium">No tasks match your filters.</p>
         </div>
       ) : (
-        <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="border-b border-slate-100">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Task</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Project</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Milestone</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Priority</th>
-                  {!isSiteEngineer && <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Assignee</th>}
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Due Date</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Action</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Task</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Project</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Milestone</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Priority</th>
+                  {!isSiteEngineer && <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Assignee</th>}
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Due Date</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -231,7 +217,7 @@ const Tasks = () => {
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-1.5">
                             {assignee && (
-                              <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
+                              <div className="w-6 h-6 rounded-lg bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
                                 {assignee.name?.charAt(0)}
                               </div>
                             )}
@@ -240,7 +226,7 @@ const Tasks = () => {
                         </td>
                       )}
                       <td className="px-6 py-5">
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${STATUS_STYLES[task.status] || ''}`}>
+                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg ${STATUS_STYLES[task.status] || ''}`}>
                           {task.status}
                         </span>
                       </td>
@@ -248,9 +234,9 @@ const Tasks = () => {
                       <td className="px-6 py-5 text-right">
                         <button
                           onClick={() => setSelectedTask(task)}
-                          className="flex items-center gap-1 text-primary hover:text-blue-600 font-medium text-sm transition-colors ml-auto"
+                          className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
                         >
-                          <Eye className="w-4 h-4" /> View
+                          View
                         </button>
                       </td>
                     </motion.tr>
@@ -259,8 +245,8 @@ const Tasks = () => {
               </tbody>
             </table>
           </div>
-        </div>
       )}
+      </div>
 
       {/* Task Detail Modal */}
       {selectedTask && (

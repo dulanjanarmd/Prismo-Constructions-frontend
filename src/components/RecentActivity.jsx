@@ -12,9 +12,9 @@ const getActivityIcon = (type) => {
 
 const RecentActivity = ({ activities }) => {
   return (
-    <div className="glass-card mt-6">
-      <div className="p-4 border-b border-border">
-        <h2 className="text-xl font-bold">Recent Activity & Alerts</h2>
+    <div className="glass-card mt-6 overflow-hidden">
+      <div className="p-4 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+        <h2 className="text-xl font-bold text-slate-900">Recent Activity & Alerts</h2>
       </div>
       <div className="p-4">
         {activities.length === 0 ? (

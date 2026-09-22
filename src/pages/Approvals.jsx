@@ -57,7 +57,7 @@ const Approvals = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600   bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
           {isClient ? 'Approval Requests' : 'Client Approvals'}
         </h1>
         <p className="text-slate-500 mt-1">{displayApprovals.length} requests shown</p>
@@ -71,7 +71,7 @@ const Approvals = () => {
             <button
               key={status}
               onClick={() => setStatusFilter(statusFilter === status ? 'All' : status)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${
                 statusFilter === status ? 'ring-2 ring-primary ring-offset-1' : ''
               } ${STATUS_STYLES[status] || 'bg-slate-100 text-slate-600'}`}
             >
@@ -82,39 +82,42 @@ const Approvals = () => {
         })}
       </div>
 
-      {/* Filters */}
-      <div className="glass-card p-4 flex flex-wrap gap-3 items-center">
-        <Filter className="w-4 h-4 text-slate-400 shrink-0" />
-        <select
-          className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary outline-none"
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-        >
-          <option value="All">All Statuses</option>
-          {['Pending', 'Approved', 'Changes Requested', 'Rejected', 'Closed'].map(s => (
-            <option key={s} value={s}>{s} ({statusCounts[s]})</option>
-          ))}
-        </select>
-        <select
-          className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary outline-none"
-          value={projectFilter}
-          onChange={e => setProjectFilter(e.target.value)}
-        >
-          <option value="All">All Projects</option>
-          {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-        </select>
-      </div>
+      {/* Table & Filters Card */}
+      <div className="glass-card flex flex-col overflow-hidden">
+        
+        {/* Filters Section */}
+        <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-end items-center p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
+            <select
+              className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all w-full sm:w-auto"
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+            >
+              <option value="All">All Statuses</option>
+              {['Pending', 'Approved', 'Changes Requested', 'Rejected', 'Closed'].map(s => (
+                <option key={s} value={s}>{s} ({statusCounts[s]})</option>
+              ))}
+            </select>
+            <select
+              className="h-12 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all w-full sm:w-auto"
+              value={projectFilter}
+              onChange={e => setProjectFilter(e.target.value)}
+            >
+              <option value="All">All Projects</option>
+              {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          </div>
+        </div>
 
       {/* Table */}
       {displayApprovals.length === 0 ? (
-        <div className="glass-card p-12 text-center text-slate-500">
+        <div className="p-12 text-center text-slate-500">
           <p className="text-lg font-medium">No approval requests match your filters.</p>
         </div>
       ) : (
-        <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50  border-b border-border text-slate-500">
+              <thead className="border-b border-slate-100 text-slate-500">
                 <tr>
                   <th className="px-6 py-3 font-medium">Title</th>
                   <th className="px-6 py-3 font-medium">Project</th>
@@ -162,7 +165,7 @@ const Approvals = () => {
                         ) : '—'}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full flex items-center gap-1 w-fit ${STATUS_STYLES[approval.status] || ''}`}>
+                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-lg flex items-center gap-1 w-fit ${STATUS_STYLES[approval.status] || ''}`}>
                           <StatusIcon className="w-3 h-3" />
                           {approval.status}
                         </span>
@@ -177,9 +180,9 @@ const Approvals = () => {
                       <td className="px-6 py-4 text-right">
                         <button
                           onClick={() => setSelectedApproval(approval)}
-                          className="flex items-center gap-1 text-primary hover:text-blue-600 font-medium text-sm transition-colors ml-auto"
+                          className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
                         >
-                          <Eye className="w-4 h-4" /> View
+                          View
                         </button>
                       </td>
                     </motion.tr>
@@ -188,8 +191,8 @@ const Approvals = () => {
               </tbody>
             </table>
           </div>
-        </div>
       )}
+      </div>
 
       {/* Detail Modal */}
       {selectedApproval && (
