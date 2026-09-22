@@ -17,6 +17,7 @@ const ProfileModal = ({ onClose }) => {
   // Picture state
   const fileInputRef = useRef(null);
   const [previewUrl, setPreviewUrl] = useState(currentUser?.profilePictureUrl || '');
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Security state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -30,6 +31,7 @@ const ProfileModal = ({ onClose }) => {
         setMessage({ type: 'error', text: 'Image must be less than 2MB' });
         return;
       }
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result);
@@ -44,12 +46,36 @@ const ProfileModal = ({ onClose }) => {
     setLoading(true);
     setMessage(null);
     try {
+      let finalUrl = previewUrl;
+
+      // If they selected a new file, upload it first
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        const uploadRes = await fetch('http://localhost:8080/api/files/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${currentUser.token}`
+          },
+          body: formData
+        });
+
+        if (!uploadRes.ok) {
+          throw new Error('Failed to upload image to server');
+        }
+
+        const uploadData = await uploadRes.json();
+        finalUrl = uploadData.fullUrl || uploadData.url;
+      }
+
       await updateProfile({ 
         name, 
         phone, 
-        profilePictureUrl: previewUrl !== currentUser?.profilePictureUrl ? previewUrl : undefined 
+        profilePictureUrl: finalUrl !== currentUser?.profilePictureUrl ? finalUrl : undefined 
       });
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setSelectedFile(null);
     } catch (err) {
       setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
     } finally {
@@ -61,6 +87,7 @@ const ProfileModal = ({ onClose }) => {
     setLoading(true);
     try {
       setPreviewUrl('');
+      setSelectedFile(null);
       await updateProfile({ profilePictureUrl: '' });
       setMessage({ type: 'success', text: 'Profile picture removed.' });
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -93,13 +120,15 @@ const ProfileModal = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 z-[100] flex items-center justify-end p-4 bg-black/50 backdrop-blur-sm">
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-xl w-full max-w-xl overflow-hidden flex flex-col"
+        initial={{ opacity: 0, x: 60 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 60 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className="glass-card w-full max-w-md h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
       >
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div className="p-6 border-b border-border flex items-center justify-between bg-background/80 backdrop-blur-md sticky top-0 z-10">
           <h2 className="text-xl font-bold text-slate-900">Manage Profile</h2>
           <button 
             onClick={onClose}
@@ -142,23 +171,27 @@ const ProfileModal = ({ onClose }) => {
             <form onSubmit={handleSaveDetails} className="space-y-6">
               <div className="flex items-center gap-6">
                 <div className="relative group">
-                  <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-slate-200 shadow-sm relative">
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-slate-200 shadow-sm relative cursor-pointer"
+                  >
                     {previewUrl ? (
                       <img src={previewUrl} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-3xl font-bold text-slate-400">{currentUser?.name?.charAt(0)}</span>
                     )}
                     <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                      <button type="button" onClick={() => fileInputRef.current?.click()} className="text-white hover:text-primary transition-colors">
-                        <Camera className="w-6 h-6" />
-                      </button>
+                      <Camera className="w-6 h-6 text-white" />
                     </div>
                   </div>
                   {previewUrl && (
                     <button 
                       type="button"
-                      onClick={handleDeletePicture}
-                      className="absolute -top-1 -right-1 bg-red-100 text-red-600 p-1.5 rounded-full shadow-sm hover:bg-red-200 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeletePicture();
+                      }}
+                      className="absolute -top-1 -right-1 bg-red-100 text-red-600 p-1.5 rounded-full shadow-sm hover:bg-red-200 transition-colors z-10"
                       title="Remove Picture"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
