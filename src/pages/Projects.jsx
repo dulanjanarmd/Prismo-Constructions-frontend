@@ -154,7 +154,7 @@ const Projects = () => {
         )}
       </div>
 
-      <ProjectAnalytics projects={visibleProjects} />
+      {/* Project Analytics moved below table */}
 
       <div className="glass-card flex flex-col overflow-hidden">
         <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
@@ -251,6 +251,8 @@ const Projects = () => {
           </table>
         </div>
       </div>
+
+      <ProjectAnalytics projects={visibleProjects} />
 
       <AnimatePresence>
         {/* Edit Project Modal */}

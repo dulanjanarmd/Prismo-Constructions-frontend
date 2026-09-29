@@ -96,8 +96,7 @@ const Tasks = () => {
         )}
       </div>
 
-      {/* Task Analytics */}
-      <TaskAnalytics tasks={displayTasks} projects={projects} />
+      {/* Task Analytics moved below table */}
 
       {/* Table & Filters Card */}
       <div className="glass-card flex flex-col overflow-hidden">
@@ -261,6 +260,9 @@ const Tasks = () => {
           </div>
       )}
       </div>
+
+      {/* Task Analytics */}
+      <TaskAnalytics tasks={displayTasks} projects={projects} />
 
       {/* Task Detail Modal */}
       {selectedTask && (
