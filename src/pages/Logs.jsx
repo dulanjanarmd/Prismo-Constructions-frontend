@@ -143,7 +143,7 @@ const Logs = () => {
     e.preventDefault();
     // Default mock photo if none provided
     const finalPhotos = formData.photos.length > 0 ? formData.photos : [{
-      url: 'https://images.unsplash.com/photo-1541888081622-6323c21c7e92?q=80&w=2070&auto=format&fit=crop',
+      fileUrl: 'https://images.unsplash.com/photo-1541888081622-6323c21c7e92?q=80&w=2070&auto=format&fit=crop',
       caption: 'General site overview'
     }];
     
@@ -173,8 +173,10 @@ const Logs = () => {
 
   const addPhoto = () => {
     if (newPhoto.url) {
-      setFormData({ ...formData, photos: [...formData.photos, newPhoto] });
+      setFormData({ ...formData, photos: [...formData.photos, { fileUrl: newPhoto.url, caption: newPhoto.caption }] });
       setNewPhoto({ url: '', caption: '' });
+      const fileInput = document.getElementById('log-photo-upload');
+      if (fileInput) fileInput.value = '';
     }
   };
 
@@ -396,7 +398,7 @@ const Logs = () => {
                     <div className="space-y-3 mb-4">
                       {formData.photos.map((p, idx) => (
                         <div key={idx} className="flex items-center space-x-3 bg-slate-50  p-2 rounded border border-border">
-                          <img src={p.url} alt={p.caption} className="w-12 h-12 object-cover rounded" />
+                          <img src={p.fileUrl || p.url} alt={p.caption} className="w-12 h-12 object-cover rounded" />
                           <p className="flex-1 text-sm truncate">{p.caption}</p>
                           <button type="button" onClick={() => removePhoto(idx)} className="p-1 text-red-500 hover:bg-red-100 :bg-red-900/30 rounded">
                             <X className="w-4 h-4" />
@@ -408,6 +410,7 @@ const Logs = () => {
 
                   <div className="flex flex-col sm:flex-row gap-2 items-center">
                     <input 
+                      id="log-photo-upload"
                       type="file" 
                       accept="image/*"
                       onChange={handleFileUpload}
