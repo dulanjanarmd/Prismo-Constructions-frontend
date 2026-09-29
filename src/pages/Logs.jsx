@@ -220,21 +220,21 @@ const Logs = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-border rounded-lg shadow-sm overflow-hidden">
+      <div className="glass-card flex flex-col overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-border text-sm font-semibold text-slate-600">
-                <th className="py-3 px-4">Date</th>
-                <th className="py-3 px-4">Project</th>
-                <th className="py-3 px-4">Task</th>
-                <th className="py-3 px-4">Weather</th>
-                <th className="py-3 px-4">Manpower</th>
-                <th className="py-3 px-4">% Complete</th>
-                <th className="py-3 px-4">Actions</th>
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-slate-100 text-xs text-slate-400">
+              <tr>
+                <th className="px-6 py-4 font-semibold tracking-wider">Date</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Project</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Task</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Weather</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Manpower</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">% Complete</th>
+                <th className="px-6 py-4 font-semibold tracking-wider text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border text-sm">
+            <tbody className="divide-y divide-slate-50">
               {logs.map(log => {
                 const project = projects.find(p => String(p.id) === String(log.projectId).replace('p', ''));
                 const task = tasks.find(t => String(t.id) === String(log.task?.id));
@@ -243,16 +243,18 @@ const Logs = () => {
                     key={log.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="hover:bg-slate-50 transition-colors"
+                    className="hover:bg-slate-50/50 transition-colors group"
                   >
-                    <td className="py-3 px-4 font-medium text-slate-900">{log.date}</td>
-                    <td className="py-3 px-4 text-slate-700">{project?.name || '-'}</td>
-                    <td className="py-3 px-4 text-slate-700">{task?.title || 'General'}</td>
-                    <td className="py-3 px-4 text-slate-700">{log.weather}</td>
-                    <td className="py-3 px-4 text-slate-700">{log.manpower}</td>
-                    <td className="py-3 px-4 text-green-600 font-semibold">{log.percentageCompleted}%</td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center space-x-3">
+                    <td className="px-6 py-5 font-bold text-slate-900">{log.date}</td>
+                    <td className="px-6 py-5 text-slate-600 font-medium">{project?.name || '-'}</td>
+                    <td className="px-6 py-5 text-slate-600 font-medium">{task?.title || 'General'}</td>
+                    <td className="px-6 py-5 text-slate-600">{log.weather}</td>
+                    <td className="px-6 py-5 text-slate-600">{log.manpower}</td>
+                    <td className="px-6 py-5">
+                      <span className="text-green-600 font-bold bg-green-50 px-2 py-1 rounded">{log.percentageCompleted}%</span>
+                    </td>
+                    <td className="px-6 py-5 text-right">
+                      <div className="flex items-center justify-end space-x-3">
                         <button onClick={() => setSelectedLog(log)} className="text-primary hover:text-primary-dark font-medium flex items-center text-sm transition-colors" title="View Details">
                           <Eye className="w-4 h-4" />
                         </button>
