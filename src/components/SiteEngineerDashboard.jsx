@@ -217,7 +217,7 @@ const SiteEngineerDashboard = () => {
       <SubmitLogModal 
         isOpen={isSubmitLogOpen} 
         onClose={() => setIsSubmitLogOpen(false)} 
-        assignedProjects={myProjects.length > 0 ? myProjects : projects}
+        assignedProjects={myProjects}
         assignedTasks={tasks}
       />
       

@@ -185,6 +185,14 @@ const Logs = () => {
   };
 
   const isSiteEngineer = currentUser?.role === 'site_engineer';
+  const currentUserId = String(currentUser?.id || '');
+  const assignedProjects = isSiteEngineer
+    ? projects.filter(project => tasks.some(task => {
+        const taskProjectId = String(task.projectId || '').replace(/^p/, '');
+        const assignedTo = String(task.assignedTo || '').replace(/^u/, '');
+        return taskProjectId === String(project.id) && assignedTo === currentUserId;
+      }))
+    : projects;
 
   return (
     <div className="space-y-6">
@@ -312,7 +320,7 @@ const Logs = () => {
                         setFormData({...formData, projectId: e.target.value, taskId: ''});
                     }}>
                       <option value="" disabled>Select a project</option>
-                      {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                      {assignedProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                     </select>
                   </div>
                   <div>

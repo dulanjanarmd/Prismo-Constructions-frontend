@@ -17,13 +17,15 @@ const Projects = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
 
-  const visibleProjects = (isSiteEngineer
+  const baseProjects = isSiteEngineer
     ? projects.filter(project => tasks.some(task => {
         const taskProjectId = String(task.projectId || '').replace(/^p/, '');
         const assignedTo = String(task.assignedTo || '').replace(/^u/, '');
         return taskProjectId === String(project.id) && assignedTo === currentUserId;
       }))
-    : projects).filter(project => {
+    : projects;
+
+  const visibleProjects = baseProjects.filter(project => {
       const matchesSearch = project.name?.toLowerCase().includes(search.toLowerCase()) ||
                             project.client?.toLowerCase().includes(search.toLowerCase()) ||
                             project.location?.toLowerCase().includes(search.toLowerCase());
@@ -159,7 +161,7 @@ const Projects = () => {
           <div className="flex items-center gap-3 ml-auto min-w-max">
             <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600">
               {['All', 'Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(status => {
-                const count = status === 'All' ? projects.length : projects.filter(p => p.status === status).length;
+                const count = status === 'All' ? baseProjects.length : baseProjects.filter(p => p.status === status).length;
                 return (
                   <button
                     key={status}
