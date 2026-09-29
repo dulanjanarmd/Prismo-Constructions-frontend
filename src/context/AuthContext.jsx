@@ -143,6 +143,10 @@ export const AuthProvider = ({ children }) => {
         ...currentUser,
         ...updatedData
       };
+      
+      if (newUserObj.role) {
+        newUserObj.role = newUserObj.role.toLowerCase();
+      }
 
       setCurrentUser(newUserObj);
       localStorage.setItem('prismoUser', JSON.stringify(newUserObj));
