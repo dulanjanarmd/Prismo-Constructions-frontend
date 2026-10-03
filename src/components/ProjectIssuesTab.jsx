@@ -119,8 +119,19 @@ const ProjectIssuesTab = ({ project }) => {
       });
       if (res.ok) {
         const json = await res.json();
-        if (type === 'image') setFormData(prev => ({ ...prev, photoUrl: json.fullUrl }));
-        else setFormData(prev => ({ ...prev, documentUrl: json.fullUrl }));
+        if (type === 'image') {
+          setFormData(prev => {
+            const current = prev.photoUrl ? prev.photoUrl.split(',') : [];
+            if (current.length >= 5) { alert('Max 5 images allowed'); return prev; }
+            return { ...prev, photoUrl: [...current, json.fullUrl].join(',') };
+          });
+        } else {
+          setFormData(prev => {
+            const current = prev.documentUrl ? prev.documentUrl.split(',') : [];
+            if (current.length >= 5) { alert('Max 5 documents allowed'); return prev; }
+            return { ...prev, documentUrl: [...current, json.fullUrl].join(',') };
+          });
+        }
       } else {
         alert('Upload failed');
       }
@@ -130,6 +141,20 @@ const ProjectIssuesTab = ({ project }) => {
     
     if (type === 'image') setIsUploadingImage(false);
     else setIsUploadingDoc(false);
+  };
+
+  const removeFile = (type, index) => {
+    setFormData(prev => {
+      if (type === 'image') {
+        const urls = prev.photoUrl.split(',');
+        urls.splice(index, 1);
+        return { ...prev, photoUrl: urls.join(',') };
+      } else {
+        const urls = prev.documentUrl.split(',');
+        urls.splice(index, 1);
+        return { ...prev, documentUrl: urls.join(',') };
+      }
+    });
   };
 
   return (
@@ -251,13 +276,24 @@ const ProjectIssuesTab = ({ project }) => {
                   <label className="block text-sm font-medium mb-1 flex items-center">
                     Supporting Photo
                   </label>
-                  <div className="flex items-center gap-4">
-                    <label className={`cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border text-sm font-medium transition-colors flex items-center ${!formData.photoUrl && !formData.documentUrl ? 'border-red-300 ring-1 ring-red-100' : 'border-slate-300'}`}>
+                  <div className="flex flex-col gap-2">
+                    <label className={`w-fit cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border text-sm font-medium transition-colors flex items-center ${!formData.photoUrl && !formData.documentUrl ? 'border-red-300 ring-1 ring-red-100' : 'border-slate-300'}`}>
                       <ImageIcon className="w-4 h-4 mr-2" />
                       {isUploadingImage ? 'Uploading...' : 'Choose Image'}
-                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, 'image')} disabled={isUploadingImage || isUploadingDoc} />
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, 'image')} disabled={isUploadingImage || isUploadingDoc || (formData.photoUrl && formData.photoUrl.split(',').length >= 5)} />
                     </label>
-                    {formData.photoUrl && <span className="text-sm text-green-600 font-medium flex items-center">✓ Attached</span>}
+                    {formData.photoUrl && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {formData.photoUrl.split(',').map((url, idx) => (
+                          <div key={idx} className="relative group">
+                            <img src={url} alt="upload" className="h-16 w-16 object-cover rounded border border-slate-200" />
+                            <button type="button" onClick={() => removeFile('image', idx)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 shadow hover:bg-red-600">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -265,13 +301,24 @@ const ProjectIssuesTab = ({ project }) => {
                   <label className="block text-sm font-medium mb-1 flex items-center">
                     Supporting Document
                   </label>
-                  <div className="flex items-center gap-4">
-                    <label className={`cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border text-sm font-medium transition-colors flex items-center ${!formData.photoUrl && !formData.documentUrl ? 'border-red-300 ring-1 ring-red-100' : 'border-slate-300'}`}>
+                  <div className="flex flex-col gap-2">
+                    <label className={`w-fit cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border text-sm font-medium transition-colors flex items-center ${!formData.photoUrl && !formData.documentUrl ? 'border-red-300 ring-1 ring-red-100' : 'border-slate-300'}`}>
                       <FileText className="w-4 h-4 mr-2" />
                       {isUploadingDoc ? 'Uploading...' : 'Choose Document'}
-                      <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={(e) => handleFileUpload(e, 'doc')} disabled={isUploadingImage || isUploadingDoc} />
+                      <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={(e) => handleFileUpload(e, 'doc')} disabled={isUploadingImage || isUploadingDoc || (formData.documentUrl && formData.documentUrl.split(',').length >= 5)} />
                     </label>
-                    {formData.documentUrl && <span className="text-sm text-green-600 font-medium flex items-center">✓ Attached</span>}
+                    {formData.documentUrl && (
+                      <div className="flex flex-col gap-1 mt-2">
+                        {formData.documentUrl.split(',').map((url, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded px-2 py-1">
+                            <span className="text-xs truncate max-w-[200px] text-slate-600">Doc {idx + 1}</span>
+                            <button type="button" onClick={() => removeFile('doc', idx)} className="text-red-500 hover:text-red-700 p-0.5">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

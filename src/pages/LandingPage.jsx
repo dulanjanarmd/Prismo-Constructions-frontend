@@ -85,7 +85,7 @@ const LandingPage = () => {
               <div className="text-[#64748b] font-medium uppercase tracking-wide text-sm">Safety Record</div>
             </div>
             <div className="text-center">
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="text-4xl md:text-5xl font-extrabold text-[#1e2a35] mb-2">$2B+</motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="text-4xl md:text-5xl font-extrabold text-[#1e2a35] mb-2">LKR 2B+</motion.div>
               <div className="text-[#64748b] font-medium uppercase tracking-wide text-sm">Value Delivered</div>
             </div>
           </div>

@@ -23,6 +23,64 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({ ...issue });
+  const [isUploadingEditImage, setIsUploadingEditImage] = useState(false);
+  const [isUploadingEditDoc, setIsUploadingEditDoc] = useState(false);
+
+  const handleEditFileUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (type === 'image') setIsUploadingEditImage(true);
+    else setIsUploadingEditDoc(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('http://localhost:8080/api/files/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${currentUser?.token}` },
+        body: formData
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      const finalUrl = data.fullUrl || data.url;
+      
+      if (type === 'image') {
+        setEditData(prev => {
+          const current = prev.photoUrl ? prev.photoUrl.split(',') : [];
+          if (current.length >= 5) { alert('Max 5 images allowed'); return prev; }
+          return { ...prev, photoUrl: [...current, finalUrl].join(',') };
+        });
+      } else {
+        setEditData(prev => {
+          const current = prev.documentUrl ? prev.documentUrl.split(',') : [];
+          if (current.length >= 5) { alert('Max 5 documents allowed'); return prev; }
+          return { ...prev, documentUrl: [...current, finalUrl].join(',') };
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to upload file');
+    } finally {
+      if (type === 'image') setIsUploadingEditImage(false);
+      else setIsUploadingEditDoc(false);
+    }
+  };
+
+  const removeEditFile = (type, index) => {
+    setEditData(prev => {
+      if (type === 'image') {
+        const urls = prev.photoUrl.split(',');
+        urls.splice(index, 1);
+        return { ...prev, photoUrl: urls.join(',') };
+      } else {
+        const urls = prev.documentUrl.split(',');
+        urls.splice(index, 1);
+        return { ...prev, documentUrl: urls.join(',') };
+      }
+    });
+  };
 
   const project = projects.find(p => String(p.id) === String(issue.projectId));
   const task = tasks.find(t => String(t.id) === String(issue.taskId));
@@ -390,6 +448,15 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
               </div>
               <form onSubmit={handleEdit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                 <div>
+                  <label className="block text-sm font-medium mb-1">Related Task</label>
+                  <select className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={editData.taskId || ''} onChange={e => setEditData({...editData, taskId: e.target.value})}>
+                    <option value="">General Site Issue</option>
+                    {tasks.filter(t => String(t.projectId).replace('p', '') === String(issue.projectId).replace('p', '')).map(t => (
+                      <option key={t.id} value={t.id}>{t.title}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm font-medium mb-1">Title</label>
                   <input required type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={editData.title} onChange={e => setEditData({...editData, title: e.target.value})} />
                 </div>
@@ -417,6 +484,46 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
                   <div>
                     <label className="block text-sm font-medium mb-1">Est. Delay (Days)</label>
                     <input type="number" min="0" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={editData.estimatedDelayDays || ''} onChange={e => setEditData({...editData, estimatedDelayDays: e.target.value ? parseInt(e.target.value) : null})} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="block text-sm font-medium mb-1 flex items-center">Supporting Photo</label>
+                    <label className="w-fit cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border text-sm font-medium transition-colors flex items-center border-slate-300">
+                      {isUploadingEditImage ? 'Uploading...' : 'Choose Image'}
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => handleEditFileUpload(e, 'image')} disabled={isUploadingEditImage || isUploadingEditDoc || (editData.photoUrl && editData.photoUrl.split(',').length >= 5)} />
+                    </label>
+                    {editData.photoUrl && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {editData.photoUrl.split(',').map((url, idx) => (
+                          <div key={idx} className="relative group">
+                            <img src={url} alt="upload" className="h-16 w-16 object-cover rounded border border-slate-200" />
+                            <button type="button" onClick={() => removeEditFile('image', idx)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 shadow hover:bg-red-600">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="block text-sm font-medium mb-1 flex items-center">Supporting Document</label>
+                    <label className="w-fit cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border text-sm font-medium transition-colors flex items-center border-slate-300">
+                      {isUploadingEditDoc ? 'Uploading...' : 'Choose Document'}
+                      <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={(e) => handleEditFileUpload(e, 'doc')} disabled={isUploadingEditImage || isUploadingEditDoc || (editData.documentUrl && editData.documentUrl.split(',').length >= 5)} />
+                    </label>
+                    {editData.documentUrl && (
+                      <div className="flex flex-col gap-1 mt-2">
+                        {editData.documentUrl.split(',').map((url, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded px-2 py-1">
+                            <span className="text-xs truncate max-w-[150px] text-slate-600">Doc {idx + 1}</span>
+                            <button type="button" onClick={() => removeEditFile('doc', idx)} className="text-red-500 hover:text-red-700 p-0.5">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-end gap-2 pt-4">

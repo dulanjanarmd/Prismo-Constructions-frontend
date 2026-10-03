@@ -42,7 +42,7 @@ const Projects = () => {
   const [statusData, setStatusData] = useState({ status: '', progress: 0 });
   
   // Milestone state
-  const [newMilestone, setNewMilestone] = useState({ title: '', date: '' });
+  const [newMilestone, setNewMilestone] = useState({ title: '', date: '', description: '', budgetAllocated: '', deliverables: '' });
 
   const openModal = (type, project = null) => {
     setActiveProject(project);
@@ -101,14 +101,21 @@ const Projects = () => {
           'Authorization': `Bearer ${currentUser.token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name: newMilestone.title, dueDate: newMilestone.date, status: 'Incomplete' })
+        body: JSON.stringify({ 
+          name: newMilestone.title, 
+          dueDate: newMilestone.date, 
+          status: 'Incomplete',
+          description: newMilestone.description,
+          budgetAllocated: newMilestone.budgetAllocated ? parseFloat(newMilestone.budgetAllocated) : null,
+          deliverables: newMilestone.deliverables
+        })
       });
       if (!res.ok) throw new Error('Failed to save milestone');
       const saved = await res.json();
       const updatedMilestones = [...(activeProject.milestones || []), saved];
       updateProject(activeProject.id, { milestones: updatedMilestones });
       setActiveProject({ ...activeProject, milestones: updatedMilestones });
-      setNewMilestone({ title: '', date: '' });
+      setNewMilestone({ title: '', date: '', description: '', budgetAllocated: '', deliverables: '' });
     } catch (err) {
       console.error('Error saving milestone:', err);
     }
@@ -384,6 +391,25 @@ const Projects = () => {
                     className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                     value={newMilestone.date}
                     onChange={e => setNewMilestone({...newMilestone, date: e.target.value})}
+                  />
+                  <textarea
+                    placeholder="Description (Optional)"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none min-h-[60px]"
+                    value={newMilestone.description}
+                    onChange={e => setNewMilestone({...newMilestone, description: e.target.value})}
+                  />
+                  <input
+                    type="number"
+                    placeholder="Budget Allocated (LKR) (Optional)"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={newMilestone.budgetAllocated}
+                    onChange={e => setNewMilestone({...newMilestone, budgetAllocated: e.target.value})}
+                  />
+                  <textarea
+                    placeholder="Deliverables (Optional)"
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none min-h-[60px]"
+                    value={newMilestone.deliverables}
+                    onChange={e => setNewMilestone({...newMilestone, deliverables: e.target.value})}
                   />
                   <button
                     type="submit"

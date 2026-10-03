@@ -4,7 +4,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import {
   X, User, Calendar, Flag, Tag, ListTodo, CheckCircle2,
-  RotateCcw, Lock, Image as ImageIcon, AlertTriangle, MessageSquare, Send, UploadCloud
+  RotateCcw, Lock, Image as ImageIcon, AlertTriangle, MessageSquare, Send, UploadCloud, Edit, Trash2
 } from 'lucide-react';
 
 const PRIORITY_STYLES = {
@@ -21,7 +21,7 @@ const STATUS_STYLES = {
   'Closed': 'bg-green-100 text-green-700'
 };
 
-const TaskDetailModal = ({ task, project, onClose }) => {
+const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
   const { updateTask, users } = useData();
   const { currentUser } = useAuth();
   const [evidenceUrl, setEvidenceUrl] = useState(task.evidence || '');
@@ -131,7 +131,7 @@ const TaskDetailModal = ({ task, project, onClose }) => {
           {/* Header */}
           <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
             <div className="flex-1 min-w-0 pr-4">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
+              <div className="flex items-center gap-2 flex-wrap mb-1 -ml-2">
                 <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full ${STATUS_STYLES[task.status] || STATUS_STYLES['To Do']}`}>
                   {task.status}
                 </span>
@@ -141,9 +141,21 @@ const TaskDetailModal = ({ task, project, onClose }) => {
               </div>
               <h2 className="text-xl font-bold text-slate-900  leading-tight">{task.title}</h2>
             </div>
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 :bg-slate-800 rounded-full transition-colors shrink-0">
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center shrink-0">
+              {onEdit && (
+                <button onClick={onEdit} className="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-full transition-colors" title="Edit task">
+                  <Edit className="w-4 h-4" />
+                </button>
+              )}
+              {onDelete && task.status === 'To Do' && (
+                <button onClick={onDelete} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" title="Delete task">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+              <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Body */}

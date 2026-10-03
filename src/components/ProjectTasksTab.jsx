@@ -347,20 +347,8 @@ const ProjectTasksTab = ({ projectId, project }) => {
                             <span className="text-xs text-slate-500 truncate max-w-[80px]">{assignee?.name || '—'}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            {isPM && (
-                              <>
-                                <button type="button" onClick={e => { e.stopPropagation(); openEditTask(task); }} className="p-1 text-slate-400 hover:text-primary" title="Edit task">
-                                  <Edit className="w-3.5 h-3.5" />
-                                </button>
-                                {task.status === 'To Do' && (
-                                  <button type="button" onClick={e => { e.stopPropagation(); handleDeleteTask(task); }} className="p-1 text-slate-400 hover:text-red-500" title="Delete task">
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                )}
-                              </>
-                            )}
                             {task.dueDate && (
-                              <span className="text-xs text-slate-400">{task.dueDate}</span>
+                              <span className="text-xs text-slate-400 mr-1">{task.dueDate}</span>
                             )}
                             <Eye className="w-3.5 h-3.5 text-slate-300 hover:text-primary transition-colors" />
                           </div>
@@ -455,6 +443,8 @@ const ProjectTasksTab = ({ projectId, project }) => {
           task={selectedTask}
           project={project}
           onClose={() => setSelectedTask(null)}
+          onEdit={isPM ? () => { setSelectedTask(null); openEditTask(selectedTask); } : undefined}
+          onDelete={isPM ? () => { handleDeleteTask(selectedTask); setSelectedTask(null); } : undefined}
         />
       )}
     </div>

@@ -193,26 +193,20 @@ const ProfileModal = ({ onClose }) => {
                       <Camera className="w-6 h-6 text-white" />
                     </div>
                   </div>
-                  {previewUrl && (
-                    <button 
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeletePicture();
-                      }}
-                      className="absolute -top-1 -right-1 bg-red-100 text-red-600 p-1.5 rounded-full shadow-sm hover:bg-red-200 transition-colors z-10"
-                      title="Remove Picture"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+
                 </div>
-                <div>
-                  <h3 className="font-bold text-slate-900">Profile Picture</h3>
-                  <p className="text-sm text-slate-500 mb-2">JPG, GIF or PNG. Max size 2MB.</p>
-                  <button type="button" onClick={() => fileInputRef.current?.click()} className="text-sm font-semibold text-primary hover:underline">
-                    Upload new picture
-                  </button>
+                <div className="flex flex-col justify-center">
+                  <h3 className="font-bold text-slate-900 mb-3">Profile Picture</h3>
+                  <div className="flex gap-3">
+                    <button type="button" onClick={() => fileInputRef.current?.click()} className="w-24 px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg shadow hover:opacity-90 transition-all text-sm flex items-center justify-center">
+                      Edit
+                    </button>
+                    {previewUrl && (
+                      <button type="button" onClick={handleDeletePicture} className="w-24 px-4 py-1.5 bg-red-600 text-white font-bold rounded-lg shadow hover:bg-red-700 transition-all text-sm flex items-center justify-center">
+                        Delete
+                      </button>
+                    )}
+                  </div>
                   <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageChange} />
                 </div>
               </div>

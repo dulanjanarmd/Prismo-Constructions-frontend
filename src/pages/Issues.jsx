@@ -27,7 +27,8 @@ const Issues = () => {
   const { currentUser } = useAuth();
   
   const [isAdding, setIsAdding] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
 
   const [formData, setFormData] = useState({
     projectId: '',
@@ -38,7 +39,8 @@ const Issues = () => {
     location: '',
     equipmentInvolved: '',
     estimatedDelayDays: '',
-    photoUrl: ''
+    photoUrl: '',
+    documentUrl: ''
   });
 
   const [expandedId, setExpandedId] = useState(null);
@@ -72,11 +74,13 @@ const Issues = () => {
 
   const openCount = myIssues.filter(i => i.status !== 'RESOLVED').length;
 
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setIsUploading(true);
+    if (type === 'image') setIsUploadingImage(true);
+    else setIsUploadingDoc(true);
+
     const data = new FormData();
     data.append('file', file);
 
@@ -88,21 +92,48 @@ const Issues = () => {
       });
       if (res.ok) {
         const json = await res.json();
-        setFormData(prev => ({ ...prev, photoUrl: json.fullUrl }));
+        if (type === 'image') {
+          setFormData(prev => {
+            const current = prev.photoUrl ? prev.photoUrl.split(',') : [];
+            if (current.length >= 5) { alert('Max 5 images allowed'); return prev; }
+            return { ...prev, photoUrl: [...current, json.fullUrl].join(',') };
+          });
+        } else {
+          setFormData(prev => {
+            const current = prev.documentUrl ? prev.documentUrl.split(',') : [];
+            if (current.length >= 5) { alert('Max 5 documents allowed'); return prev; }
+            return { ...prev, documentUrl: [...current, json.fullUrl].join(',') };
+          });
+        }
       } else {
         alert('Upload failed');
       }
     } catch (err) {
       console.error(err);
     }
-    setIsUploading(false);
+    if (type === 'image') setIsUploadingImage(false);
+    else setIsUploadingDoc(false);
+  };
+
+  const removeFile = (type, index) => {
+    setFormData(prev => {
+      if (type === 'image') {
+        const urls = prev.photoUrl.split(',');
+        urls.splice(index, 1);
+        return { ...prev, photoUrl: urls.join(',') };
+      } else {
+        const urls = prev.documentUrl.split(',');
+        urls.splice(index, 1);
+        return { ...prev, documentUrl: urls.join(',') };
+      }
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const newIssue = { ...formData, status: 'OPEN' };
     addIssue(newIssue);
-    setFormData({ projectId: '', taskId: '', title: '', description: '', severity: 'Medium', location: '', equipmentInvolved: '', estimatedDelayDays: '', photoUrl: '' });
+    setFormData({ projectId: '', taskId: '', title: '', description: '', severity: 'Medium', location: '', equipmentInvolved: '', estimatedDelayDays: '', photoUrl: '', documentUrl: '' });
     setIsAdding(false);
   };
 
@@ -213,23 +244,57 @@ const Issues = () => {
                 <textarea required rows="3" placeholder="Describe the issue in detail..." className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none resize-none" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1 flex items-center">
-                  Supporting Photo / Document
-                </label>
-                <div className="flex items-center gap-4">
-                  <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border border-slate-300 text-sm font-medium transition-colors flex items-center">
-                    <UploadCloud className="w-4 h-4 mr-2" />
-                    {isUploading ? 'Uploading...' : 'Choose File'}
-                    <input type="file" className="hidden" onChange={handleFileUpload} disabled={isUploading} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="block text-sm font-medium mb-1 flex items-center">
+                    Supporting Photo
                   </label>
-                  {formData.photoUrl && <span className="text-sm text-green-600 font-medium flex items-center">✓ File Attached</span>}
+                  <label className={`w-fit cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border text-sm font-medium transition-colors flex items-center ${!formData.photoUrl && !formData.documentUrl ? 'border-red-300 ring-1 ring-red-100' : 'border-slate-300'}`}>
+                    <UploadCloud className="w-4 h-4 mr-2" />
+                    {isUploadingImage ? 'Uploading...' : 'Choose Image'}
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, 'image')} disabled={isUploadingImage || isUploadingDoc || (formData.photoUrl && formData.photoUrl.split(',').length >= 5)} />
+                  </label>
+                  {formData.photoUrl && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {formData.photoUrl.split(',').map((url, idx) => (
+                        <div key={idx} className="relative group">
+                          <img src={url} alt="upload" className="h-16 w-16 object-cover rounded border border-slate-200" />
+                          <button type="button" onClick={() => removeFile('image', idx)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 shadow hover:bg-red-600">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="block text-sm font-medium mb-1 flex items-center">
+                    Supporting Document
+                  </label>
+                  <label className={`w-fit cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md border text-sm font-medium transition-colors flex items-center ${!formData.photoUrl && !formData.documentUrl ? 'border-red-300 ring-1 ring-red-100' : 'border-slate-300'}`}>
+                    <UploadCloud className="w-4 h-4 mr-2" />
+                    {isUploadingDoc ? 'Uploading...' : 'Choose Document'}
+                    <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={(e) => handleFileUpload(e, 'doc')} disabled={isUploadingImage || isUploadingDoc || (formData.documentUrl && formData.documentUrl.split(',').length >= 5)} />
+                  </label>
+                  {formData.documentUrl && (
+                    <div className="flex flex-col gap-1 mt-2">
+                      {formData.documentUrl.split(',').map((url, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded px-2 py-1">
+                          <span className="text-xs truncate max-w-[200px] text-slate-600">Doc {idx + 1}</span>
+                          <button type="button" onClick={() => removeFile('doc', idx)} className="text-red-500 hover:text-red-700 p-0.5">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setIsAdding(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 rounded-md transition-colors">Cancel</button>
-                <button type="submit" disabled={isUploading} className="px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-md transition-colors shadow-lg shadow-red-500/20">Submit Issue</button>
+                <button type="submit" disabled={isUploadingImage || isUploadingDoc} className="px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-md transition-colors shadow-lg shadow-red-500/20">Submit Issue</button>
               </div>
             </div>
           </motion.form>
