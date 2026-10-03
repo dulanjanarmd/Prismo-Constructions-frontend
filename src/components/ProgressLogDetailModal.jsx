@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import {
-  X, Cloud, Users, TrendingUp, Wrench, AlertTriangle,
-  MessageSquare, Send, CheckCircle2, ArrowRight
+  X, Cloud, HardHat, TrendingUp, Wrench, AlertTriangle,
+  MessageSquare, Send, CheckCircle2, ArrowRight,
+  Sun, CloudRain, CloudLightning, Clock, Calendar, Camera
 } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
 
@@ -22,8 +23,8 @@ const STATUS_STYLES = {
 
 const STATUS_NEXT = { Open: 'In Progress', 'In Progress': 'Resolved', Resolved: 'Open' };
 
-const WEATHER_EMOJI = {
-  Sunny: '☀️', Cloudy: '⛅', Rainy: '🌧️', Storm: '⛈️'
+const WEATHER_ICONS = {
+  Sunny: Sun, Cloudy: Cloud, Rainy: CloudRain, Storm: CloudLightning
 };
 
 const ProgressLogDetailModal = ({ log, users, onClose }) => {
@@ -71,7 +72,7 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 80 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="glass-card w-full max-w-2xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
+          className="bg-white border border-border rounded-lg shadow-2xl w-full max-w-2xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
         >
           {/* Header */}
           <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-md px-6 py-5 border-b border-border flex items-start justify-between gap-4">
@@ -93,34 +94,73 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
           <div className="flex-1 p-6 space-y-7">
             {/* Stats row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="glass-card p-3 text-center">
-                <p className="text-2xl">{WEATHER_EMOJI[log.weather] || '🌤️'}</p>
-                <p className="text-xs text-slate-500 mt-1">Weather</p>
-                <p className="text-sm font-semibold">{log.weather}</p>
-              </div>
-              <div className="glass-card p-3 text-center">
-                <div className="flex justify-center mb-1">
-                  <Users className="w-5 h-5 text-blue-500" />
+              <div className="bg-slate-50 rounded-lg p-3 text-center border border-border">
+                <div className="flex justify-center mb-2">
+                  {(() => {
+                    const Icon = WEATHER_ICONS[log.weather] || Sun;
+                    return <Icon className="w-6 h-6 text-slate-400" />;
+                  })()}
                 </div>
-                <p className="text-xs text-slate-500">Manpower</p>
+                <p className="text-xs text-slate-500 mt-1">Weather</p>
+                <p className="text-sm font-semibold">{log.weather} {log.temperature ? `(${log.temperature}°C)` : ''}</p>
+              </div>
+              <div className="bg-slate-50 rounded-lg p-3 text-center border border-border">
+                <div className="flex justify-center mb-2">
+                  <Clock className="w-6 h-6 text-slate-400" />
+                </div>
+                <p className="text-xs text-slate-500 mt-1">Shift & Cond.</p>
+                <p className="text-sm font-semibold">{log.shiftType || 'Day'} • {log.siteConditions || 'Normal'}</p>
+              </div>
+              <div className="bg-slate-50 rounded-lg p-3 text-center border border-border">
+                <div className="flex justify-center mb-2">
+                  <HardHat className="w-6 h-6 text-slate-400" />
+                </div>
+                <p className="text-xs text-slate-500 mt-1">Manpower</p>
                 <p className="text-sm font-semibold">{log.manpower} workers</p>
               </div>
-              <div className="glass-card p-3 text-center col-span-2">
-                <div className="flex justify-center mb-1">
-                  <TrendingUp className="w-5 h-5 text-green-500" />
+              <div className="bg-slate-50 rounded-lg p-3 text-center border border-border">
+                <div className="flex justify-center mb-2">
+                  <TrendingUp className="w-6 h-6 text-slate-400" />
                 </div>
-                <p className="text-xs text-slate-500">Progress Today</p>
-                <p className="text-2xl font-bold text-green-600">+{log.percentageCompleted}%</p>
+                <p className="text-xs text-slate-500 mt-1">Progress Today</p>
+                <p className="text-xl font-bold text-green-600">+{log.percentageCompleted}%</p>
               </div>
             </div>
 
             {/* Work Done */}
-            <div>
-              <h3 className="flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
-                <Wrench className="w-4 h-4" /> Work Completed
-              </h3>
-              <div className="bg-slate-50  rounded-lg p-4 border border-border">
-                <p className="text-slate-700  text-sm leading-relaxed">{log.workDone}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                <h3 className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  <Wrench className="w-4 h-4 text-slate-400" /> Work Completed
+                </h3>
+                <p className="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">{log.workDone}</p>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                <h3 className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  <Calendar className="w-4 h-4 text-slate-400" /> Next Day Plan
+                </h3>
+                <p className="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">{log.nextDayPlan || 'Not specified'}</p>
+              </div>
+
+              <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Equipment Used</h4>
+                <p className="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">{log.equipmentUsed || 'None'}</p>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Materials Delivered</h4>
+                <p className="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">{log.materialsDelivered || 'None'}</p>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Subcontractors</h4>
+                <p className="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">{log.subcontractors || 'None'}</p>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Inspections</h4>
+                <p className="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">{log.inspections || 'None'}</p>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm md:col-span-2">
+                <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Visitors</h4>
+                <p className="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">{log.visitors || 'None'}</p>
               </div>
             </div>
 
@@ -128,7 +168,7 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
             {formattedPhotos.length > 0 && (
               <div>
                 <h3 className="flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
-                  <span>📷</span> Site Photos ({formattedPhotos.length})
+                  <Camera className="w-4 h-4 text-slate-400" /> Site Photos ({formattedPhotos.length})
                 </h3>
                 <PhotoGallery photos={formattedPhotos} />
               </div>

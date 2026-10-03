@@ -22,6 +22,12 @@ const Logs = () => {
     materialsDelivered: '',
     safetyIncidents: '',
     delayHours: '',
+    shiftType: 'Day',
+    siteConditions: 'Normal',
+    visitors: '',
+    nextDayPlan: '',
+    subcontractors: '',
+    inspections: '',
     issues: '',
     photos: [] // Array of { url, caption }
   });
@@ -44,6 +50,12 @@ const Logs = () => {
       materialsDelivered: log.materialsDelivered || '',
       safetyIncidents: log.safetyIncidents || '',
       delayHours: log.delayHours || '',
+      shiftType: log.shiftType || 'Day',
+      siteConditions: log.siteConditions || 'Normal',
+      visitors: log.visitors || '',
+      nextDayPlan: log.nextDayPlan || '',
+      subcontractors: log.subcontractors || '',
+      inspections: log.inspections || '',
       issues: log.issues || '',
       photos: log.photos || []
     });
@@ -167,7 +179,8 @@ const Logs = () => {
       projectId: '', taskId: '', date: new Date().toISOString().split('T')[0], 
       weather: 'Sunny', temperature: '', manpower: '', percentageCompleted: '', 
       workDone: '', equipmentUsed: '', materialsDelivered: '', 
-      safetyIncidents: '', delayHours: '', issues: '', photos: [] 
+      safetyIncidents: '', delayHours: '', shiftType: 'Day', siteConditions: 'Normal',
+      visitors: '', nextDayPlan: '', subcontractors: '', inspections: '', issues: '', photos: [] 
     });
   };
 
@@ -305,7 +318,8 @@ const Logs = () => {
                     projectId: '', taskId: '', date: new Date().toISOString().split('T')[0], 
                     weather: 'Sunny', temperature: '', manpower: '', percentageCompleted: '', 
                     workDone: '', equipmentUsed: '', materialsDelivered: '', 
-                    safetyIncidents: '', delayHours: '', issues: '', photos: [] 
+                    safetyIncidents: '', delayHours: '', shiftType: 'Day', siteConditions: 'Normal',
+                    visitors: '', nextDayPlan: '', subcontractors: '', inspections: '', issues: '', photos: [] 
                   });
                 }}
                 className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
@@ -342,7 +356,27 @@ const Logs = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-700  mb-1">Temperature (°C)</label>
-                    <input type="number" step="0.1" placeholder="e.g. 28.5" className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.temperature} onChange={e => setFormData({...formData, temperature: e.target.value})} />
+                    <input required type="number" step="0.1" placeholder="e.g. 28.5" className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.temperature} onChange={e => setFormData({...formData, temperature: e.target.value})} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700  mb-1">Shift</label>
+                    <select required className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.shiftType} onChange={e => setFormData({...formData, shiftType: e.target.value})}>
+                      <option>Day</option>
+                      <option>Night</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700  mb-1">Site Conditions</label>
+                    <select required className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.siteConditions} onChange={e => setFormData({...formData, siteConditions: e.target.value})}>
+                      <option>Normal</option>
+                      <option>Dry</option>
+                      <option>Wet</option>
+                      <option>Muddy</option>
+                      <option>Dusty</option>
+                    </select>
                   </div>
                 </div>
 
@@ -383,13 +417,29 @@ const Logs = () => {
                     </div>
                   </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-red-600  mb-1 flex items-center">
-                    <AlertTriangle className="w-4 h-4 mr-1" />
-                    Report Issues or Observations (Optional)
-                  </label>
-                  <textarea rows="2" placeholder="Report any delays, material shortages, safety concerns..." className="w-full rounded border border-red-200  bg-red-50  px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none resize-none" value={formData.issues} onChange={e => setFormData({...formData, issues: e.target.value})}></textarea>
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700  mb-1">Visitors (Optional)</label>
+                      <textarea rows="2" placeholder="List any site visitors..." className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.visitors} onChange={e => setFormData({...formData, visitors: e.target.value})}></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700  mb-1">Next Day Plan (Optional)</label>
+                      <textarea rows="2" placeholder="What is planned for tomorrow?" className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.nextDayPlan} onChange={e => setFormData({...formData, nextDayPlan: e.target.value})}></textarea>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700  mb-1">Subcontractors (Optional)</label>
+                      <textarea rows="2" placeholder="List subcontractors & headcount..." className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.subcontractors} onChange={e => setFormData({...formData, subcontractors: e.target.value})}></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700  mb-1">Inspections (Optional)</label>
+                      <textarea rows="2" placeholder="Any QA/QC inspections performed?" className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.inspections} onChange={e => setFormData({...formData, inspections: e.target.value})}></textarea>
+                    </div>
+                  </div>
+
+
 
                 <div className="border-t border-border pt-4">
                   <label className="block text-sm font-bold text-slate-700  mb-2">Progress Photos & Captions</label>
@@ -447,7 +497,8 @@ const Logs = () => {
                       projectId: '', taskId: '', date: new Date().toISOString().split('T')[0], 
                       weather: 'Sunny', temperature: '', manpower: '', percentageCompleted: '', 
                       workDone: '', equipmentUsed: '', materialsDelivered: '', 
-                      safetyIncidents: '', delayHours: '', issues: '', photos: [] 
+                      safetyIncidents: '', delayHours: '', shiftType: 'Day', siteConditions: 'Normal',
+                      visitors: '', nextDayPlan: '', subcontractors: '', inspections: '', issues: '', photos: [] 
                     });
                   }} className="px-4 py-2 font-semibold text-slate-600 hover:bg-slate-100 rounded transition-colors">Cancel</button>
                   <button type="submit" className="btn-primary">{editingLogId ? 'Update Log' : 'Submit Daily Log'}</button>
@@ -494,27 +545,47 @@ const Logs = () => {
                   <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider font-semibold">Completed</p>
                   <p className="font-medium text-green-600">+{selectedLog.percentageCompleted}%</p>
                 </div>
+                <div>
+                  <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider font-semibold">Shift</p>
+                  <p className="font-medium text-slate-800">{selectedLog.shiftType || 'Day'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider font-semibold">Conditions</p>
+                  <p className="font-medium text-slate-800">{selectedLog.siteConditions || 'Normal'}</p>
+                </div>
               </div>
 
               <div className="space-y-6">
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900 mb-2 uppercase tracking-wider">Work Done</h4>
-                  <p className="text-slate-600 text-sm leading-relaxed">{selectedLog.workDone}</p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {selectedLog.equipmentUsed && (
-                    <div className="bg-slate-50 p-4 rounded border border-border">
-                      <h4 className="text-sm font-bold text-slate-900 mb-1 uppercase tracking-wider">Equipment Used</h4>
-                      <p className="text-slate-600 text-sm">{selectedLog.equipmentUsed}</p>
-                    </div>
-                  )}
-                  {selectedLog.materialsDelivered && (
-                    <div className="bg-slate-50 p-4 rounded border border-border">
-                      <h4 className="text-sm font-bold text-slate-900 mb-1 uppercase tracking-wider">Materials Delivered</h4>
-                      <p className="text-slate-600 text-sm">{selectedLog.materialsDelivered}</p>
-                    </div>
-                  )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                    <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Work Done</h4>
+                    <p className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">{selectedLog.workDone}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                    <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Next Day Plan</h4>
+                    <p className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">{selectedLog.nextDayPlan || 'Not specified'}</p>
+                  </div>
+
+                  <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                    <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Equipment Used</h4>
+                    <p className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">{selectedLog.equipmentUsed || 'None'}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                    <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Materials Delivered</h4>
+                    <p className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">{selectedLog.materialsDelivered || 'None'}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                    <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Subcontractors</h4>
+                    <p className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">{selectedLog.subcontractors || 'None'}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm">
+                    <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Inspections</h4>
+                    <p className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">{selectedLog.inspections || 'None'}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-border shadow-sm md:col-span-2">
+                    <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Site Visitors</h4>
+                    <p className="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed">{selectedLog.visitors || 'None'}</p>
+                  </div>
                 </div>
 
                 {(selectedLog.issues || selectedLog.safetyIncidents || selectedLog.delayHours) && (

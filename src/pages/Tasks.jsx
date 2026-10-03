@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Eye, Lock, AlertTriangle, Filter } from 'lucide-react';
 import { motion } from 'framer-motion';
 import TaskDetailModal from '../components/TaskDetailModal';
-import TaskAnalytics from '../components/TaskAnalytics';
 
 const PRIORITY_STYLES = {
   High: 'bg-red-500 text-white',
@@ -260,9 +259,6 @@ const Tasks = () => {
           </div>
       )}
       </div>
-
-      {/* Task Analytics */}
-      <TaskAnalytics tasks={displayTasks} projects={projects} />
 
       {/* Task Detail Modal */}
       {selectedTask && (

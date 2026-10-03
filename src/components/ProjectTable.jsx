@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, Filter, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const ProjectTable = ({ projects }) => {
+const ProjectTable = ({ projects, title = "Projects" }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const ProjectTable = ({ projects }) => {
     <div className="glass-card flex flex-col mt-6 overflow-hidden">
       <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-slate-900">Projects</h2>
+          <h2 className="text-xl font-bold text-slate-900">{title}</h2>
           <span className="bg-slate-300/50 text-slate-700 text-xs font-bold px-2 py-0.5 rounded-lg">{projects.length}</span>
         </div>
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center w-full justify-end">

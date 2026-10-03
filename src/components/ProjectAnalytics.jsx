@@ -7,15 +7,19 @@ import { motion } from 'framer-motion';
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white/90 backdrop-blur-md border border-slate-200 p-3 rounded-lg shadow-xl">
-        <p className="font-bold text-slate-900 mb-2">{label}</p>
-        {payload.map((entry, index) => (
-          <div key={index} className="flex items-center gap-2 text-sm font-medium">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color || entry.payload.fill }} />
-            <span className="text-slate-600 capitalize">{entry.name}:</span>
-            <span className="text-slate-900">{entry.value}</span>
-          </div>
-        ))}
+      <div className="bg-white/80 backdrop-blur-xl border border-white/40 p-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+        <p className="font-bold text-slate-800 mb-3 border-b border-slate-200/50 pb-2">{label}</p>
+        <div className="space-y-2">
+          {payload.map((entry, index) => (
+            <div key={index} className="flex items-center justify-between gap-6 text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <div className="w-3.5 h-3.5 rounded-full shadow-inner" style={{ backgroundColor: entry.color || entry.payload.fill }} />
+                <span className="text-slate-500 capitalize">{entry.name}:</span>
+              </div>
+              <span className="text-slate-800 font-bold">{entry.value}</span>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -39,17 +43,20 @@ const ProjectAnalytics = ({ projects }) => {
     <div className="mb-6">
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="glass-card p-6 rounded-2xl flex flex-col w-full"
+        className="glass-card p-6 flex flex-col w-full"
       >
-        <h3 className="text-lg font-bold text-slate-900 mb-6">Project Progress Overview</h3>
-        <div className="h-72 w-full">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-base font-bold text-slate-800">Project Progress</h3>
+          <span className="text-slate-400 font-bold cursor-pointer hover:text-slate-600">...</span>
+        </div>
+        <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={projectProgressData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} angle={-25} textAnchor="end" />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-              <RechartsTooltip content={<CustomTooltip />} />
-              <Bar dataKey="progress" name="Progress (%)" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
+            <BarChart data={projectProgressData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }} barGap={6}>
+              <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }} dx={-10} />
+              <RechartsTooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+              <Bar dataKey="progress" name="Progress (%)" fill="#34d399" radius={[10, 10, 10, 10]} maxBarSize={12} />
             </BarChart>
           </ResponsiveContainer>
         </div>

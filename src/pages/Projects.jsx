@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle, ArrowRight, Trash2, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import ProjectAnalytics from '../components/ProjectAnalytics';
 
 const Projects = () => {
   const { projects, tasks, updateProject, deleteProject, users } = useData();
@@ -258,8 +257,6 @@ const Projects = () => {
           </table>
         </div>
       </div>
-
-      <ProjectAnalytics projects={visibleProjects} />
 
       <AnimatePresence>
         {/* Edit Project Modal */}

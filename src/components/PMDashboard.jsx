@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import PortfolioSummaryCards from './PortfolioSummaryCards';
-import PMDataAnalytics from './PMDataAnalytics';
 import ProjectTable from './ProjectTable';
 import CreateProjectButton from './CreateProjectButton';
 import DashboardHeader from './DashboardHeader';
@@ -21,8 +20,6 @@ const PMDashboard = () => {
       <PortfolioSummaryCards projects={projects} />
 
       <ProjectTable projects={projects} />
-
-      <PMDataAnalytics projects={projects} tasks={tasks} approvals={approvals} issues={issues} logs={logs} />
     </div>
   );
 };

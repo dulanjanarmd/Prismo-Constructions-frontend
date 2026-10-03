@@ -3,7 +3,7 @@ import { useData } from '../context/DataContext';
 import { UserPlus, Shield, Mail, Trash2, X, Edit, Key, Users, Briefcase, AlertCircle, FileText, Activity, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+
 
 const AdminPortal = () => {
   const { users, projects, tasks, issues, logs, addUser, deleteUser, updateUser, resetUserPassword } = useData();
@@ -194,99 +194,40 @@ const AdminPortal = () => {
           >
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="glass-card p-6 border-l-4 border-blue-500">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-500 mb-1">Total Users</p>
-                    <h3 className="text-3xl font-bold text-slate-800">{users?.length || 0}</h3>
-                  </div>
-                  <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
-                    <Users className="w-6 h-6" />
-                  </div>
+              <div className="glass-card p-6 border-l-4 border-l-blue-500 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <p className="text-sm font-semibold text-slate-500 mb-1">Total Users</p>
+                  <p className="text-3xl font-bold text-slate-800">{users?.length || 0}</p>
                 </div>
+                <Users className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-blue-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
               </div>
-              <div className="glass-card p-6 border-l-4 border-emerald-500">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-500 mb-1">Active Projects</p>
-                    <h3 className="text-3xl font-bold text-slate-800">{activeProjectsCount}</h3>
-                  </div>
-                  <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600">
-                    <Briefcase className="w-6 h-6" />
-                  </div>
+
+              <div className="glass-card p-6 border-l-4 border-l-emerald-500 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <p className="text-sm font-semibold text-slate-500 mb-1">Active Projects</p>
+                  <p className="text-3xl font-bold text-slate-800">{activeProjectsCount}</p>
                 </div>
+                <Briefcase className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-emerald-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
               </div>
-              <div className="glass-card p-6 border-l-4 border-rose-500">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-500 mb-1">Open Issues</p>
-                    <h3 className="text-3xl font-bold text-slate-800">{openIssuesCount}</h3>
-                  </div>
-                  <div className="p-3 bg-rose-50 rounded-xl text-rose-600">
-                    <AlertCircle className="w-6 h-6" />
-                  </div>
+
+              <div className="glass-card p-6 border-l-4 border-l-rose-500 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <p className="text-sm font-semibold text-slate-500 mb-1">Open Issues</p>
+                  <p className="text-3xl font-bold text-slate-800">{openIssuesCount}</p>
                 </div>
+                <AlertCircle className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-rose-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
               </div>
-              <div className="glass-card p-6 border-l-4 border-amber-500">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-500 mb-1">Total Progress Logs</p>
-                    <h3 className="text-3xl font-bold text-slate-800">{logs?.length || 0}</h3>
-                  </div>
-                  <div className="p-3 bg-amber-50 rounded-xl text-amber-600">
-                    <FileText className="w-6 h-6" />
-                  </div>
+
+              <div className="glass-card p-6 border-l-4 border-l-amber-500 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <p className="text-sm font-semibold text-slate-500 mb-1">Total Progress Logs</p>
+                  <p className="text-3xl font-bold text-slate-800">{logs?.length || 0}</p>
                 </div>
+                <FileText className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-amber-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
               </div>
             </div>
 
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="glass-card p-6">
-                <h3 className="text-lg font-bold mb-4">User Distribution by Role</h3>
-                <div className="h-[300px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={userRoleData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      >
-                        {userRoleData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <RechartsTooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
 
-              <div className="glass-card p-6">
-                <h3 className="text-lg font-bold mb-4">Projects by Status</h3>
-                <div className="h-[300px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={projectStatusData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                      <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                      <YAxis allowDecimals={false} tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} />
-                      <RechartsTooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                      <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]}>
-                        {projectStatusData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
           </motion.div>
         )}
 

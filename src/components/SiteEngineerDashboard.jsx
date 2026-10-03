@@ -7,6 +7,7 @@ import DashboardHeader from './DashboardHeader';
 import RecentActivity from './RecentActivity';
 import SubmitLogModal from './SubmitLogModal';
 import ReportIssueModal from './ReportIssueModal';
+import ProjectTable from './ProjectTable';
 
 const SiteEngineerDashboard = () => {
   const { projects, tasks, logs, issues } = useData();
@@ -96,52 +97,48 @@ const SiteEngineerDashboard = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="glass-card p-5 border-l-4 border-l-blue-500">
-          <p className="text-sm font-semibold text-slate-500 mb-1">My Open Tasks</p>
-          <div className="flex items-center justify-between">
+        <div className="glass-card p-5 border-l-4 border-l-blue-500 relative overflow-hidden group">
+          <div className="relative z-10">
+            <p className="text-sm font-semibold text-slate-500 mb-1">My Open Tasks</p>
             <p className="text-3xl font-bold text-slate-800 ">{openTasks.length}</p>
-            <div className="p-2 bg-blue-50  rounded-full text-blue-500">
-              <CheckSquare className="w-5 h-5" />
-            </div>
           </div>
+          <CheckSquare className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-blue-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
         </div>
         
-        <div className="glass-card p-5 border-l-4 border-l-orange-500">
-          <p className="text-sm font-semibold text-slate-500 mb-1">Due Today</p>
-          <div className="flex items-center justify-between">
+        <div className="glass-card p-5 border-l-4 border-l-orange-500 relative overflow-hidden group">
+          <div className="relative z-10">
+            <p className="text-sm font-semibold text-slate-500 mb-1">Due Today</p>
             <p className="text-3xl font-bold text-slate-800 ">{tasksDueToday}</p>
-            <div className="p-2 bg-orange-50  rounded-full text-orange-500">
-              <Calendar className="w-5 h-5" />
-            </div>
           </div>
+          <Calendar className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-orange-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
         </div>
 
-        <div className="glass-card p-5 border-l-4 border-l-green-500">
-          <p className="text-sm font-semibold text-slate-500 mb-1">Logs This Week</p>
-          <div className="flex items-center justify-between">
+        <div className="glass-card p-5 border-l-4 border-l-green-500 relative overflow-hidden group">
+          <div className="relative z-10">
+            <p className="text-sm font-semibold text-slate-500 mb-1">Logs This Week</p>
             <p className="text-3xl font-bold text-slate-800 ">{logsThisWeek}</p>
-            <div className="p-2 bg-green-50  rounded-full text-green-500">
-              <Camera className="w-5 h-5" />
-            </div>
           </div>
+          <Camera className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-green-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
         </div>
 
-        <div className="glass-card p-5 border-l-4 border-l-red-500">
-          <p className="text-sm font-semibold text-slate-500 mb-1">Open Issues</p>
-          <div className="flex items-center justify-between">
+        <div className="glass-card p-5 border-l-4 border-l-red-500 relative overflow-hidden group">
+          <div className="relative z-10">
+            <p className="text-sm font-semibold text-slate-500 mb-1">Open Issues</p>
             <p className="text-3xl font-bold text-slate-800 ">{openIssuesCount}</p>
-            <div className="p-2 bg-red-50  rounded-full text-red-500">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
           </div>
+          <AlertTriangle className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-red-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
         </div>
       </div>
 
+      {/* My Projects */}
+      <div className="mt-8">
+        <ProjectTable projects={myProjects} title="My Assigned Projects" />
+      </div>
 
       {/* Active Tasks List */}
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold">My Active Tasks</h2>
+      <div className="glass-card flex flex-col mt-6 overflow-hidden">
+        <div className="flex justify-between items-center p-6 bg-[#e5e7eb] border-b border-slate-200">
+          <h2 className="text-xl font-bold text-slate-900">My Active Tasks</h2>
           <button 
             onClick={() => navigate('/portal/tasks')}
             className="text-sm font-semibold text-primary hover:underline flex items-center"
@@ -151,14 +148,13 @@ const SiteEngineerDashboard = () => {
         </div>
         
         {openTasks.length === 0 ? (
-          <div className="glass-card p-8 text-center text-slate-500">
+          <div className="p-8 text-center text-slate-500">
             <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-green-500 opacity-60" />
             <p>You have no open tasks. Great job!</p>
           </div>
         ) : (
-          <div className="glass-card overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm whitespace-nowrap">
+          <div className="overflow-x-auto p-6 pt-0 mt-6">
+            <table className="w-full text-left text-sm whitespace-nowrap">
                 <thead className="bg-slate-50  border-b border-border text-slate-500">
                   <tr>
                     <th className="px-4 py-3 font-medium">Task Title</th>
@@ -179,22 +175,26 @@ const SiteEngineerDashboard = () => {
                         <td className="px-4 py-3 text-slate-600 ">{project?.name || '—'}</td>
                         <td className="px-4 py-3 text-slate-600 ">{task.milestoneName || (projects?.find(p => String(p.id) === String(task.projectId).replace('p', ''))?.milestones?.find(m => String(m.id) === String(task.milestoneId)?.replace('m', ''))?.name) || '—'}</td>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-0.5 text-xs font-semibold rounded-md border ${
-                            task.priority === 'High' ? 'bg-red-50 text-red-700 border-red-200' :
-                            task.priority === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                            'bg-blue-50 text-blue-700 border-blue-200'
+                          <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-20 inline-block text-center ${
+                            task.priority === 'High' ? 'bg-red-500 text-white' :
+                            task.priority === 'Medium' ? 'bg-amber-500 text-white' :
+                            'bg-blue-500 text-white'
                           }`}>
                             {task.priority || 'Medium'}
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="font-semibold text-xs uppercase tracking-wider text-slate-600 ">
+                          <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-28 inline-block text-center ${
+                            task.status === 'Completed' || task.status === 'Closed' ? 'bg-emerald-500 text-white' :
+                            task.status === 'In Progress' ? 'bg-amber-500 text-white' : 
+                            'bg-slate-200 text-slate-700'
+                          }`}>
                             {task.status}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-slate-600 ">{task.dueDate || '—'}</td>
                         <td className="px-4 py-3 text-right">
-                          <button onClick={() => navigate('/portal/tasks')} className="text-primary hover:text-primary/80 font-semibold flex items-center justify-end gap-1 ml-auto">
+                          <button onClick={() => navigate('/portal/tasks')} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-md transition-colors flex items-center justify-center gap-1 ml-auto">
                             View <ChevronRight className="w-3 h-3" />
                           </button>
                         </td>
@@ -204,7 +204,6 @@ const SiteEngineerDashboard = () => {
                 </tbody>
               </table>
             </div>
-          </div>
         )}
       </div>
 

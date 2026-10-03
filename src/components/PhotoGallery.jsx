@@ -43,7 +43,7 @@ const PhotoGallery = ({ photos = [] }) => {
         'grid-cols-3'
       }`}>
         {photos.map((photo, idx) => {
-          const url = typeof photo === 'string' ? photo : photo.url;
+          const url = typeof photo === 'string' ? photo : (photo.fileUrl || photo.url);
           const caption = typeof photo === 'string' ? 'Site photo' : (photo.caption || 'Site photo');
           return (
             <div
@@ -119,7 +119,7 @@ const PhotoGallery = ({ photos = [] }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={typeof current === 'string' ? current : current.url}
+                src={typeof current === 'string' ? current : (current.fileUrl || current.url)}
                 alt={typeof current === 'string' ? 'Site photo' : current.caption}
                 className="max-w-full max-h-[72vh] object-contain rounded-lg shadow-2xl"
               />
@@ -143,7 +143,7 @@ const PhotoGallery = ({ photos = [] }) => {
             {photos.length > 1 && (
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                 {photos.map((p, idx) => {
-                  const thumbUrl = typeof p === 'string' ? p : p.url;
+                  const thumbUrl = typeof p === 'string' ? p : (p.fileUrl || p.url);
                   return (
                     <div
                       key={idx}

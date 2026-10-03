@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useData } from '../context/DataContext';
-import { Camera, Search, Filter, AlertTriangle, ImageIcon, ChevronRight, TrendingUp, Users, Cloud } from 'lucide-react';
+import { Camera, Search, Filter, AlertTriangle, ImageIcon, ChevronRight, TrendingUp, HardHat, Cloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ProgressLogDetailModal from './ProgressLogDetailModal';
 
@@ -212,7 +212,7 @@ const ProjectLogsTab = ({ projectId }) => {
                         {WEATHER_EMOJI[log.weather] || '🌤️'} {log.weather}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Users className="w-3 h-3" /> {log.manpower} workers
+                        <HardHat className="w-3 h-3" /> {log.manpower} workers
                       </span>
                       {photoCount > 0 && (
                         <span className="flex items-center gap-1">
@@ -227,30 +227,14 @@ const ProjectLogsTab = ({ projectId }) => {
                     </div>
                   </div>
 
-                  {/* Right: progress badge + arrow */}
-                  <div className="flex flex-col items-end gap-2 shrink-0">
-                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-bold border border-primary/20">
+                  {/* Right: progress badge + action */}
+                  <div className="flex flex-col items-end justify-between h-full shrink-0">
+                    <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-bold border border-amber-200">
                       +{log.percentageCompleted}%
                     </span>
-                    {photoCount > 0 && (
-                      <div className="flex -space-x-1 overflow-hidden">
-                        {(log.photos || []).slice(0, 3).map((p, i) => (
-                          <div key={i} className="w-7 h-7 rounded-full border-2 border-background overflow-hidden bg-slate-200">
-                            <img
-                              src={typeof p === 'string' ? p : p.url}
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
-                        {photoCount > 3 && (
-                          <div className="w-7 h-7 rounded-full border-2 border-background bg-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-600">
-                            +{photoCount - 3}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors" />
+                    <button className="text-primary text-sm font-medium flex items-center gap-1 group-hover:underline mt-6">
+                      View <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </button>
                   </div>
                 </div>
               </motion.div>
