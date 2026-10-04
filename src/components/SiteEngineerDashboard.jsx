@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { CheckSquare, AlertTriangle, FileText, Activity, Clock, LogOut, Calendar, Camera, ChevronRight, CheckCircle2 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
-import RecentActivity from './RecentActivity';
 import SubmitLogModal from './SubmitLogModal';
 import ReportIssueModal from './ReportIssueModal';
 import ProjectTable from './ProjectTable';
@@ -207,10 +206,7 @@ const SiteEngineerDashboard = () => {
         )}
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-lg font-bold mb-4">Recent Activity</h2>
-        <RecentActivity activities={recentActivities} />
-      </div>
+
 
       {/* Modals */}
       <SubmitLogModal 

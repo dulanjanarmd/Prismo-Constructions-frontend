@@ -19,7 +19,6 @@ const ProjectTable = ({ projects, title = "Projects" }) => {
       <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-bold text-slate-900">{title}</h2>
-          <span className="bg-slate-300/50 text-slate-700 text-xs font-bold px-2 py-0.5 rounded-lg">{projects.length}</span>
         </div>
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center w-full justify-end">
           <div className="flex flex-wrap md:flex-nowrap space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto">

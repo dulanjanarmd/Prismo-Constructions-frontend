@@ -3,7 +3,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import PortfolioSummaryCards from './PortfolioSummaryCards';
 import ProjectTable from './ProjectTable';
-import CreateProjectButton from './CreateProjectButton';
+
 import DashboardHeader from './DashboardHeader';
 import { MessageSquare, Send } from 'lucide-react';
 
@@ -14,7 +14,7 @@ const PMDashboard = () => {
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <DashboardHeader rightElement={<CreateProjectButton />} />
+        <DashboardHeader />
       </div>
 
       <PortfolioSummaryCards projects={projects} />

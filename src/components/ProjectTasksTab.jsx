@@ -197,7 +197,6 @@ const ProjectTasksTab = ({ projectId, project }) => {
 
   const handleDrop = async (e, newStatus) => {
     e.preventDefault();
-    if (!isSiteEngineer) return;
     const taskId = e.dataTransfer.getData('taskId');
     if (!taskId) return;
     const task = tasks.find(t => String(t.id) === String(taskId));
@@ -231,53 +230,63 @@ const ProjectTasksTab = ({ projectId, project }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-xl font-bold">Task Board</h2>
-          <p className="text-sm text-slate-500">{projectTasks.length} tasks — {columnCounts['Closed']} closed</p>
+      {/* Header & Filters */}
+      <div className="glass-card flex flex-col overflow-hidden mb-6">
+        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <div>
+              <h2 className="text-xl font-bold whitespace-nowrap">Task Board</h2>
+            </div>
+          </div>
+          
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-6 items-center w-full justify-end">
+            {isPM && (
+              <>
+                <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto w-full xl:w-auto max-w-full">
+                  {['All', ...STATUS_COLUMNS].map(status => {
+                    const count = status === 'All' ? projectTasks.length : (columnCounts[status] || 0);
+                    return (
+                      <button
+                        key={status}
+                        onClick={() => setStatusFilter(status)}
+                        className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                          statusFilter === status 
+                            ? 'bg-white shadow-sm text-slate-900 font-bold' 
+                            : 'hover:text-slate-900'
+                        }`}
+                      >
+                        {status} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <div className="relative w-full xl:w-auto h-12">
+                  <select
+                    className="h-full w-full xl:w-40 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all px-4 cursor-pointer"
+                    value={assigneeFilter}
+                    onChange={e => setAssigneeFilter(e.target.value)}
+                  >
+                    <option value="All">All Assignees</option>
+                    {siteEngineers.map(u => (
+                      <option key={u.id} value={u.id}>{u.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+            
+            {isPM && (
+              <button
+                onClick={() => { setIsEditing(false); setSelectedTask(null); setIsModalOpen(true); }}
+                className="h-12 flex items-center px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
+              >
+                Create Task
+              </button>
+            )}
+          </div>
         </div>
-        {isPM && (
-          <button
-            onClick={() => { setIsEditing(false); setSelectedTask(null); setIsModalOpen(true); }}
-            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Create Task
-          </button>
-        )}
       </div>
-
-      {/* Filters */}
-      {isPM && (
-        <div className="flex flex-wrap gap-3">
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-slate-400" />
-            <select
-              className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary outline-none"
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-            >
-              <option value="All">All Statuses</option>
-              {STATUS_COLUMNS.map(s => (
-                <option key={s} value={s}>{s} ({columnCounts[s]})</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <select
-              className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:ring-2 focus:ring-primary outline-none"
-              value={assigneeFilter}
-              onChange={e => setAssigneeFilter(e.target.value)}
-            >
-              <option value="All">All Assignees</option>
-              {siteEngineers.map(u => (
-                <option key={u.id} value={u.id}>{u.name}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      )}
 
       {/* Kanban Board */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 xl:grid-cols-5">

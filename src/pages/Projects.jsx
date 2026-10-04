@@ -152,9 +152,8 @@ const Projects = () => {
         {!isSiteEngineer && !isClient && (
           <button 
             onClick={() => navigate('/portal/projects/new')}
-            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
+            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold"
           >
-            <Plus className="w-5 h-5 mr-2" />
             New Project
           </button>
         )}

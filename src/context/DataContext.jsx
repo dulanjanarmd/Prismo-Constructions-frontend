@@ -425,7 +425,8 @@ export const DataProvider = ({ children }) => {
       priority: updates.priority ?? currentTask?.priority,
       dueDate: updates.dueDate ?? currentTask?.dueDate ?? null,
       status: statusValues[updates.status] || updates.status,
-      completionEvidence: updates.evidence ?? currentTask?.evidence ?? null
+      completionEvidence: updates.evidence ?? currentTask?.evidence ?? null,
+      assignedTo: updates.assignedTo ?? currentTask?.assignedTo ?? null
     };
     const response = await fetch(`http://localhost:8080/api/tasks/${taskId}`, {
       method: 'PUT',
@@ -588,7 +589,8 @@ export const DataProvider = ({ children }) => {
         location: issue.location || null,
         equipmentInvolved: issue.equipmentInvolved || null,
         estimatedDelayDays: issue.estimatedDelayDays ? parseInt(issue.estimatedDelayDays) : null,
-        photoUrl: issue.photoUrl || null
+        photoUrl: issue.photoUrl || null,
+        documentUrl: issue.documentUrl || null
       };
       
       let url = `http://localhost:8080/api/issues?projectId=${projectId}`;
@@ -631,7 +633,9 @@ export const DataProvider = ({ children }) => {
         equipmentInvolved: updates.equipmentInvolved || null,
         estimatedDelayDays: updates.estimatedDelayDays == null || updates.estimatedDelayDays === ''
           ? null
-          : Number(updates.estimatedDelayDays)
+          : Number(updates.estimatedDelayDays),
+        photoUrl: updates.photoUrl || null,
+        documentUrl: updates.documentUrl || null
       };
       const res = await fetch(`http://localhost:8080/api/issues/${rawId}`, {
         method: 'PUT',

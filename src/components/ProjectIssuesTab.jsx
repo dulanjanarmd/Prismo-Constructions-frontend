@@ -48,7 +48,12 @@ const ProjectIssuesTab = ({ project }) => {
   const pmIssues = projectIssues.filter(i => getReporterRole(i) === 'project_manager' || getReporterRole(i) === 'pm');
 
   const [activeTab, setActiveTab] = useState(currentUser?.role === 'ceo' ? 'pm' : 'se'); // 'se' or 'pm'
-  const activeIssues = activeTab === 'se' ? seIssues : pmIssues;
+  const [statusFilter, setStatusFilter] = useState('All');
+  
+  const baseActiveIssues = activeTab === 'se' ? seIssues : pmIssues;
+  const activeIssues = statusFilter === 'All' 
+    ? baseActiveIssues 
+    : baseActiveIssues.filter(i => i.status?.replace('_', ' ').toUpperCase() === statusFilter.toUpperCase());
 
   const [expandedId, setExpandedId] = useState(null);
 
@@ -69,9 +74,9 @@ const ProjectIssuesTab = ({ project }) => {
     title: '', description: '', severity: 'Medium', location: '', equipmentInvolved: '', estimatedDelayDays: '', taskId: '', photoUrl: '', documentUrl: ''
   });
 
-  const openCount = activeIssues.filter(i => i.status === 'Open' || i.status === 'OPEN').length;
-  const inProgressCount = activeIssues.filter(i => i.status === 'In Progress' || i.status === 'IN_PROGRESS').length;
-  const resolvedCount = activeIssues.filter(i => i.status === 'Resolved' || i.status === 'RESOLVED').length;
+  const openCount = baseActiveIssues.filter(i => i.status === 'Open' || i.status === 'OPEN').length;
+  const inProgressCount = baseActiveIssues.filter(i => i.status === 'In Progress' || i.status === 'IN_PROGRESS').length;
+  const resolvedCount = baseActiveIssues.filter(i => i.status === 'Resolved' || i.status === 'RESOLVED').length;
 
   const advanceStatus = (id) => {
     const issue = projectIssues.find(i => i.id === id);
@@ -123,13 +128,13 @@ const ProjectIssuesTab = ({ project }) => {
           setFormData(prev => {
             const current = prev.photoUrl ? prev.photoUrl.split(',') : [];
             if (current.length >= 5) { alert('Max 5 images allowed'); return prev; }
-            return { ...prev, photoUrl: [...current, json.fullUrl].join(',') };
+            return { ...prev, photoUrl: [...current, json.fullUrl || json.url].join(',') };
           });
         } else {
           setFormData(prev => {
             const current = prev.documentUrl ? prev.documentUrl.split(',') : [];
             if (current.length >= 5) { alert('Max 5 documents allowed'); return prev; }
-            return { ...prev, documentUrl: [...current, json.fullUrl].join(',') };
+            return { ...prev, documentUrl: [...current, json.fullUrl || json.url].join(',') };
           });
         }
       } else {
@@ -159,58 +164,69 @@ const ProjectIssuesTab = ({ project }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold">Issues & Problems</h2>
-          <p className="text-sm text-slate-500">
-            {openCount} open · {inProgressCount} in progress · {resolvedCount} resolved
-          </p>
-        </div>
-        {!isCEO && (
-          <button
-            onClick={() => setIsAdding(true)}
-            className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30 font-bold"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Report Issue
-          </button>
-        )}
-      </div>
-
-      {/* Summary chips */}
-      <div className="flex gap-3 flex-wrap">
-        {['Open', 'In Progress', 'Resolved'].map(s => {
-          const count = activeIssues.filter(i => i.status?.replace('_', ' ').toUpperCase() === s.toUpperCase()).length;
-          return (
-            <div key={s} className={`px-3 py-1.5 rounded-full text-sm font-medium border ${STATUS_STYLES[s] || STATUS_STYLES.Open} border-current/20`}>
-              {s}: {count}
+      {/* Header & Filters */}
+      <div className="glass-card flex flex-col overflow-hidden mb-6">
+        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
+            <h2 className="text-xl font-bold leading-tight shrink-0">
+              Issues &<br />Problems
+            </h2>
+          </div>
+          
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-6 items-start xl:items-center w-full lg:w-auto justify-end">
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto w-fit max-w-full shrink-0">
+              {['All', 'Open', 'In Progress', 'Resolved'].map(s => {
+                const count = s === 'All'
+                  ? baseActiveIssues.length
+                  : baseActiveIssues.filter(i => i.status?.replace('_', ' ').toUpperCase() === s.toUpperCase()).length;
+                return (
+                  <button 
+                    key={s}
+                    onClick={() => setStatusFilter(s)}
+                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                      statusFilter === s
+                        ? 'bg-white shadow-sm text-slate-900 font-bold'
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    {s} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                  </button>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
 
-      {/* Tabs */}
-      {(currentUser?.role === 'project_manager' || currentUser?.role === 'pm') && (
-        <div className="flex space-x-1 bg-slate-100 p-1 rounded-lg w-fit">
-          <button
-            onClick={() => setActiveTab('se')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === 'se' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            Site Engineer Issues ({seIssues.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('pm')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === 'pm' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            My Escalated Issues ({pmIssues.length})
-          </button>
+            {(currentUser?.role === 'project_manager' || currentUser?.role === 'pm') && (
+              <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto w-fit max-w-full shrink-0">
+                <button
+                  onClick={() => setActiveTab('se')}
+                  className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                    activeTab === 'se' ? 'bg-white shadow-sm text-slate-900' : 'hover:text-slate-900'
+                  }`}
+                >
+                  Site Engineer Issues <span className="ml-1 opacity-60 font-normal">({seIssues.length})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('pm')}
+                  className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                    activeTab === 'pm' ? 'bg-white shadow-sm text-slate-900' : 'hover:text-slate-900'
+                  }`}
+                >
+                  My Escalated Issues <span className="ml-1 opacity-60 font-normal">({pmIssues.length})</span>
+                </button>
+              </div>
+            )}
+            
+            {!isCEO && (
+              <button
+                onClick={() => setIsAdding(true)}
+                className="h-12 flex items-center px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30 font-bold shrink-0"
+              >
+                Report Issue
+              </button>
+            )}
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Add form */}
       <AnimatePresence>

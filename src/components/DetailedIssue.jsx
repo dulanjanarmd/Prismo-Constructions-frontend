@@ -150,6 +150,13 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    const currentUrls = commentPhoto ? commentPhoto.split(',') : [];
+    if (currentUrls.length >= 5) {
+      alert('Maximum 5 files allowed per comment.');
+      return;
+    }
+
     setUploading(true);
     const data = new FormData();
     data.append('file', file);
@@ -161,7 +168,8 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
       });
       if (res.ok) {
         const json = await res.json();
-        setCommentPhoto(json.fullUrl || `http://localhost:8080${json.url}`);
+        const newUrl = json.fullUrl || `http://localhost:8080${json.url}`;
+        setCommentPhoto([...currentUrls, newUrl].join(','));
       } else {
         const message = await res.text();
         alert(message || `File upload failed (${res.status})`);
@@ -171,6 +179,12 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
       alert(err.message || 'File upload failed. Please try again.');
     }
     setUploading(false);
+  };
+
+  const removeCommentFile = (index) => {
+    const urls = commentPhoto.split(',');
+    urls.splice(index, 1);
+    setCommentPhoto(urls.join(','));
   };
 
   const submitComment = async () => {
@@ -290,15 +304,24 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
       </div>
 
       <div className="flex gap-6 mb-8 flex-col lg:flex-row">
-        {issue.photoUrl && (
-          <div className="w-full lg:w-1/3 rounded-lg overflow-hidden shrink-0 border border-border">
-            {isImageFile(issue.photoUrl) ? (
-              <img src={getFileUrl(issue.photoUrl)} alt="Issue Evidence" className="w-full h-full object-cover" />
-            ) : (
-              <a href={getFileUrl(issue.photoUrl)} target="_blank" rel="noreferrer" className="block p-4 text-sm text-indigo-600 hover:underline">
-                Open issue attachment
+        {(issue.photoUrl || issue.documentUrl) && (
+          <div className="w-full lg:w-1/3 flex flex-col gap-3 shrink-0">
+            {issue.photoUrl && issue.photoUrl.split(',').map((url, idx) => (
+              <div key={`photo-${idx}`} className="w-full rounded-lg overflow-hidden border border-border bg-slate-50 flex items-center justify-center">
+                {isImageFile(url) ? (
+                  <img src={getFileUrl(url)} alt={`Issue Evidence ${idx + 1}`} className="w-full h-auto object-cover max-h-64" />
+                ) : (
+                  <a href={getFileUrl(url)} target="_blank" rel="noreferrer" className="block p-4 text-sm text-indigo-600 hover:underline w-full text-center">
+                    Open issue attachment {idx + 1}
+                  </a>
+                )}
+              </div>
+            ))}
+            {issue.documentUrl && issue.documentUrl.split(',').map((url, idx) => (
+              <a key={`doc-${idx}`} href={getFileUrl(url)} target="_blank" rel="noreferrer" className="block p-3 text-sm text-indigo-600 hover:underline bg-indigo-50 border border-indigo-100 rounded-lg text-center w-full font-medium">
+                View Document {idx + 1}
               </a>
-            )}
+            ))}
           </div>
         )}
         <div className="flex-1">
@@ -345,13 +368,19 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
                   {isSolution && <span className="text-xs font-bold text-green-700 uppercase mb-1 block">Solution Provided</span>}
                   {isInfoReq && <span className="text-xs font-bold text-orange-700 uppercase mb-1 block">Information Requested</span>}
                   <p className="text-sm text-slate-700">{item.message}</p>
-                  {item.photoUrl && (isImageFile(item.photoUrl) ? (
-                    <img src={getFileUrl(item.photoUrl)} alt="Attached" className="mt-2 rounded max-w-xs max-h-40 border border-slate-200" />
-                  ) : (
-                    <a href={getFileUrl(item.photoUrl)} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-indigo-600 hover:underline">
-                      Open attached file
-                    </a>
-                  ))}
+                  {item.photoUrl && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {item.photoUrl.split(',').map((url, idx) => (
+                        isImageFile(url) ? (
+                          <img key={idx} src={getFileUrl(url)} alt={`Attached ${idx+1}`} className="rounded max-w-xs max-h-40 border border-slate-200" />
+                        ) : (
+                          <a key={idx} href={getFileUrl(url)} target="_blank" rel="noreferrer" className="inline-block text-sm text-indigo-600 hover:underline bg-indigo-50 px-3 py-1.5 rounded border border-indigo-100 font-medium">
+                            View Attached File {idx + 1}
+                          </a>
+                        )
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -386,12 +415,30 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
               onChange={e => setNewComment(e.target.value)}
             />
             
+            {commentPhoto && (
+              <div className="flex flex-wrap gap-2 mt-2 mb-2">
+                {commentPhoto.split(',').map((url, idx) => (
+                  <div key={idx} className="relative group flex items-center bg-slate-50 border border-slate-200 rounded px-2 py-1 pr-7">
+                    {isImageFile(url) ? (
+                      <img src={getFileUrl(url)} alt="upload" className="h-6 w-6 object-cover rounded mr-2" />
+                    ) : (
+                      <UploadCloud className="w-4 h-4 text-slate-400 mr-2" />
+                    )}
+                    <span className="text-xs truncate max-w-[150px] text-slate-600">File {idx + 1}</span>
+                    <button type="button" onClick={() => removeCommentFile(idx)} className="absolute right-1 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 p-0.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            
             <div className="flex justify-between items-center mt-2">
               <div className="flex items-center gap-2">
-                <input type="file" id={`upload-${issue.id}`} className="hidden" onChange={handleFileUpload} />
-                <label htmlFor={`upload-${issue.id}`} className="cursor-pointer text-slate-500 hover:text-slate-700 flex items-center text-sm font-medium transition-colors">
+                <input type="file" id={`upload-${issue.id}`} className="hidden" onChange={handleFileUpload} disabled={uploading || (commentPhoto && commentPhoto.split(',').length >= 5)} />
+                <label htmlFor={`upload-${issue.id}`} className={`cursor-pointer flex items-center text-sm font-medium transition-colors ${commentPhoto && commentPhoto.split(',').length >= 5 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-500 hover:text-slate-700'}`}>
                   <UploadCloud className="w-4 h-4 mr-1" />
-                  {uploading ? 'Uploading...' : commentPhoto ? 'File Attached' : 'Attach File'}
+                  {uploading ? 'Uploading...' : 'Attach File'}
                 </label>
               </div>
               <button onClick={submitComment} disabled={uploading || (!newComment.trim() && !commentPhoto)} className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">

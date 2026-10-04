@@ -5,17 +5,20 @@ import { Calendar, Edit2, Activity, X, CheckSquare, AlertTriangle, Clock, FileTe
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
-const SummaryCard = ({ icon: Icon, label, value, colorClass }) => (
-  <div className="glass-card p-4 flex items-center space-x-4">
-    <div className={`p-2.5 rounded-xl ${colorClass}`}>
-      <Icon className="w-5 h-5" />
+const SummaryCard = ({ icon: Icon, label, value, colorClass }) => {
+  const textColor = colorClass.split(' ').find(c => c.startsWith('text-')) || 'text-slate-500';
+  const borderColor = textColor.replace('text-', 'border-l-');
+
+  return (
+    <div className={`glass-card p-5 border-l-4 ${borderColor} relative overflow-hidden group`}>
+      <div className="relative z-10">
+        <p className="text-sm font-semibold text-slate-500 mb-1">{label}</p>
+        <p className="text-3xl font-bold text-slate-800">{value}</p>
+      </div>
+      <Icon className={`absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300 ${textColor}`} />
     </div>
-    <div>
-      <p className="text-xs font-medium text-slate-500 ">{label}</p>
-      <p className="text-2xl font-bold">{value}</p>
-    </div>
-  </div>
-);
+  );
+};
 
 const ProjectOverviewTab = ({ project }) => {
   const { updateProject, deleteProject, tasks, approvals, logs, users } = useData();
