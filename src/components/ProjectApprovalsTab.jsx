@@ -162,19 +162,19 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
             </p>
           </div>
           
-          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4 items-start xl:items-center w-full lg:w-auto justify-end">
-            <div className="relative w-full lg:w-48">
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-6 items-start xl:items-center w-full lg:w-auto justify-end">
+            <div className="relative w-full lg:w-56">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search approvals..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 h-10 rounded-lg border border-slate-300 bg-white/80 focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-sm text-sm"
+                className="w-full pl-9 pr-4 h-12 rounded-lg border border-slate-300 bg-white/80 focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-sm text-sm"
               />
             </div>
             
-            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-10 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto w-fit max-w-full shrink-0">
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto w-fit max-w-full shrink-0">
               {['All', 'Pending', 'Approved', 'Rejected', 'Changes Requested', 'Closed'].map(s => {
                 const count = s === 'All'
                   ? projectApprovals.length
@@ -183,7 +183,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                   <button 
                     key={s}
                     onClick={() => setStatusFilter(s)}
-                    className={`relative px-3 py-1.5 rounded-md cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
                       statusFilter === s
                         ? 'bg-white shadow-sm text-slate-900 font-bold'
                         : 'hover:text-slate-900'
@@ -198,7 +198,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
             {isPM && (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="h-10 flex items-center px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
+                className="h-12 flex items-center px-6 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Request Approval

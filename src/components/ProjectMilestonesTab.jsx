@@ -384,8 +384,8 @@ const ProjectMilestonesTab = ({ project }) => {
             </h2>
           </div>
           
-          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4 items-start xl:items-center w-full lg:w-auto justify-end">
-            <div className="relative w-full lg:w-48">
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-6 items-start xl:items-center w-full lg:w-auto justify-end">
+            <div className="relative w-full lg:w-56">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
@@ -405,7 +405,7 @@ const ProjectMilestonesTab = ({ project }) => {
                   <button 
                     key={s}
                     onClick={() => setStatusFilter(s)}
-                    className={`relative px-3 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
                       statusFilter === s
                         ? 'bg-white shadow-sm text-slate-900 font-bold'
                         : 'hover:text-slate-900'
