@@ -16,8 +16,13 @@ const ProjectMilestonesTab = ({ project }) => {
   const isClient = currentUser?.role === 'client';
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [newForm, setNewForm] = useState({ name: '', dueDate: '', description: '', budgetAllocated: '', deliverables: '' });
-  const [editForm, setEditForm] = useState({ name: '', dueDate: '', description: '', budgetAllocated: '', deliverables: '' });
+  const emptyForm = { 
+    name: '', startDate: '', dueDate: '', category: 'Civil Works', 
+    subcontractor: '', inspectionRequired: false, paymentStatus: 'Unpaid', 
+    description: '', budgetAllocated: '', deliverables: '' 
+  };
+  const [newForm, setNewForm] = useState(emptyForm);
+  const [editForm, setEditForm] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
 
   const milestones = project.milestones || [];
@@ -46,6 +51,36 @@ const ProjectMilestonesTab = ({ project }) => {
     if (parseFloat(newForm.budgetAllocated) <= 0) {
       alert("Budget must be a positive value.");
       return;
+    }
+
+    if (newForm.startDate) {
+      const msStart = new Date(newForm.startDate);
+      msStart.setHours(0, 0, 0, 0);
+
+      if (project?.startDate) {
+        const projStart = new Date(project.startDate);
+        projStart.setHours(0, 0, 0, 0);
+        if (msStart < projStart) {
+          alert("Milestone start date cannot be before the project's start date.");
+          return;
+        }
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (msStart < today) {
+        alert("Milestone start date cannot be in the past.");
+        return;
+      }
+
+      if (newForm.dueDate) {
+        const msEnd = new Date(newForm.dueDate);
+        msEnd.setHours(0, 0, 0, 0);
+        if (msStart > msEnd) {
+          alert("Milestone start date cannot be after its due date.");
+          return;
+        }
+      }
     }
 
     if (newForm.dueDate) {
@@ -85,8 +120,13 @@ const ProjectMilestonesTab = ({ project }) => {
         headers: authHeaders,
         body: JSON.stringify({ 
           name: newForm.name, 
+          startDate: newForm.startDate || null,
           dueDate: newForm.dueDate || null, 
           status: 'Incomplete',
+          category: newForm.category || 'Civil Works',
+          subcontractor: newForm.subcontractor || null,
+          inspectionRequired: newForm.inspectionRequired || false,
+          paymentStatus: newForm.paymentStatus || 'Unpaid',
           description: newForm.description || null,
           budgetAllocated: newForm.budgetAllocated ? parseFloat(newForm.budgetAllocated) : null,
           deliverables: newForm.deliverables || null
@@ -112,7 +152,7 @@ const ProjectMilestonesTab = ({ project }) => {
         status: newProjectStatus
       });
       
-      setNewForm({ name: '', dueDate: '', description: '', budgetAllocated: '', deliverables: '' });
+      setNewForm(emptyForm);
       setIsAdding(false);
     } catch (err) {
       console.error(err);
@@ -192,7 +232,12 @@ const ProjectMilestonesTab = ({ project }) => {
     setEditingId(m.id);
     setEditForm({ 
       name: m.name || m.title || '', 
+      startDate: m.startDate || '',
       dueDate: m.dueDate || m.date || '',
+      category: m.category || 'Civil Works',
+      subcontractor: m.subcontractor || '',
+      inspectionRequired: m.inspectionRequired || false,
+      paymentStatus: m.paymentStatus || 'Unpaid',
       description: m.description || '',
       budgetAllocated: m.budgetAllocated || '',
       deliverables: m.deliverables || ''
@@ -207,6 +252,36 @@ const ProjectMilestonesTab = ({ project }) => {
     if (parseFloat(editForm.budgetAllocated) <= 0) {
       alert("Budget must be a positive value.");
       return;
+    }
+
+    if (editForm.startDate) {
+      const msStart = new Date(editForm.startDate);
+      msStart.setHours(0, 0, 0, 0);
+
+      if (project?.startDate) {
+        const projStart = new Date(project.startDate);
+        projStart.setHours(0, 0, 0, 0);
+        if (msStart < projStart) {
+          alert("Milestone start date cannot be before the project's start date.");
+          return;
+        }
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (msStart < today) {
+        alert("Milestone start date cannot be in the past.");
+        return;
+      }
+
+      if (editForm.dueDate) {
+        const msEnd = new Date(editForm.dueDate);
+        msEnd.setHours(0, 0, 0, 0);
+        if (msStart > msEnd) {
+          alert("Milestone start date cannot be after its due date.");
+          return;
+        }
+      }
     }
 
     if (editForm.dueDate) {
@@ -245,7 +320,12 @@ const ProjectMilestonesTab = ({ project }) => {
         headers: authHeaders,
         body: JSON.stringify({ 
           name: editForm.name, 
+          startDate: editForm.startDate || null,
           dueDate: editForm.dueDate || null,
+          category: editForm.category || 'Civil Works',
+          subcontractor: editForm.subcontractor || null,
+          inspectionRequired: editForm.inspectionRequired || false,
+          paymentStatus: editForm.paymentStatus || 'Unpaid',
           description: editForm.description || null,
           budgetAllocated: editForm.budgetAllocated ? parseFloat(editForm.budgetAllocated) : null,
           deliverables: editForm.deliverables || null
@@ -329,34 +409,92 @@ const ProjectMilestonesTab = ({ project }) => {
             <h3 className="font-semibold mb-3">New Milestone</h3>
             <div className="flex flex-col gap-3">
               <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  required
-                  type="text"
-                  placeholder="Milestone name (e.g. Foundation Complete)"
-                  className="flex-1 min-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                  value={newForm.name}
-                  onChange={e => setNewForm({ ...newForm, name: e.target.value })}
-                  autoFocus
-                />
-                <input
-                  required
-                  type="date"
-                  min={minDateStr}
-                  max={maxDateStr}
-                  className="w-full sm:w-auto rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                  value={newForm.dueDate}
-                  onChange={e => setNewForm({ ...newForm, dueDate: e.target.value })}
-                />
-                <input
-                  required
-                  type="number"
-                  min="1"
-                  placeholder="Budget (LKR)"
-                  className="w-full sm:w-32 rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                  value={newForm.budgetAllocated}
-                  onChange={e => setNewForm({ ...newForm, budgetAllocated: e.target.value })}
-                />
-              </div>
+                  <input
+                    required
+                    type="text"
+                    placeholder="Milestone name (e.g. Foundation Complete)"
+                    className="flex-1 min-w-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={newForm.name}
+                    onChange={e => setNewForm({ ...newForm, name: e.target.value })}
+                    autoFocus
+                  />
+                  <select
+                    className="w-full sm:w-auto rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={newForm.category}
+                    onChange={e => setNewForm({ ...newForm, category: e.target.value })}
+                  >
+                    <option value="Pre-construction">Pre-construction</option>
+                    <option value="Civil Works">Civil Works</option>
+                    <option value="MEP">MEP</option>
+                    <option value="Finishing">Finishing</option>
+                    <option value="Handover">Handover</option>
+                  </select>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col flex-1">
+                    <label className="text-xs text-slate-500 mb-1">Start Date</label>
+                    <input
+                      required
+                      type="date"
+                      min={minDateStr}
+                      max={maxDateStr}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                      value={newForm.startDate}
+                      onChange={e => setNewForm({ ...newForm, startDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <label className="text-xs text-slate-500 mb-1">Due Date</label>
+                    <input
+                      required
+                      type="date"
+                      min={minDateStr}
+                      max={maxDateStr}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                      value={newForm.dueDate}
+                      onChange={e => setNewForm({ ...newForm, dueDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="flex flex-col w-full sm:w-32">
+                    <label className="text-xs text-slate-500 mb-1">Budget (LKR)</label>
+                    <input
+                      required
+                      type="number"
+                      min="1"
+                      placeholder="Budget"
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                      value={newForm.budgetAllocated}
+                      onChange={e => setNewForm({ ...newForm, budgetAllocated: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    placeholder="Subcontractor / Lead (Optional)"
+                    className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={newForm.subcontractor}
+                    onChange={e => setNewForm({ ...newForm, subcontractor: e.target.value })}
+                  />
+                  <select
+                    className="w-full sm:w-auto rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                    value={newForm.paymentStatus}
+                    onChange={e => setNewForm({ ...newForm, paymentStatus: e.target.value })}
+                  >
+                    <option value="Unpaid">Unpaid</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                  </select>
+                  <label className="flex items-center gap-2 text-sm text-slate-700 bg-slate-50 px-3 py-2 rounded-md border border-slate-200 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newForm.inspectionRequired}
+                      onChange={e => setNewForm({ ...newForm, inspectionRequired: e.target.checked })}
+                      className="rounded border-slate-300 text-primary focus:ring-primary"
+                    />
+                    Inspection Req.
+                  </label>
+                </div>
               <textarea
                 required
                 placeholder="Description"
@@ -436,22 +574,79 @@ const ProjectMilestonesTab = ({ project }) => {
                             value={editForm.name}
                             onChange={e => setEditForm({ ...editForm, name: e.target.value })}
                           />
+                          <select
+                            className="w-full sm:w-auto rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            value={editForm.category}
+                            onChange={e => setEditForm({ ...editForm, category: e.target.value })}
+                          >
+                            <option value="Pre-construction">Pre-construction</option>
+                            <option value="Civil Works">Civil Works</option>
+                            <option value="MEP">MEP</option>
+                            <option value="Finishing">Finishing</option>
+                            <option value="Handover">Handover</option>
+                          </select>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <div className="flex flex-col flex-1">
+                            <label className="text-[10px] text-slate-500 mb-0.5">Start Date</label>
+                            <input
+                              type="date"
+                              min={minDateStr}
+                              max={maxDateStr}
+                              className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                              value={editForm.startDate}
+                              onChange={e => setEditForm({ ...editForm, startDate: e.target.value })}
+                            />
+                          </div>
+                          <div className="flex flex-col flex-1">
+                            <label className="text-[10px] text-slate-500 mb-0.5">Due Date</label>
+                            <input
+                              type="date"
+                              min={minDateStr}
+                              max={maxDateStr}
+                              className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                              value={editForm.dueDate}
+                              onChange={e => setEditForm({ ...editForm, dueDate: e.target.value })}
+                            />
+                          </div>
+                          <div className="flex flex-col w-full sm:w-32">
+                            <label className="text-[10px] text-slate-500 mb-0.5">Budget (LKR)</label>
+                            <input
+                              type="number"
+                              min="1"
+                              placeholder="Budget"
+                              className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                              value={editForm.budgetAllocated}
+                              onChange={e => setEditForm({ ...editForm, budgetAllocated: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <input
-                            type="date"
-                            min={minDateStr}
-                            max={maxDateStr}
-                            className="w-full sm:w-40 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
-                            value={editForm.dueDate}
-                            onChange={e => setEditForm({ ...editForm, dueDate: e.target.value })}
+                            type="text"
+                            placeholder="Subcontractor"
+                            className="flex-1 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            value={editForm.subcontractor}
+                            onChange={e => setEditForm({ ...editForm, subcontractor: e.target.value })}
                           />
-                          <input
-                            type="number"
-                            min="1"
-                            placeholder="Budget (LKR)"
-                            className="w-full sm:w-32 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
-                            value={editForm.budgetAllocated}
-                            onChange={e => setEditForm({ ...editForm, budgetAllocated: e.target.value })}
-                          />
+                          <select
+                            className="w-full sm:w-auto rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            value={editForm.paymentStatus}
+                            onChange={e => setEditForm({ ...editForm, paymentStatus: e.target.value })}
+                          >
+                            <option value="Unpaid">Unpaid</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                          </select>
+                          <label className="flex items-center gap-1 text-xs text-slate-700 bg-slate-50 px-2 py-1 rounded border border-slate-200 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={editForm.inspectionRequired}
+                              onChange={e => setEditForm({ ...editForm, inspectionRequired: e.target.checked })}
+                              className="rounded border-slate-300 text-primary focus:ring-primary w-3 h-3"
+                            />
+                            Inspection Req.
+                          </label>
                         </div>
                         <input
                           type="text"
@@ -478,15 +673,38 @@ const ProjectMilestonesTab = ({ project }) => {
                           {displayDate && (
                             <span className={`text-xs flex items-center gap-1 ${isOverdue ? 'text-red-500 font-semibold' : 'text-slate-500'}`}>
                               <Calendar className="w-3 h-3" />
-                              {isOverdue ? 'Overdue · ' : ''}{displayDate}
+                              {isOverdue ? 'Overdue · ' : ''}
+                              {m.startDate ? `${m.startDate} to ${displayDate}` : displayDate}
                             </span>
                           )}
                           <span className={`px-2 py-0.5 text-xs font-medium rounded-full border ${statusColors[m.status] || statusColors.Incomplete}`}>
                             {m.status}
                           </span>
+                          {m.category && (
+                            <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                              {m.category}
+                            </span>
+                          )}
                           {m.budgetAllocated && (
                             <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                               Budget: LKR {m.budgetAllocated.toLocaleString()}
+                            </span>
+                          )}
+                          {m.subcontractor && (
+                            <span className="text-xs text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                              Sub: {m.subcontractor}
+                            </span>
+                          )}
+                          {m.paymentStatus && m.paymentStatus !== 'Unpaid' && (
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded border ${
+                              m.paymentStatus === 'Paid' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                            }`}>
+                              {m.paymentStatus}
+                            </span>
+                          )}
+                          {m.inspectionRequired && (
+                            <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                              Inspection Required
                             </span>
                           )}
                           {m.deliverables && (
