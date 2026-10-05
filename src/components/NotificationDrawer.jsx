@@ -20,9 +20,7 @@ const NotificationDrawer = ({ isOpen, onClose }) => {
         >
           <div className="p-6 border-b border-border flex items-center justify-between bg-background/80 backdrop-blur-md sticky top-0 z-10">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <Bell className="w-4 h-4 text-blue-600" />
-              </div>
+
               <h2 className="text-xl font-bold text-slate-900">Notifications</h2>
             </div>
             <button 
