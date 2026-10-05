@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { Flag, Plus, Trash2, CheckCircle2, Circle, Edit2, X, Check, Calendar } from 'lucide-react';
+import { Flag, Plus, Trash2, CheckCircle2, Circle, Edit2, X, Check, Calendar, Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const statusColors = {
@@ -24,6 +24,9 @@ const ProjectMilestonesTab = ({ project }) => {
   const [newForm, setNewForm] = useState(emptyForm);
   const [editForm, setEditForm] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [categoryFilter, setCategoryFilter] = useState('All');
 
   const milestones = project.milestones || [];
 
@@ -32,8 +35,21 @@ const ProjectMilestonesTab = ({ project }) => {
     'Content-Type': 'application/json'
   };
 
+  const filteredMilestones = milestones.filter(m => {
+    const searchLower = searchQuery.toLowerCase();
+    const nameMatch = (m.name || m.title || '').toLowerCase().includes(searchLower);
+    const descMatch = (m.description || '').toLowerCase().includes(searchLower);
+    const subMatch = (m.subcontractor || '').toLowerCase().includes(searchLower);
+    const matchesSearch = nameMatch || descMatch || subMatch;
+
+    const matchesStatus = statusFilter === 'All' || m.status === statusFilter;
+    const matchesCategory = categoryFilter === 'All' || m.category === categoryFilter;
+
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
+
   // Sort: incomplete first, then by due date (earliest first, no date at the bottom)
-  const sorted = [...milestones].sort((a, b) => {
+  const sorted = [...filteredMilestones].sort((a, b) => {
     if ((a.status === 'Completed') !== (b.status === 'Completed')) {
       return a.status === 'Completed' ? 1 : -1;
     }
@@ -360,22 +376,76 @@ const ProjectMilestonesTab = ({ project }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold">Project Milestones</h2>
-          <p className="text-sm text-slate-500">
-            {completedCount} of {milestones.length} completed
-          </p>
+      <div className="glass-card flex flex-col overflow-hidden mb-6">
+        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
+            <h2 className="text-xl font-bold leading-tight shrink-0">
+              Project<br />Milestones
+            </h2>
+            <div className="text-sm font-medium text-slate-600 bg-white/60 px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+              {completedCount} of {milestones.length} completed
+            </div>
+          </div>
+          
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4 items-start xl:items-center w-full lg:w-auto justify-end">
+            <div className="relative w-full lg:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search milestones..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 h-12 rounded-lg border border-slate-300 bg-white/80 focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-sm"
+              />
+            </div>
+            
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto shrink-0 max-w-full">
+              {['All', 'Incomplete', 'In Progress', 'Completed'].map(s => {
+                const count = s === 'All'
+                  ? milestones.length
+                  : milestones.filter(m => m.status === s).length;
+                return (
+                  <button 
+                    key={s}
+                    onClick={() => setStatusFilter(s)}
+                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                      statusFilter === s
+                        ? 'bg-white shadow-sm text-slate-900 font-bold'
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    {s} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center h-12 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm rounded-lg px-3 shrink-0">
+              <Filter className="w-4 h-4 text-slate-500 mr-2" />
+              <select
+                value={categoryFilter}
+                onChange={e => setCategoryFilter(e.target.value)}
+                className="bg-transparent border-none outline-none text-sm font-medium text-slate-700 cursor-pointer h-full"
+              >
+                <option value="All">All Categories</option>
+                <option value="Pre-construction">Pre-construction</option>
+                <option value="Civil Works">Civil Works</option>
+                <option value="MEP">MEP</option>
+                <option value="Finishing">Finishing</option>
+                <option value="Handover">Handover</option>
+              </select>
+            </div>
+            {!isClient && project.status !== 'Completed' && (
+              <button
+                onClick={() => setIsAdding(true)}
+                className="h-12 flex items-center px-6 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Add Milestone
+              </button>
+            )}
+          </div>
         </div>
-        {!isClient && project.status !== 'Completed' && (
-          <button
-            onClick={() => setIsAdding(true)}
-            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Add Milestone
-          </button>
-        )}
       </div>
 
       {/* Overall progress */}
