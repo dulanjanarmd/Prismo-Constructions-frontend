@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { CheckCircle2, XCircle, FileText, Send, Clock, RotateCcw, Lock, Plus, X, Paperclip, ImageIcon } from 'lucide-react';
+import { CheckCircle2, XCircle, FileText, Send, Clock, RotateCcw, Lock, Plus, X, Paperclip, ImageIcon, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ApprovalDetailModal from './ApprovalDetailModal';
 
@@ -52,6 +52,8 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedApproval, setSelectedApproval] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -80,6 +82,12 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
   const projectApprovals = approvals.filter(a =>
     String(a.projectId) === String(projectId) || a.projectId === `p${projectId}`
   ).sort((a, b) => new Date(b.dateRequested) - new Date(a.dateRequested));
+
+  const filteredApprovals = projectApprovals.filter(a => {
+    const matchesSearch = a.title?.toLowerCase().includes(searchQuery.toLowerCase()) || a.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || a.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   // Progress logs for this project (for linking)
   const projectLogs = logs.filter(l =>
@@ -140,25 +148,64 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold">Client Approvals</h2>
-          <p className="text-sm text-slate-500">
-            {projectApprovals.length} total
-            {pendingCount > 0 && <span className="ml-2 text-amber-600 font-semibold">· {pendingCount} pending</span>}
-            {changesCount > 0 && <span className="ml-2 text-orange-600 font-semibold">· {changesCount} need changes</span>}
-          </p>
+      {/* Header & Filters */}
+      <div className="glass-card flex flex-col overflow-hidden mb-6">
+        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
+            <h2 className="text-xl font-bold leading-tight shrink-0">
+              Client<br />Approvals
+            </h2>
+            <p className="text-sm text-slate-500 flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2 xl:mt-0">
+              <span>{projectApprovals.length} total</span>
+              {pendingCount > 0 && <span className="text-amber-600 font-semibold">· {pendingCount} pending</span>}
+              {changesCount > 0 && <span className="text-orange-600 font-semibold">· {changesCount} need changes</span>}
+            </p>
+          </div>
+          
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4 items-start xl:items-center w-full lg:w-auto justify-end">
+            <div className="relative w-full lg:w-48">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search approvals..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 h-10 rounded-lg border border-slate-300 bg-white/80 focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-sm text-sm"
+              />
+            </div>
+            
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-10 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto w-fit max-w-full shrink-0">
+              {['All', 'Pending', 'Approved', 'Rejected', 'Changes Requested', 'Closed'].map(s => {
+                const count = s === 'All'
+                  ? projectApprovals.length
+                  : projectApprovals.filter(a => a.status === s).length;
+                return (
+                  <button 
+                    key={s}
+                    onClick={() => setStatusFilter(s)}
+                    className={`relative px-3 py-1.5 rounded-md cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                      statusFilter === s
+                        ? 'bg-white shadow-sm text-slate-900 font-bold'
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    {s} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+            
+            {isPM && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="h-10 flex items-center px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Request Approval
+              </button>
+            )}
+          </div>
         </div>
-        {isPM && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Request Approval
-          </button>
-        )}
       </div>
 
       {/* Alert banner */}
@@ -178,7 +225,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
       )}
 
       {/* Approvals list */}
-      {projectApprovals.length === 0 ? (
+      {filteredApprovals.length === 0 ? (
         <div className="glass-card p-12 text-center text-slate-500">
           <FileText className="w-12 h-12 mx-auto mb-4 opacity-40" />
           <p className="text-lg font-medium">No approval requests yet.</p>
@@ -186,7 +233,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
         </div>
       ) : (
         <div className="space-y-3">
-          {projectApprovals.map((approval, idx) => {
+          {filteredApprovals.map((approval, idx) => {
             const StatusIcon = STATUS_ICON[approval.status] || Clock;
             const needsAction = isPM && (approval.status === 'Pending' || approval.status === 'Changes Requested');
             return (
