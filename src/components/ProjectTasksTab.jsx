@@ -230,7 +230,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
                       <button
                         key={status}
                         onClick={() => setStatusFilter(status)}
-                        className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                        className={`relative px-3 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
                           statusFilter === status 
                             ? 'bg-white shadow-sm text-slate-900 font-bold' 
                             : 'hover:text-slate-900'
@@ -244,7 +244,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
                 
                 <div className="relative w-full xl:w-auto h-12">
                   <select
-                    className="h-full w-full xl:w-40 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all px-4 cursor-pointer"
+                    className="h-full w-full xl:w-36 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all px-3 cursor-pointer"
                     value={assigneeFilter}
                     onChange={e => setAssigneeFilter(e.target.value)}
                   >

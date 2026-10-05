@@ -382,13 +382,10 @@ const ProjectMilestonesTab = ({ project }) => {
             <h2 className="text-xl font-bold leading-tight shrink-0">
               Project<br />Milestones
             </h2>
-            <div className="text-sm font-medium text-slate-600 bg-white/60 px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
-              {completedCount} of {milestones.length} completed
-            </div>
           </div>
           
           <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4 items-start xl:items-center w-full lg:w-auto justify-end">
-            <div className="relative w-full lg:w-64">
+            <div className="relative w-full lg:w-48">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
@@ -408,7 +405,7 @@ const ProjectMilestonesTab = ({ project }) => {
                   <button 
                     key={s}
                     onClick={() => setStatusFilter(s)}
-                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                    className={`relative px-3 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
                       statusFilter === s
                         ? 'bg-white shadow-sm text-slate-900 font-bold'
                         : 'hover:text-slate-900'
@@ -420,8 +417,7 @@ const ProjectMilestonesTab = ({ project }) => {
               })}
             </div>
 
-            <div className="flex items-center h-12 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm rounded-lg px-3 shrink-0">
-              <Filter className="w-4 h-4 text-slate-500 mr-2" />
+            <div className="flex items-center h-12 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm rounded-lg px-2 shrink-0">
               <select
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
@@ -440,7 +436,6 @@ const ProjectMilestonesTab = ({ project }) => {
                 onClick={() => setIsAdding(true)}
                 className="h-12 flex items-center px-6 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
               >
-                <Plus className="w-5 h-5 mr-2" />
                 Add Milestone
               </button>
             )}
