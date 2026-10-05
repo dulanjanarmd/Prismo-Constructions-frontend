@@ -2,7 +2,6 @@ import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import { useAuth } from './context/AuthContext';
-import AnimatedBackground from './components/AnimatedBackground';
 
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
@@ -51,7 +50,7 @@ function App() {
 
   return (
     <>
-      <AnimatedBackground />
+
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
