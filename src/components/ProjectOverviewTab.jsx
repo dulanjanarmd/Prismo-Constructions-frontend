@@ -36,8 +36,6 @@ const ProjectOverviewTab = ({ project }) => {
     endDate: project.endDate,
     description: project.description
   });
-  const [statusData, setStatusData] = useState({ status: project.status, progress: project.progress });
-
   const openModal = (type) => {
     setModalType(type);
     if (type === 'edit') {
@@ -45,8 +43,6 @@ const ProjectOverviewTab = ({ project }) => {
         name: project.name, client: project.client, clientId: project.clientId || '', location: project.location,
         startDate: project.startDate, endDate: project.endDate, description: project.description
       });
-    } else if (type === 'status') {
-      setStatusData({ status: project.status, progress: project.progress });
     }
   };
 
@@ -61,12 +57,6 @@ const ProjectOverviewTab = ({ project }) => {
       console.error('Error updating project details:', error);
       alert('Failed to update project details. Please try again.');
     }
-  };
-
-  const handleStatusSubmit = (e) => {
-    e.preventDefault();
-    updateProject(project.id, { status: statusData.status, progress: parseInt(statusData.progress, 10) });
-    closeModal();
   };
 
   const handleDeleteProject = async () => {
@@ -86,13 +76,7 @@ const ProjectOverviewTab = ({ project }) => {
     String(t.projectId) === String(project.id) || t.projectId === `p${project.id}`
   );
   const completedTasks = projectTasks.filter(t => t.status === 'Completed').length;
-  const incompleteTasks = projectTasks.length - completedTasks;
-  const projectMilestones = project.milestones || [];
-  const incompleteMilestones = projectMilestones.filter(m => m.status !== 'Completed').length;
-  const canCompleteProject = incompleteTasks === 0 && incompleteMilestones === 0;
 
-  const hasStartedTasks = projectTasks.some(t => t.status !== 'To Do');
-  const canRevertToPlanning = !hasStartedTasks && project.progress === 0;
 
   const projectLogs = logs.filter(l =>
     String(l.projectId) === String(project.id) || l.projectId === `p${project.id}`
@@ -144,6 +128,18 @@ const ProjectOverviewTab = ({ project }) => {
               {!isClient && (
                 <div className="flex gap-2">
                   <button
+                    onClick={() => {
+                      if (project.status === 'On Hold') {
+                        updateProject(project.id, { status: 'Planning' }); // State machine will auto-correct this if it should be In Progress
+                      } else {
+                        updateProject(project.id, { status: 'On Hold' });
+                      }
+                    }}
+                    className={`flex items-center px-3 py-1.5 text-xs font-bold ${project.status === 'On Hold' ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-amber-500 text-white hover:bg-amber-600'} rounded-md shadow-sm transition-all`}
+                  >
+                    {project.status === 'On Hold' ? 'Resume Project' : 'Hold Project'}
+                  </button>
+                  <button
                     onClick={() => openModal('edit')}
                     className="flex items-center px-3 py-1.5 text-xs font-bold bg-primary text-slate-900 hover:brightness-105 rounded-md shadow-sm transition-all"
                   >
@@ -190,38 +186,6 @@ const ProjectOverviewTab = ({ project }) => {
             </div>
           </div>
 
-          {/* Status & Progress */}
-          <div className="glass-card overflow-hidden">
-            <div className="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-slate-800">
-                Status &amp; Progress
-              </h2>
-              {!isClient && (
-                <button
-                  onClick={() => openModal('status')}
-                  className="flex items-center px-3 py-1.5 text-xs font-bold bg-primary text-slate-900 hover:brightness-105 rounded-md shadow-sm transition-all"
-                >
-                  Update Status
-                </button>
-              )}
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <p className="text-sm text-slate-500 mb-2">Overall Progress</p>
-                <div className="flex items-center space-x-4">
-                  <div className="flex-1 bg-slate-200  rounded-full h-3">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${project.progress}%` }}
-                      transition={{ duration: 1 }}
-                      className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full"
-                    />
-                  </div>
-                  <span className="text-xl font-bold text-primary">{project.progress}%</span>
-                </div>
-              </div>
-            </div>
-          </div>
       </div>
 
       {/* Modals */}
@@ -282,63 +246,6 @@ const ProjectOverviewTab = ({ project }) => {
           </div>
         )}
 
-        {modalType === 'status' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card w-full max-w-sm p-6 relative">
-              <button onClick={closeModal} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
-              <h2 className="text-xl font-bold mb-6">Update Status & Progress</h2>
-              <form onSubmit={handleStatusSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Status</label>
-                  <select 
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-60 disabled:cursor-not-allowed" 
-                    value={statusData.status} 
-                    onChange={e => setStatusData({ ...statusData, status: e.target.value })}
-                  >
-                    <option value="Not Started" disabled={!canRevertToPlanning}>Not Started</option>
-                    <option value="Planning" disabled={!canRevertToPlanning}>Planning</option>
-                    <option value="In Progress" disabled={project.milestones?.length > 0 && statusData.progress === 100}>In Progress</option>
-                    <option value="On Hold">On Hold</option>
-                    <option value="Completed" disabled={!canCompleteProject}>Completed</option>
-                  </select>
-                  {(!canCompleteProject || !canRevertToPlanning) && (
-                    <p className="text-xs text-amber-600 mt-2 font-medium">
-                      {!canCompleteProject && statusData.status === 'Completed' 
-                        ? "Project can only be marked as Completed when all tasks and milestones are completed."
-                        : "Some status options are disabled based on current task progress."}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Overall Progress ({statusData.progress}%)</label>
-                  {project.milestones && project.milestones.length > 0 ? (
-                    <div className="text-sm text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                      <p className="mb-2">Progress is automatically calculated based on milestone completion.</p>
-                      <div className="flex items-center space-x-3">
-                        <div className="flex-1 bg-slate-200 rounded-full h-2">
-                          <div
-                            style={{ width: `${statusData.progress}%` }}
-                            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full"
-                          />
-                        </div>
-                        <span className="font-bold text-primary">{statusData.progress}%</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <input type="range" min="0" max="100" className="w-full accent-primary" value={statusData.progress} onChange={e => setStatusData({ ...statusData, progress: e.target.value })} />
-                      <div className="text-center font-bold text-primary mt-1">{statusData.progress}%</div>
-                    </>
-                  )}
-                </div>
-                <div className="pt-4 flex justify-end space-x-3">
-                  <button type="button" onClick={closeModal} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 :bg-slate-800 rounded-md transition-colors">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">Update</button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
       </AnimatePresence>
     </div>
   );

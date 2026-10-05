@@ -43,6 +43,10 @@ const ProjectMilestonesTab = ({ project }) => {
       alert("Please fill in all fields.");
       return;
     }
+    if (parseFloat(newForm.budgetAllocated) <= 0) {
+      alert("Budget must be a positive value.");
+      return;
+    }
 
     if (newForm.dueDate) {
       const msDate = new Date(newForm.dueDate);
@@ -51,8 +55,8 @@ const ProjectMilestonesTab = ({ project }) => {
       if (project?.startDate) {
         const projStart = new Date(project.startDate);
         projStart.setHours(0, 0, 0, 0);
-        if (msDate <= projStart) {
-          alert("Milestone due date must be strictly after the project's start date.");
+        if (msDate < projStart) {
+          alert("Milestone due date cannot be before the project's start date.");
           return;
         }
       }
@@ -60,8 +64,8 @@ const ProjectMilestonesTab = ({ project }) => {
       if (project?.endDate) {
         const projEnd = new Date(project.endDate);
         projEnd.setHours(0, 0, 0, 0);
-        if (msDate >= projEnd) {
-          alert("Milestone due date must be strictly before the project's end date.");
+        if (msDate > projEnd) {
+          alert("Milestone due date cannot be after the project's end date.");
           return;
         }
       }
@@ -193,6 +197,10 @@ const ProjectMilestonesTab = ({ project }) => {
       alert("Please fill in all fields.");
       return;
     }
+    if (parseFloat(editForm.budgetAllocated) <= 0) {
+      alert("Budget must be a positive value.");
+      return;
+    }
 
     if (editForm.dueDate) {
       const msDate = new Date(editForm.dueDate);
@@ -201,8 +209,8 @@ const ProjectMilestonesTab = ({ project }) => {
       if (project?.startDate) {
         const projStart = new Date(project.startDate);
         projStart.setHours(0, 0, 0, 0);
-        if (msDate <= projStart) {
-          alert("Milestone due date must be strictly after the project's start date.");
+        if (msDate < projStart) {
+          alert("Milestone due date cannot be before the project's start date.");
           return;
         }
       }
@@ -210,8 +218,8 @@ const ProjectMilestonesTab = ({ project }) => {
       if (project?.endDate) {
         const projEnd = new Date(project.endDate);
         projEnd.setHours(0, 0, 0, 0);
-        if (msDate >= projEnd) {
-          alert("Milestone due date must be strictly before the project's end date.");
+        if (msDate > projEnd) {
+          alert("Milestone due date cannot be after the project's end date.");
           return;
         }
       }
@@ -243,11 +251,11 @@ const ProjectMilestonesTab = ({ project }) => {
   const pct = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
 
   const minDateStr = project?.startDate 
-    ? new Date(new Date(project.startDate).getTime() + 86400000).toISOString().split('T')[0]
+    ? new Date(project.startDate).toISOString().split('T')[0]
     : undefined;
   
   const maxDateStr = project?.endDate 
-    ? new Date(new Date(project.endDate).getTime() - 86400000).toISOString().split('T')[0]
+    ? new Date(project.endDate).toISOString().split('T')[0]
     : undefined;
 
   return (
@@ -323,7 +331,8 @@ const ProjectMilestonesTab = ({ project }) => {
                 <input
                   required
                   type="number"
-                  placeholder="Budget ($)"
+                  min="1"
+                  placeholder="Budget (LKR)"
                   className="w-full sm:w-32 rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                   value={newForm.budgetAllocated}
                   onChange={e => setNewForm({ ...newForm, budgetAllocated: e.target.value })}
@@ -418,7 +427,8 @@ const ProjectMilestonesTab = ({ project }) => {
                           />
                           <input
                             type="number"
-                            placeholder="Budget"
+                            min="1"
+                            placeholder="Budget (LKR)"
                             className="w-full sm:w-32 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
                             value={editForm.budgetAllocated}
                             onChange={e => setEditForm({ ...editForm, budgetAllocated: e.target.value })}
@@ -457,7 +467,7 @@ const ProjectMilestonesTab = ({ project }) => {
                           </span>
                           {m.budgetAllocated && (
                             <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                              Budget: ${m.budgetAllocated.toLocaleString()}
+                              Budget: LKR {m.budgetAllocated.toLocaleString()}
                             </span>
                           )}
                           {m.deliverables && (

@@ -73,8 +73,8 @@ const ProjectTasksTab = ({ projectId, project }) => {
       if (project?.startDate) {
         const projStart = new Date(project.startDate);
         projStart.setHours(0, 0, 0, 0);
-        if (taskDate <= projStart) {
-          alert("Task due date must be strictly after the project's start date.");
+        if (taskDate < projStart) {
+          alert("Task due date cannot be before the project's start date.");
           return;
         }
       }
@@ -88,18 +88,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
         }
       }
 
-      if (formData.milestoneId) {
-        const milestoneIdStr = String(formData.milestoneId).replace('m', '');
-        const milestone = milestones.find(m => String(m.id) === milestoneIdStr);
-        if (milestone && (milestone.dueDate || milestone.date)) {
-          const msDate = new Date(milestone.dueDate || milestone.date);
-          msDate.setHours(0, 0, 0, 0);
-          if (taskDate > msDate) {
-            alert("Task due date cannot be after its linked milestone's delivery date.");
-            return;
-          }
-        }
-      }
+
     }
 
     setSubmitting(true);
@@ -215,18 +204,10 @@ const ProjectTasksTab = ({ projectId, project }) => {
     return acc;
   }, {});
 
-  // Determine min and max dates for the task due date input
   let minDate = project?.startDate 
-    ? new Date(new Date(project.startDate).getTime() + 86400000).toISOString().split('T')[0]
+    ? new Date(project.startDate).toISOString().split('T')[0]
     : undefined;
   let maxDate = project?.endDate || undefined;
-  if (formData.milestoneId) {
-    const milestoneIdStr = String(formData.milestoneId).replace('m', '');
-    const milestone = milestones.find(m => String(m.id) === milestoneIdStr);
-    if (milestone && (milestone.dueDate || milestone.date)) {
-      maxDate = milestone.dueDate || milestone.date;
-    }
-  }
 
   return (
     <div className="space-y-6">

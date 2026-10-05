@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { ArrowLeft, LayoutDashboard, Flag, CheckSquare, Camera, AlertTriangle, MessageSquare, FolderOpen, X, MapPin, Building2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-
+import { motion } from 'framer-motion';
 import ProjectOverviewTab from '../components/ProjectOverviewTab';
 import ProjectMilestonesTab from '../components/ProjectMilestonesTab';
 import ProjectTasksTab from '../components/ProjectTasksTab';
@@ -99,6 +99,17 @@ const ProjectDetailPage = () => {
                 <span className={`text-sm font-bold ${STATUS_STYLE[project.status] ? STATUS_STYLE[project.status] : 'text-slate-600'}`}>
                   {project.status}
                 </span>
+              </div>
+              <div className="flex items-center gap-3 glass-card px-4 py-2 rounded-xl border-white/40 shadow-sm w-48 sm:w-64">
+                <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden flex-1">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${project.progress}%` }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
+                    className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full"
+                  />
+                </div>
+                <span className="text-sm font-bold text-primary">{project.progress}%</span>
               </div>
             </div>
           </div>

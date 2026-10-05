@@ -227,6 +227,56 @@ export const DataProvider = ({ children }) => {
     };
   }, [currentUser]);
 
+  // Automated Project State Machine
+  useEffect(() => {
+    if (!projects || projects.length === 0) return;
+    const timeoutId = setTimeout(() => {
+      projects.forEach(project => {
+        // Skip manually held or cancelled projects
+        if (project.status === 'On Hold' || project.status === 'Cancelled') return;
+
+        const pTasks = tasks.filter(t => String(t.projectId) === String(project.id) || t.projectId === `p${project.id}`);
+        const pIssues = issues.filter(i => String(i.projectId) === String(project.id) || i.projectId === `p${project.id}`);
+        const pApprovals = approvals.filter(a => String(a.projectId) === String(project.id) || a.projectId === `p${project.id}`);
+        const pMilestones = project.milestones || [];
+
+        const completedTasksCount = pTasks.filter(t => t.status === 'Completed' || t.status === 'Closed').length;
+        const completedMilestonesCount = pMilestones.filter(m => m.status === 'Completed').length;
+        
+        const totalItems = pTasks.length + pMilestones.length;
+        const calculatedProgress = totalItems > 0 
+          ? Math.round(((completedTasksCount + completedMilestonesCount) / totalItems) * 100)
+          : 0;
+
+        let calculatedStatus = 'Planning';
+        
+        const allTasksDone = pTasks.length > 0 && completedTasksCount === pTasks.length;
+        const allMilestonesDone = pMilestones.length > 0 && completedMilestonesCount === pMilestones.length;
+        const hasOpenIssues = pIssues.some(i => i.status === 'OPEN' || i.status === 'IN_PROGRESS');
+        const hasPendingApprovals = pApprovals.some(a => a.status === 'Pending' || a.status === 'Changes Requested');
+
+        // Logic for Completed
+        const isComplete = (pTasks.length > 0 || pMilestones.length > 0) &&
+                           (pTasks.length === 0 || allTasksDone) &&
+                           (pMilestones.length === 0 || allMilestonesDone) &&
+                           !hasOpenIssues && !hasPendingApprovals;
+
+        if (isComplete) {
+          calculatedStatus = 'Completed';
+        } else if (pTasks.some(t => t.status !== 'To Do') || completedMilestonesCount > 0 || calculatedProgress > 0) {
+          // If any work has started, it's In Progress
+          calculatedStatus = 'In Progress';
+        }
+
+        if (project.status !== calculatedStatus || project.progress !== calculatedProgress) {
+          console.log(`Auto-updating project ${project.id} from ${project.status}(${project.progress}%) to ${calculatedStatus}(${calculatedProgress}%)`);
+          updateProject(project.id, { status: calculatedStatus, progress: calculatedProgress });
+        }
+      });
+    }, 1500); // Debounce to allow multiple rapid state updates (e.g. initial load) to settle
+    return () => clearTimeout(timeoutId);
+  }, [projects, tasks, issues, approvals]);
+
   const addProject = async (projectData) => {
     try {
       const response = await fetch('http://localhost:8080/api/projects', {
