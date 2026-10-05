@@ -13,7 +13,7 @@ const ProjectLogsTab = ({ projectId }) => {
 
   const [search, setSearch] = useState('');
   const [engineerFilter, setEngineerFilter] = useState('All');
-  const [hasIssuesFilter, setHasIssuesFilter] = useState('All'); // 'All' | 'Yes' | 'No'
+  const [logTypeFilter, setLogTypeFilter] = useState('All'); // 'All' | 'HasIssues' | 'NoIssues' | 'WithPhotos'
   const [dateFilter, setDateFilter] = useState('All'); // 'All' | 'today' | '7days'
   const [selectedLog, setSelectedLog] = useState(null);
 
@@ -48,14 +48,15 @@ const ProjectLogsTab = ({ projectId }) => {
           String(log.submittedBy) === String(engineerFilter);
         if (!match) return false;
       }
-      // Issues filter
-      if (hasIssuesFilter === 'Yes' && !log.issues) return false;
-      if (hasIssuesFilter === 'No' && log.issues) return false;
+      // Type filter
+      if (logTypeFilter === 'HasIssues' && !log.issues) return false;
+      if (logTypeFilter === 'NoIssues' && log.issues) return false;
+      if (logTypeFilter === 'WithPhotos' && (!log.photos || log.photos.length === 0)) return false;
       // Search
       if (search && !log.workDone?.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [projectLogs, search, engineerFilter, hasIssuesFilter, dateFilter]);
+  }, [projectLogs, search, engineerFilter, logTypeFilter, dateFilter]);
 
   const totalPhotos = projectLogs.reduce((sum, l) => sum + (l.photos?.length || 0), 0);
   const logsWithIssues = projectLogs.filter(l => l.issues).length;
@@ -72,40 +73,22 @@ const ProjectLogsTab = ({ projectId }) => {
 
   return (
     <div className="space-y-6">
-      {/* Stats summary */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="glass-card p-3 text-center border-t-4 border-t-primary">
-          <p className="text-2xl font-bold text-slate-800">{projectLogs.length}</p>
-          <p className="text-xs text-slate-500 mt-0.5 font-medium">Total Logs</p>
-        </div>
-        <div className="glass-card p-3 text-center border-t-4 border-t-blue-500">
-          <p className="text-2xl font-bold text-slate-800">{totalPhotos}</p>
-          <p className="text-xs text-slate-500 mt-0.5 font-medium">Photos</p>
-        </div>
-        <div className="glass-card p-3 text-center border-t-4 border-t-red-500">
-          <p className={`text-2xl font-bold ${logsWithIssues > 0 ? 'text-red-500' : 'text-slate-800'}`}>
-            {logsWithIssues}
-          </p>
-          <p className="text-xs text-slate-500 mt-0.5 font-medium">Issues Reported</p>
-        </div>
-      </div>
 
-      {/* Header & Filters */}
-      <div className="glass-card flex flex-col overflow-hidden mb-6">
+
+      {/* Combined Header, Filters & Table */}
+      <div className="glass-card flex flex-col overflow-hidden mb-6 bg-white">
+        {/* Header & Filters */}
         <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <div>
               <h2 className="text-xl font-bold whitespace-nowrap">Daily Progress Feed</h2>
-              <p className="text-sm text-slate-600 font-medium mt-1">
-                {projectLogs.length} logs · {totalPhotos} photos · {logsWithIssues} with issues
-              </p>
             </div>
           </div>
           
           <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4 items-center w-full lg:w-auto justify-end">
             
             {/* Search */}
-            <div className="relative w-full xl:w-64 h-12 flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm rounded-lg px-3 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary transition-all">
+            <div className="relative w-full xl:w-48 h-12 flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm rounded-lg px-3 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary transition-all">
               <Search className="w-4 h-4 text-slate-400 shrink-0 mr-2" />
               <input
                 type="text"
@@ -118,7 +101,7 @@ const ProjectLogsTab = ({ projectId }) => {
 
             <div className="relative w-full xl:w-auto h-12">
               <select
-                className="h-full w-full xl:w-36 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all px-4 cursor-pointer"
+                className="h-full w-full xl:w-32 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all px-4 cursor-pointer"
                 value={dateFilter}
                 onChange={e => setDateFilter(e.target.value)}
               >
@@ -130,7 +113,7 @@ const ProjectLogsTab = ({ projectId }) => {
             
             <div className="relative w-full xl:w-auto h-12">
               <select
-                className="h-full w-full xl:w-44 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all px-4 cursor-pointer"
+                className="h-full w-full xl:w-36 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all px-4 cursor-pointer"
                 value={engineerFilter}
                 onChange={e => setEngineerFilter(e.target.value)}
               >
@@ -141,42 +124,53 @@ const ProjectLogsTab = ({ projectId }) => {
               </select>
             </div>
 
-            <div className="relative w-full xl:w-auto h-12">
-              <select
-                className="h-full w-full xl:w-36 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all px-4 cursor-pointer"
-                value={hasIssuesFilter}
-                onChange={e => setHasIssuesFilter(e.target.value)}
-              >
-                <option value="All">All Logs</option>
-                <option value="Yes">Has Issues</option>
-                <option value="No">No Issues</option>
-              </select>
+            {/* Log Type Pills */}
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto w-fit max-w-full shrink-0">
+              {['All', 'Issues', 'Photos'].map(s => {
+                let count = 0;
+                if (s === 'All') count = projectLogs.length;
+                else if (s === 'Issues') count = projectLogs.filter(l => l.issues).length;
+                else if (s === 'Photos') count = projectLogs.filter(l => l.photos && l.photos.length > 0).length;
+
+                const valueMap = {
+                  'All': 'All',
+                  'Issues': 'HasIssues',
+                  'Photos': 'WithPhotos'
+                };
+                const val = valueMap[s];
+
+                return (
+                  <button 
+                    key={s}
+                    onClick={() => setLogTypeFilter(val)}
+                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                      logTypeFilter === val
+                        ? 'bg-white shadow-sm text-slate-900 font-bold'
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    {s} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {(search || dateFilter !== 'All' || engineerFilter !== 'All' || hasIssuesFilter !== 'All') && (
-              <button
-                onClick={() => { setSearch(''); setDateFilter('All'); setEngineerFilter('All'); setHasIssuesFilter('All'); }}
-                className="h-12 text-xs text-red-600 bg-red-50 hover:bg-red-100 font-bold px-4 rounded-lg transition-colors border border-red-100 shrink-0"
-              >
-                Clear
-              </button>
-            )}
           </div>
         </div>
-      </div>
 
-      {/* Log count */}
-      {filtered.length !== projectLogs.length && (
-        <p className="text-sm text-slate-500">Showing {filtered.length} of {projectLogs.length} logs</p>
-      )}
+        {/* Log count */}
+        {filtered.length !== projectLogs.length && (
+          <div className="px-6 py-2 bg-slate-50 border-b border-slate-200 text-sm text-slate-500 font-medium">
+            Showing {filtered.length} of {projectLogs.length} logs
+          </div>
+        )}
 
-      {/* Log Table View */}
-      {filtered.length === 0 ? (
-        <div className="glass-card p-8 text-center text-slate-400">
-          <p>No logs match your filters.</p>
-        </div>
-      ) : (
-        <div className="glass-card overflow-hidden bg-white">
+        {/* Log Table View */}
+        {filtered.length === 0 ? (
+          <div className="p-12 text-center text-slate-400 bg-white">
+            <p>No logs match your filters.</p>
+          </div>
+        ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse whitespace-nowrap">
               <thead>
@@ -264,8 +258,8 @@ const ProjectLogsTab = ({ projectId }) => {
               </tbody>
             </table>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Detail Modal */}
       {selectedLog && (
