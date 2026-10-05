@@ -24,11 +24,11 @@ const STATUS_HEADER_STYLE = {
 };
 
 const STATUS_CARD_BG = {
-  'To Do': 'bg-[#f3e8ff]', 
-  'In Progress': 'bg-[#cffafe]', 
-  'Completed': 'bg-[#dcfce7]', 
-  'Reopened': 'bg-[#fef3c7]', 
-  'Closed': 'bg-[#f1f5f9]' 
+  'To Do': 'bg-white', 
+  'In Progress': 'bg-white', 
+  'Completed': 'bg-white', 
+  'Reopened': 'bg-white', 
+  'Closed': 'bg-white' 
 };
 
 const PRIORITY_STYLES = {
@@ -344,22 +344,12 @@ const ProjectTasksTab = ({ projectId, project }) => {
 
                           <div className="flex items-center justify-between pt-3 border-t border-slate-200/60 mt-auto">
                             <div className="flex items-center gap-2">
-                              {assignee ? (
-                                <div className="w-6 h-6 rounded-full bg-white/60 text-primary flex items-center justify-center text-[10px] font-bold ring-2 ring-white">
-                                  {assignee.name?.charAt(0)}
-                                </div>
-                              ) : (
-                                <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-bold ring-2 ring-white">
-                                  ?
-                                </div>
-                              )}
                               <span className="text-[11px] font-medium text-slate-500 truncate max-w-[80px]">{assignee?.name || 'Unassigned'}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               {task.dueDate && (
                                 <span className="text-[11px] font-semibold text-slate-400">{task.dueDate}</span>
                               )}
-                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
                             </div>
                           </div>
                         </div>
