@@ -67,10 +67,9 @@ const ProjectDetailPage = () => {
   };
 
   return (
-    <div className="space-y-0 animate-in fade-in duration-300 bg-[#f0f4f8] min-h-screen">
-      {/* ── Redesigned Header ── */}
-      <div className="bg-[#f0f4f8] pt-6 pb-0 mb-6">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="space-y-0 animate-in fade-in duration-300 bg-[#f0f4f8] min-h-screen py-6">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
           
           {/* Back Button */}
           <button
@@ -82,27 +81,33 @@ const ProjectDetailPage = () => {
           </button>
 
           {/* Title & Meta */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
-              <div className="flex items-center gap-4 mb-2">
-                <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
+              <div className="flex flex-wrap items-center gap-3 mb-3">
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
                   {project.name}
                 </h1>
-                <span className={`px-3 py-1 text-xs font-bold rounded-full ${STATUS_STYLE[project.status] || 'bg-slate-100 text-slate-600'}`}>
+                <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-md border ${STATUS_STYLE[project.status] ? STATUS_STYLE[project.status] + ' border-transparent' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
                   {project.status}
                 </span>
               </div>
               
-              <div className="flex items-center text-slate-500 text-sm gap-3">
-                <span className="font-medium text-slate-700">{project.client}</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-                <span>{project.location}</span>
+              <div className="flex flex-wrap items-center text-slate-500 text-sm gap-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400">Client:</span>
+                  <span className="font-medium text-slate-700">{project.client}</span>
+                </div>
+                <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400">Location:</span>
+                  <span className="font-medium text-slate-700">{project.location}</span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Tab bar */}
-          <nav className="flex items-center space-x-1 bg-slate-200/60 p-1.5 rounded-xl w-fit overflow-x-auto scrollbar-none mb-6" aria-label="Project tabs">
+          <nav className="flex items-center space-x-1 bg-slate-200/60 p-1.5 rounded-xl w-fit overflow-x-auto scrollbar-none mb-8" aria-label="Project tabs">
             {availableTabs.map(tab => {
               const isActive = activeTab === tab.id;
               return (
@@ -120,18 +125,19 @@ const ProjectDetailPage = () => {
               );
             })}
           </nav>
-        </div>
-      </div>
 
-      {/* ── Tab Content ── */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        {activeTab === 'overview'   && <ProjectOverviewTab project={project} />}
-        {activeTab === 'milestones' && <ProjectMilestonesTab project={project} />}
-        {activeTab === 'tasks'      && <ProjectTasksTab projectId={project.id} project={project} />}
-        {activeTab === 'progress'   && <ProjectLogsTab projectId={project.id} project={project} />}
-        {activeTab === 'issues'     && <ProjectIssuesTab project={project} />}
-        {activeTab === 'approvals'  && <ProjectApprovalsTab projectId={project.id} project={project} />}
-        {activeTab === 'documents'  && <ProjectDocumentsTab project={project} />}
+          {/* ── Tab Content ── */}
+          <div className="mt-2">
+            {activeTab === 'overview'   && <ProjectOverviewTab project={project} />}
+            {activeTab === 'milestones' && <ProjectMilestonesTab project={project} />}
+            {activeTab === 'tasks'      && <ProjectTasksTab projectId={project.id} project={project} />}
+            {activeTab === 'progress'   && <ProjectLogsTab projectId={project.id} project={project} />}
+            {activeTab === 'issues'     && <ProjectIssuesTab project={project} />}
+            {activeTab === 'approvals'  && <ProjectApprovalsTab projectId={project.id} project={project} />}
+            {activeTab === 'documents'  && <ProjectDocumentsTab project={project} />}
+          </div>
+
+        </div>
       </div>
     </div>
   );
