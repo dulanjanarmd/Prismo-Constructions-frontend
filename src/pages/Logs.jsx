@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { Camera, Plus, X, UploadCloud, AlertTriangle, MessageSquare, Download, Eye, LayoutList, Edit, Trash2 } from 'lucide-react';
+import { Camera, Plus, X, UploadCloud, AlertTriangle, MessageSquare, Download, Eye, LayoutList, Edit, Trash2, Filter, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Logs = () => {
   const { logs, addLog, updateLog, deleteLog, projects, tasks } = useData();
   const { currentUser } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [projectFilter, setProjectFilter] = useState('All');
   
   const [formData, setFormData] = useState({
     projectId: '',
@@ -209,6 +211,16 @@ const Logs = () => {
       }))
     : projects;
 
+  const filteredLogs = logs.filter(log => {
+    const project = projects.find(p => String(p.id) === String(log.projectId).replace('p', ''));
+    const task = tasks.find(t => String(t.id) === String(log.task?.id));
+    const matchSearch = (project?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (task?.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (log.weather || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchProject = projectFilter === 'All' || String(log.projectId).replace('p', '') === String(projectFilter).replace('p', '');
+    return matchSearch && matchProject;
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -218,24 +230,56 @@ const Logs = () => {
           </h1>
           <p className="text-slate-500 mt-1">Daily field capture and issue reporting.</p>
         </div>
-        <div className="flex space-x-3">
-          <button onClick={exportToCSV} className="flex items-center px-4 py-2 bg-slate-200/50 hover:bg-slate-200 text-slate-700 rounded-md font-medium transition-colors">
-            <Download className="w-4 h-4 mr-2 text-primary" />
-            Export CSV
-          </button>
-          {isSiteEngineer && (
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="btn-primary flex items-center"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Submit Daily Log
-            </button>
-          )}
-        </div>
       </div>
 
       <div className="glass-card flex flex-col overflow-hidden">
+        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold whitespace-nowrap">Daily Logs</h2>
+          </div>
+          
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-3 items-start xl:items-center w-full lg:w-auto justify-end">
+            <div className="relative w-full lg:w-64 h-11 shrink-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search logs..."
+                className="w-full h-full pl-9 pr-4 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all rounded-lg"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <div className="relative w-full lg:w-48 h-11 shrink-0">
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <select
+                className="w-full h-full pl-9 pr-10 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all appearance-none cursor-pointer rounded-lg"
+                value={projectFilter}
+                onChange={e => setProjectFilter(e.target.value)}
+              >
+                <option value="All">All Projects</option>
+                {assignedProjects.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+
+            <button onClick={exportToCSV} className="w-full lg:w-auto flex justify-center items-center px-4 h-11 bg-white/60 backdrop-blur-xl border border-white/40 hover:bg-white text-slate-700 rounded-lg font-medium transition-colors shadow-sm whitespace-nowrap">
+              Export CSV
+            </button>
+            {isSiteEngineer && (
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="w-full lg:w-auto flex justify-center items-center px-6 h-11 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0 whitespace-nowrap"
+              >
+                Submit Daily Log
+              </button>
+            )}
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-slate-100 text-xs text-slate-400">
@@ -250,7 +294,7 @@ const Logs = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {logs.map(log => {
+              {filteredLogs.map(log => {
                 const project = projects.find(p => String(p.id) === String(log.projectId).replace('p', ''));
                 const task = tasks.find(t => String(t.id) === String(log.task?.id));
                 return (

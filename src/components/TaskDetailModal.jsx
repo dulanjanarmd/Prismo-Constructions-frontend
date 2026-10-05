@@ -8,17 +8,17 @@ import {
 } from 'lucide-react';
 
 const PRIORITY_STYLES = {
-  High: 'bg-red-100 text-red-700 border-red-200',
-  Medium: 'bg-amber-100 text-amber-700 border-amber-200',
-  Low: 'bg-green-100 text-green-700 border-green-200'
+  High: 'bg-red-500 text-white',
+  Medium: 'bg-amber-500 text-white',
+  Low: 'bg-blue-500 text-white'
 };
 
 const STATUS_STYLES = {
-  'To Do': 'bg-slate-100 text-slate-600',
-  'In Progress': 'bg-amber-100 text-amber-700',
-  'Completed': 'bg-blue-100 text-blue-700',
-  'Reopened': 'bg-red-100 text-red-700',
-  'Closed': 'bg-green-100 text-green-700'
+  'To Do': 'bg-[#a855f7] text-white',
+  'In Progress': 'bg-[#06b6d4] text-white',
+  'Completed': 'bg-[#22c55e] text-white',
+  'Reopened': 'bg-[#f59e0b] text-white',
+  'Closed': 'bg-[#64748b] text-white'
 };
 
 const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
@@ -132,11 +132,11 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
           <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
             <div className="flex-1 min-w-0 pr-4">
               <div className="flex items-center gap-2 flex-wrap mb-1 -ml-2">
-                <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full ${STATUS_STYLES[task.status] || STATUS_STYLES['To Do']}`}>
+                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-sm ${STATUS_STYLES[task.status] || STATUS_STYLES['To Do']}`}>
                   {task.status}
                 </span>
-                <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
-                  {task.priority} Priority
+                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-sm ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
+                  {task.priority}
                 </span>
               </div>
               <h2 className="text-xl font-bold text-slate-900  leading-tight">{task.title}</h2>
