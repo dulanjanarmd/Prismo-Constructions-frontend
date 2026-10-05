@@ -86,6 +86,13 @@ const ProjectOverviewTab = ({ project }) => {
     String(t.projectId) === String(project.id) || t.projectId === `p${project.id}`
   );
   const completedTasks = projectTasks.filter(t => t.status === 'Completed').length;
+  const incompleteTasks = projectTasks.length - completedTasks;
+  const projectMilestones = project.milestones || [];
+  const incompleteMilestones = projectMilestones.filter(m => m.status !== 'Completed').length;
+  const canCompleteProject = incompleteTasks === 0 && incompleteMilestones === 0;
+
+  const hasStartedTasks = projectTasks.some(t => t.status !== 'To Do');
+  const canRevertToPlanning = !hasStartedTasks && project.progress === 0;
 
   const projectLogs = logs.filter(l =>
     String(l.projectId) === String(project.id) || l.projectId === `p${project.id}`
@@ -288,12 +295,19 @@ const ProjectOverviewTab = ({ project }) => {
                     value={statusData.status} 
                     onChange={e => setStatusData({ ...statusData, status: e.target.value })}
                   >
-                    <option value="Not Started" disabled={project.milestones?.length > 0 && statusData.progress > 0}>Not Started</option>
-                    <option value="Planning" disabled={project.milestones?.length > 0 && statusData.progress > 0}>Planning</option>
+                    <option value="Not Started" disabled={!canRevertToPlanning}>Not Started</option>
+                    <option value="Planning" disabled={!canRevertToPlanning}>Planning</option>
                     <option value="In Progress" disabled={project.milestones?.length > 0 && statusData.progress === 100}>In Progress</option>
                     <option value="On Hold">On Hold</option>
-                    <option value="Completed">Completed</option>
+                    <option value="Completed" disabled={!canCompleteProject}>Completed</option>
                   </select>
+                  {(!canCompleteProject || !canRevertToPlanning) && (
+                    <p className="text-xs text-amber-600 mt-2 font-medium">
+                      {!canCompleteProject && statusData.status === 'Completed' 
+                        ? "Project can only be marked as Completed when all tasks and milestones are completed."
+                        : "Some status options are disabled based on current task progress."}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Overall Progress ({statusData.progress}%)</label>

@@ -260,7 +260,7 @@ const ProjectMilestonesTab = ({ project }) => {
             {completedCount} of {milestones.length} completed
           </p>
         </div>
-        {!isClient && (
+        {!isClient && project.status !== 'Completed' && (
           <button
             onClick={() => setIsAdding(true)}
             className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold"

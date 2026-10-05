@@ -276,7 +276,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
               </>
             )}
             
-            {isPM && (
+            {isPM && project.status !== 'Completed' && (
               <button
                 onClick={() => { setIsEditing(false); setSelectedTask(null); setIsModalOpen(true); }}
                 className="h-12 flex items-center px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
