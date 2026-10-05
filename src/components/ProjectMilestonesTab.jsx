@@ -61,6 +61,13 @@ const ProjectMilestonesTab = ({ project }) => {
         }
       }
 
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (msDate < today) {
+        alert("Milestone due date cannot be in the past.");
+        return;
+      }
+
       if (project?.endDate) {
         const projEnd = new Date(project.endDate);
         projEnd.setHours(0, 0, 0, 0);
@@ -215,6 +222,13 @@ const ProjectMilestonesTab = ({ project }) => {
         }
       }
 
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (msDate < today) {
+        alert("Milestone due date cannot be in the past.");
+        return;
+      }
+
       if (project?.endDate) {
         const projEnd = new Date(project.endDate);
         projEnd.setHours(0, 0, 0, 0);
@@ -250,9 +264,14 @@ const ProjectMilestonesTab = ({ project }) => {
   const completedCount = milestones.filter(m => m.status === 'Completed').length;
   const pct = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
 
-  const minDateStr = project?.startDate 
+  const todayStr = new Date().toISOString().split('T')[0];
+  let minDateStr = project?.startDate 
     ? new Date(project.startDate).toISOString().split('T')[0]
-    : undefined;
+    : todayStr;
+
+  if (minDateStr < todayStr) {
+    minDateStr = todayStr;
+  }
   
   const maxDateStr = project?.endDate 
     ? new Date(project.endDate).toISOString().split('T')[0]
