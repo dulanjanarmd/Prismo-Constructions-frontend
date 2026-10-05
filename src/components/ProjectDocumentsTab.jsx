@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FileText, Upload, Download, Trash2, File, FileImage, FileCode } from 'lucide-react';
+import { FileText, Upload, Download, Trash2, File, FileImage, FileCode, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Helper to pick an icon based on file type
@@ -32,6 +32,8 @@ const ProjectDocumentsTab = ({ project }) => {
   const [documents, setDocuments] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({ name: '', category: 'design', file: null, note: '' });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('All');
   const projectId = String(project?.id || '').replace(/^p/, '');
 
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
@@ -95,31 +97,73 @@ const ProjectDocumentsTab = ({ project }) => {
   };
 
   // No longer grouping by category, rendering in a single table
+  const filteredDocuments = documents.filter(d => {
+    const matchesSearch = d.fileName?.toLowerCase().includes(searchQuery.toLowerCase()) || d.note?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === 'All' || d.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold">Project Documents</h2>
-          <p className="text-sm text-slate-500">{documents.length} file{documents.length !== 1 ? 's' : ''} shared for this project</p>
+      <div className="glass-card flex flex-col overflow-hidden mb-6">
+        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
+            <h2 className="text-xl font-bold leading-tight shrink-0">
+              Project<br />Documents
+            </h2>
+          </div>
+          
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-3 items-start xl:items-center w-full lg:w-auto justify-end">
+            <div className="relative w-full lg:w-40">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search documents..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 h-12 rounded-lg border border-slate-300 bg-white/80 focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-sm text-sm"
+              />
+            </div>
+            
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto w-fit max-w-full shrink-0">
+              {['All', 'design', 'contract', 'report', 'photo', 'other'].map(c => {
+                const count = c === 'All'
+                  ? documents.length
+                  : documents.filter(d => d.category === c).length;
+                const displayLabel = c === 'All' ? 'All' : CATEGORY_LABELS[c] || c;
+                return (
+                  <button 
+                    key={c}
+                    onClick={() => setCategoryFilter(c)}
+                    className={`relative px-2.5 py-1.5 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                      categoryFilter === c
+                        ? 'bg-white shadow-sm text-slate-900 font-bold'
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    {displayLabel} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {isPM && (
+              <button
+                onClick={() => setIsUploading(true)}
+                className="h-12 flex items-center px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
+              >
+                Upload Document
+              </button>
+            )}
+          </div>
         </div>
-        {isPM && (
-          <button
-            onClick={() => setIsUploading(true)}
-            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold"
-          >
-            <Upload className="w-5 h-5 mr-2" />
-            Upload Document
-          </button>
-        )}
-      </div>
 
       {/* Upload Form */}
       {isUploading && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-6 border-2 border-primary/30"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="p-6 border-b border-border bg-slate-50"
         >
           <h3 className="text-lg font-bold mb-4">Add New Document</h3>
           <form onSubmit={handleUpload} className="space-y-4">
@@ -177,10 +221,10 @@ const ProjectDocumentsTab = ({ project }) => {
       )}
 
       {/* Empty State */}
-      {documents.length === 0 && !isUploading && (
-        <div className="glass-card p-12 text-center text-slate-500">
+      {filteredDocuments.length === 0 && !isUploading && (
+        <div className="p-12 text-center text-slate-500">
           <FileText className="w-12 h-12 mx-auto mb-4 opacity-40" />
-          <p className="text-lg font-medium">No documents uploaded yet.</p>
+          <p className="text-lg font-medium">No documents found.</p>
           <p className="text-sm mt-1">Upload design plans, contracts, and reports to share with the client.</p>
           {isPM && (
             <button
@@ -195,8 +239,8 @@ const ProjectDocumentsTab = ({ project }) => {
       )}
 
       {/* Documents Table */}
-      {documents.length > 0 && (
-        <div className="glass-card overflow-hidden">
+      {filteredDocuments.length > 0 && (
+        <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 border-b border-border">
               <tr>
@@ -209,7 +253,7 @@ const ProjectDocumentsTab = ({ project }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {documents.map(doc => (
+              {filteredDocuments.map(doc => (
                 <motion.tr
                   key={doc.id}
                   initial={{ opacity: 0 }}
@@ -258,6 +302,7 @@ const ProjectDocumentsTab = ({ project }) => {
           </table>
         </div>
       )}
+      </div>
     </div>
   );
 };

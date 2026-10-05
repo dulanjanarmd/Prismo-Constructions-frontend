@@ -15,6 +15,22 @@ const STATUS_DOT = {
   'Closed': 'bg-green-500'
 };
 
+const STATUS_HEADER_STYLE = {
+  'To Do': 'bg-[#a855f7] text-white', // Purple
+  'In Progress': 'bg-[#06b6d4] text-white', // Cyan
+  'Completed': 'bg-[#22c55e] text-white', // Green
+  'Reopened': 'bg-[#f59e0b] text-white', // Yellow
+  'Closed': 'bg-[#64748b] text-white' // Slate
+};
+
+const STATUS_CARD_BG = {
+  'To Do': 'bg-[#f3e8ff]', 
+  'In Progress': 'bg-[#cffafe]', 
+  'Completed': 'bg-[#dcfce7]', 
+  'Reopened': 'bg-[#fef3c7]', 
+  'Closed': 'bg-[#f1f5f9]' 
+};
+
 const PRIORITY_STYLES = {
   High: 'bg-red-100 text-red-700',
   Medium: 'bg-amber-100 text-amber-700',
@@ -280,19 +296,15 @@ const ProjectTasksTab = ({ projectId, project }) => {
           return (
             <div 
               key={col} 
-              className={`glass-card p-4 flex flex-col bg-slate-50/50 min-h-[200px] ${isSiteEngineer ? 'transition-colors hover:bg-slate-100/50' : ''}`}
+              className={`rounded-lg flex flex-col bg-white border border-slate-200 shadow-sm min-h-[300px] overflow-hidden ${isSiteEngineer ? 'transition-colors hover:shadow-md' : ''}`}
               onDragOver={(e) => { if (isSiteEngineer) e.preventDefault(); }}
               onDrop={(e) => handleDrop(e, col)}
             >
-              <h3 className="font-bold text-sm mb-4 flex items-center border-b border-border pb-3">
-                <span className={`w-2.5 h-2.5 rounded-full mr-2 ${STATUS_DOT[col]}`} />
+              <h3 className={`font-bold text-sm flex items-center justify-center px-4 py-3 uppercase tracking-wider ${STATUS_HEADER_STYLE[col] || 'bg-slate-500 text-white'}`}>
                 {col}
-                <span className="ml-auto text-xs font-medium text-slate-400 bg-white  px-1.5 py-0.5 rounded-full border border-border">
-                  {colTasks.length}
-                </span>
               </h3>
 
-              <div className="space-y-3 flex-1">
+              <div className="space-y-3 flex-1 p-3">
                 {colTasks.length === 0 ? (
                   <p className="text-xs text-slate-400 text-center py-4">Empty</p>
                 ) : (
@@ -301,46 +313,52 @@ const ProjectTasksTab = ({ projectId, project }) => {
                     return (
                       <motion.div
                         key={task.id}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className={`bg-white p-3 rounded-lg shadow-sm border border-border cursor-pointer hover:shadow-md hover:border-primary/30 transition-all ${isSiteEngineer ? 'cursor-grab active:cursor-grabbing' : ''}`}
+                        className={`${STATUS_CARD_BG[col] || 'bg-white'} p-4 rounded-lg shadow-sm hover:shadow-md border border-slate-200/40 cursor-pointer transition-all flex flex-col group ${isSiteEngineer ? 'cursor-grab active:cursor-grabbing' : ''}`}
                         onClick={() => setSelectedTask(task)}
                         draggable={isSiteEngineer}
                         onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
                       >
-                        <div className="flex justify-between items-start mb-2">
-                          <span className={`px-1.5 py-0.5 text-xs font-semibold rounded ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
+                        <div className="flex justify-between items-start mb-3">
+                          <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
                             {task.priority}
                           </span>
-                          {task.status === 'Completed' && !task.evidence && isPM && (
-                            <AlertTriangle className="w-3.5 h-3.5 text-amber-500" title="Needs review" />
-                          )}
-                          {task.status === 'Closed' && (
-                            <Lock className="w-3.5 h-3.5 text-green-500" title="Closed" />
-                          )}
+                          <div className="flex gap-1.5">
+                            {task.status === 'Completed' && !task.evidence && isPM && (
+                              <AlertTriangle className="w-4 h-4 text-amber-500" title="Needs review" />
+                            )}
+                            {task.status === 'Closed' && (
+                              <Lock className="w-4 h-4 text-green-500" title="Closed" />
+                            )}
+                          </div>
                         </div>
 
-                        <h4 className="font-semibold text-sm text-slate-900  leading-tight mb-2">{task.title}</h4>
+                        <h4 className="font-bold text-sm text-slate-800 leading-snug mb-2">{task.title}</h4>
 
                         {task.description && (
-                          <p className="text-xs text-slate-500 mb-2 line-clamp-2">{task.description}</p>
+                          <p className="text-xs text-slate-500 mb-4 line-clamp-2 leading-relaxed">{task.description}</p>
                         )}
 
-                        <div className="flex items-center justify-between pt-2 border-t border-border mt-2">
-                          <div className="flex items-center gap-1.5">
-                            {assignee && (
-                              <div className="w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[9px] font-bold">
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-auto">
+                          <div className="flex items-center gap-2">
+                            {assignee ? (
+                              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold ring-2 ring-white">
                                 {assignee.name?.charAt(0)}
                               </div>
+                            ) : (
+                              <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-bold ring-2 ring-white">
+                                ?
+                              </div>
                             )}
-                            <span className="text-xs text-slate-500 truncate max-w-[80px]">{assignee?.name || '—'}</span>
+                            <span className="text-[11px] font-medium text-slate-500 truncate max-w-[80px]">{assignee?.name || 'Unassigned'}</span>
                           </div>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-2">
                             {task.dueDate && (
-                              <span className="text-xs text-slate-400 mr-1">{task.dueDate}</span>
+                              <span className="text-[11px] font-semibold text-slate-400">{task.dueDate}</span>
                             )}
-                            <Eye className="w-3.5 h-3.5 text-slate-300 hover:text-primary transition-colors" />
+                            <Eye className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors" />
                           </div>
                         </div>
                       </motion.div>
