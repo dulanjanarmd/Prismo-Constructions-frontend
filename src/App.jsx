@@ -18,7 +18,7 @@ import Issues from './pages/Issues';
 import ServicesPage from './pages/ServicesPage';
 import PortfolioPage from './pages/PortfolioPage';
 import AboutPage from './pages/AboutPage';
-import RecentActivityPage from './pages/RecentActivityPage';
+import NotificationsPage from './pages/NotificationsPage';
 import CreateProjectPage from './pages/CreateProjectPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 
@@ -86,7 +86,7 @@ function App() {
             </RequireAuth>
           } />
           <Route path="issues" element={<Issues />} />
-          <Route path="activity" element={<RecentActivityPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
           <Route path="admin" element={
             <RequireAuth allowedRoles={['admin']}>
               <AdminPortal />

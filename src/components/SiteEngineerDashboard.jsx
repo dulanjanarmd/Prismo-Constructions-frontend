@@ -53,39 +53,6 @@ const SiteEngineerDashboard = () => {
   // Format today's date
   const todayFormatted = new Date().toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
 
-  // 3. Recent Activity (Filtered to SE's projects)
-  const recentActivities = useMemo(() => {
-    const activities = [];
-    myTasks.forEach(task => {
-      const project = projects.find(p => String(p.id) === String(task.projectId).replace('p', '') || `p${p.id}` === String(task.projectId));
-      if (project) {
-        activities.push({
-          type: 'task',
-          description: `Task "${task.title}" is ${task.status}`,
-          projectName: project.name,
-          timestamp: task.dueDate || 'Recent',
-          dateObj: new Date(task.dueDate || new Date())
-        });
-      }
-    });
-
-    logs.forEach(log => {
-      if (String(log.submittedBy) === String(currentUser?.id) || `u${log.submittedBy}` === currentUser?.id) {
-        const project = projects.find(p => String(p.id) === String(log.projectId).replace('p', '') || `p${p.id}` === String(log.projectId));
-        if (project) {
-          activities.push({
-            type: 'log',
-            description: `You submitted a progress log`,
-            projectName: project.name,
-            timestamp: log.date,
-            dateObj: new Date(log.date)
-          });
-        }
-      }
-    });
-
-    return activities.sort((a, b) => b.dateObj - a.dateObj).slice(0, 10);
-  }, [myTasks, logs, projects, currentUser]);
 
   return (
     <div className="space-y-6">

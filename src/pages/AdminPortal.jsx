@@ -177,7 +177,7 @@ const AdminPortal = () => {
           }`}
         >
           <Activity className="w-4 h-4 mr-2" />
-          System Activity
+          System Notifications
         </button>
       </div>
 
@@ -326,13 +326,13 @@ const AdminPortal = () => {
             className="space-y-6"
           >
             <div>
-              <h2 className="text-xl font-bold">System Activity</h2>
+              <h2 className="text-xl font-bold">System Notifications</h2>
               <p className="text-sm text-slate-500">Recent events and system notifications.</p>
             </div>
             <div className="glass-card p-6 flex flex-col items-center justify-center min-h-[400px] text-slate-500 text-center">
               <Activity className="w-16 h-16 mb-4 text-slate-300" />
-              <h3 className="text-xl font-medium text-slate-800 mb-2">Activity Log Unavailable</h3>
-              <p className="max-w-md text-slate-500">Detailed system activity logging is currently empty or not enabled. Check back later for recent administrative actions, logins, and system events.</p>
+              <h3 className="text-xl font-medium text-slate-800 mb-2">Notifications Log Unavailable</h3>
+              <p className="max-w-md text-slate-500">Detailed system notification logging is currently empty or not enabled. Check back later for recent administrative actions, logins, and system events.</p>
               <button className="mt-6 px-6 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors font-medium">
                 Refresh Logs
               </button>

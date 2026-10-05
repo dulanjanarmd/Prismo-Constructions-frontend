@@ -49,46 +49,7 @@ const ClientDashboard = () => {
   const completed = myProjects.filter(p => p.status === 'Completed').length;
   const pendingCount = pendingApprovals.length;
 
-  // Real notifications: recent logs for my projects
-  const myProjectIds = myProjects.map(p => String(p.id));
-  const recentLogs = logs
-    .filter(l => {
-      const pId = String(l.projectId).replace('p', '');
-      return myProjectIds.includes(pId) || myProjectIds.includes(String(l.projectId));
-    })
-    .sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0))
-    .slice(0, 5);
 
-  // Recent approvals for notification feed
-  const recentApprovals = approvals
-    .filter(a => {
-      const isForMyProject = myProjects.some(p =>
-        String(p.id) === String(a.projectId) || `p${p.id}` === String(a.projectId)
-      );
-      const statusLower = (a.status || '').toLowerCase();
-      return isForMyProject && (statusLower === 'approved' || statusLower === 'rejected');
-    })
-    .sort((a, b) => new Date(b.dateRequested || 0) - new Date(a.dateRequested || 0))
-    .slice(0, 3);
-
-  const notificationItems = [
-    ...recentLogs.map(l => ({
-      icon: FileText,
-      iconColor: 'text-blue-600',
-      iconBg: 'bg-blue-100',
-      text: `New progress report submitted for ${myProjects.find(p => `p${p.id}` === String(l.projectId) || String(p.id) === String(l.projectId))?.name || 'your project'} (+${l.percentageCompleted}%)`,
-      date: l.date || l.createdAt
-    })),
-    ...recentApprovals.map(a => ({
-      icon: CheckSquare,
-      iconColor: a.status?.toLowerCase() === 'approved' ? 'text-green-600' : 'text-red-600',
-      iconBg: a.status?.toLowerCase() === 'approved' ? 'bg-green-100' : 'bg-red-100',
-      text: `Approval "${a.title}" was ${a.status?.toLowerCase()}`,
-      date: a.dateRequested
-    }))
-  ]
-    .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-    .slice(0, 5);
 
   const handleSendRequest = async () => {
     if (!requestText.trim()) return;
@@ -226,37 +187,6 @@ const ClientDashboard = () => {
             )}
           </div>
 
-          <div className="glass-card p-4">
-            <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center">
-              <Bell className="w-5 h-5 mr-2 text-primary" />
-              Recent Notifications
-            </h2>
-
-            {notificationItems.length === 0 ? (
-              <div className="text-center py-6 text-slate-500">
-                <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                <p className="text-sm">No recent activity.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {notificationItems.map((item, idx) => (
-                  <div key={idx} className="flex gap-3">
-                    <div className={`w-8 h-8 rounded-full ${item.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
-                      <item.icon className={`w-4 h-4 ${item.iconColor}`} />
-                    </div>
-                    <div>
-                      <p className="text-sm text-slate-800">{item.text}</p>
-                      {item.date && (
-                        <p className="text-xs text-slate-500 mt-1">
-                          {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
 

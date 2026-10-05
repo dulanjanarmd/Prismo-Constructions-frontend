@@ -22,7 +22,7 @@ const DashboardHeader = ({ rightElement }) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
       <div>
-        <h1 className="text-2xl md:text-3xl font-ethnocentric tracking-wide text-slate-900 pb-1 uppercase">
+        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 pb-1">
           {greeting}, <span className="text-primary">{currentUser?.name || 'User'}</span>
         </h1>
         <div className="flex items-center gap-3 mt-1.5">

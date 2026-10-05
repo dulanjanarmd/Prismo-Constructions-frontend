@@ -1005,6 +1005,34 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const deleteNotification = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/notifications/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${currentUser.token}` }
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const clearNotifications = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/notifications/clear`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${currentUser.token}` }
+      });
+      if (res.ok) {
+        setNotifications([]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const value = {
     projects,
     tasks,
@@ -1044,7 +1072,9 @@ export const DataProvider = ({ children }) => {
     editGlobalMessage,
     deleteGlobalMessage,
     notifications,
-    markNotificationAsRead
+    markNotificationAsRead,
+    deleteNotification,
+    clearNotifications
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
