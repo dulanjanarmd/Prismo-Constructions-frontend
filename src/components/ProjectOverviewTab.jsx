@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { Calendar, Edit2, Activity, X, CheckSquare, AlertTriangle, Clock, FileText, Trash2, DollarSign, Users, ShieldCheck, ThermometerSun, HardHat, TrendingUp } from 'lucide-react';
+import { Calendar, Edit2, Activity, X, CheckSquare, AlertTriangle, Clock, FileText, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -215,100 +215,6 @@ const ProjectOverviewTab = ({ project }) => {
                   <span className="text-xl font-bold text-primary">{project.progress}%</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right: Advanced Project Intelligence */}
-        <div className="space-y-6">
-          <div className="glass-card overflow-hidden">
-            <div className="bg-slate-100 px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-indigo-600" />
-                Project Intelligence
-              </h2>
-            </div>
-            <div className="p-6 space-y-6">
-              
-              {/* Project Health */}
-              <div>
-                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Project Health</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <ShieldCheck className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-800">On Track</p>
-                    <p className="text-xs text-slate-500">All milestones are meeting deadlines.</p>
-                  </div>
-                </div>
-              </div>
-
-              <hr className="border-slate-100" />
-
-              {/* Financials Overview */}
-              <div>
-                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Financials</p>
-                <div className="bg-slate-50 rounded-lg p-4 border border-slate-100">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-slate-600 flex items-center gap-1.5">
-                      <DollarSign className="w-4 h-4 text-emerald-500" /> Budget Spent
-                    </span>
-                    <span className="text-sm font-bold text-slate-800">42%</span>
-                  </div>
-                  <div className="w-full bg-slate-200 rounded-full h-2 mb-2">
-                    <div className="bg-emerald-500 h-2 rounded-full" style={{ width: '42%' }}></div>
-                  </div>
-                  <p className="text-xs text-slate-500 text-right">Est. Cost: $1.2M / $2.8M Total</p>
-                </div>
-              </div>
-
-              <hr className="border-slate-100" />
-
-              {/* Site Conditions */}
-              <div>
-                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Site Conditions</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
-                    <ThermometerSun className="w-5 h-5 text-orange-500 mb-1.5" />
-                    <p className="text-xs text-slate-500">Weather</p>
-                    <p className="text-sm font-bold text-slate-800">Sunny, 28°C</p>
-                  </div>
-                  <div className="bg-amber-50/50 p-3 rounded-lg border border-amber-100">
-                    <HardHat className="w-5 h-5 text-amber-600 mb-1.5" />
-                    <p className="text-xs text-slate-500">Active Workers</p>
-                    <p className="text-sm font-bold text-slate-800">124 Personnel</p>
-                  </div>
-                </div>
-              </div>
-
-              <hr className="border-slate-100" />
-
-              {/* Key Stakeholders */}
-              <div>
-                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Key Stakeholders</p>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                      <Users className="w-4 h-4 text-indigo-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-800">Sarah Jenkins</p>
-                      <p className="text-xs text-slate-500">Project Manager</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                      <Users className="w-4 h-4 text-slate-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-800">Michael Chang</p>
-                      <p className="text-xs text-slate-500">Lead Architect</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>
