@@ -32,9 +32,9 @@ const STATUS_CARD_BG = {
 };
 
 const PRIORITY_STYLES = {
-  High: 'bg-red-100 text-red-700',
-  Medium: 'bg-amber-100 text-amber-700',
-  Low: 'bg-green-100 text-green-700'
+  High: 'bg-red-500 text-white',
+  Medium: 'bg-amber-500 text-white',
+  Low: 'bg-blue-500 text-white'
 };
 
 const ProjectTasksTab = ({ projectId, project }) => {
@@ -316,49 +316,51 @@ const ProjectTasksTab = ({ projectId, project }) => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className={`${STATUS_CARD_BG[col] || 'bg-white'} p-4 rounded-lg shadow-sm hover:shadow-md border border-slate-200/40 cursor-pointer transition-all flex flex-col group ${isSiteEngineer ? 'cursor-grab active:cursor-grabbing' : ''}`}
+                        className={`${STATUS_CARD_BG[col] || 'bg-white'} rounded-lg shadow-sm hover:shadow-md border border-slate-200/40 cursor-pointer transition-all flex flex-col group overflow-hidden ${isSiteEngineer ? 'cursor-grab active:cursor-grabbing' : ''}`}
                         onClick={() => setSelectedTask(task)}
                         draggable={isSiteEngineer}
                         onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
                       >
-                        <div className="flex justify-between items-start mb-3">
-                          <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
+                        <div className={`px-4 py-2 flex justify-between items-center ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
+                          <span className="text-[10px] font-bold uppercase tracking-wider">
                             {task.priority}
                           </span>
                           <div className="flex gap-1.5">
                             {task.status === 'Completed' && !task.evidence && isPM && (
-                              <AlertTriangle className="w-4 h-4 text-amber-500" title="Needs review" />
+                              <AlertTriangle className="w-4 h-4 text-white/90" title="Needs review" />
                             )}
                             {task.status === 'Closed' && (
-                              <Lock className="w-4 h-4 text-green-500" title="Closed" />
+                              <Lock className="w-4 h-4 text-white/90" title="Closed" />
                             )}
                           </div>
                         </div>
 
-                        <h4 className="font-bold text-sm text-slate-800 leading-snug mb-2">{task.title}</h4>
+                        <div className="p-4 flex flex-col flex-1">
+                          <h4 className="font-bold text-sm text-slate-800 leading-snug mb-2">{task.title}</h4>
 
-                        {task.description && (
-                          <p className="text-xs text-slate-500 mb-4 line-clamp-2 leading-relaxed">{task.description}</p>
-                        )}
+                          {task.description && (
+                            <p className="text-xs text-slate-500 mb-4 line-clamp-2 leading-relaxed">{task.description}</p>
+                          )}
 
-                        <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-auto">
-                          <div className="flex items-center gap-2">
-                            {assignee ? (
-                              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold ring-2 ring-white">
-                                {assignee.name?.charAt(0)}
-                              </div>
-                            ) : (
-                              <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-bold ring-2 ring-white">
-                                ?
-                              </div>
-                            )}
-                            <span className="text-[11px] font-medium text-slate-500 truncate max-w-[80px]">{assignee?.name || 'Unassigned'}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {task.dueDate && (
-                              <span className="text-[11px] font-semibold text-slate-400">{task.dueDate}</span>
-                            )}
-                            <Eye className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors" />
+                          <div className="flex items-center justify-between pt-3 border-t border-slate-200/60 mt-auto">
+                            <div className="flex items-center gap-2">
+                              {assignee ? (
+                                <div className="w-6 h-6 rounded-full bg-white/60 text-primary flex items-center justify-center text-[10px] font-bold ring-2 ring-white">
+                                  {assignee.name?.charAt(0)}
+                                </div>
+                              ) : (
+                                <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-bold ring-2 ring-white">
+                                  ?
+                                </div>
+                              )}
+                              <span className="text-[11px] font-medium text-slate-500 truncate max-w-[80px]">{assignee?.name || 'Unassigned'}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {task.dueDate && (
+                                <span className="text-[11px] font-semibold text-slate-400">{task.dueDate}</span>
+                              )}
+                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
+                            </div>
                           </div>
                         </div>
                       </motion.div>
