@@ -149,14 +149,7 @@ const Projects = () => {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">
           {isSiteEngineer ? 'My Projects' : 'Projects Management'}
         </h1>
-        {!isSiteEngineer && !isClient && (
-          <button 
-            onClick={() => navigate('/portal/projects/new')}
-            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold"
-          >
-            New Project
-          </button>
-        )}
+
       </div>
 
       {/* Project Analytics moved below table */}
@@ -193,6 +186,14 @@ const Projects = () => {
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
+            {!isSiteEngineer && !isClient && (
+              <button 
+                onClick={() => navigate('/portal/projects/new')}
+                className="flex items-center px-4 py-2 h-12 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
+              >
+                New Project
+              </button>
+            )}
           </div>
         </div>
         <div className="overflow-x-auto">
