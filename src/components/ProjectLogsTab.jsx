@@ -1,11 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { useData } from '../context/DataContext';
-import { Camera, Search, Filter, AlertTriangle, ImageIcon, ChevronRight, TrendingUp, HardHat, Cloud } from 'lucide-react';
+import { Camera, Search, Filter, AlertTriangle, ImageIcon, ChevronRight, TrendingUp, HardHat, Cloud, Sun, CloudRain, CloudLightning } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ProgressLogDetailModal from './ProgressLogDetailModal';
 
-const WEATHER_EMOJI = {
-  Sunny: '☀️', Cloudy: '⛅', Rainy: '🌧️', Storm: '⛈️'
+const WeatherIcon = ({ weather }) => {
+  switch (weather) {
+    case 'Sunny': return <Sun className="w-3.5 h-3.5" />;
+    case 'Cloudy': return <Cloud className="w-3.5 h-3.5" />;
+    case 'Rainy': return <CloudRain className="w-3.5 h-3.5" />;
+    case 'Storm': return <CloudLightning className="w-3.5 h-3.5" />;
+    default: return <Sun className="w-3.5 h-3.5" />;
+  }
 };
 
 const ProjectLogsTab = ({ projectId }) => {
@@ -218,14 +224,14 @@ const ProjectLogsTab = ({ projectId }) => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-4 text-xs text-slate-500">
                           <span className="flex items-center gap-1.5" title="Weather">
-                            <span className="text-sm">{WEATHER_EMOJI[log.weather] || '🌤️'}</span> {log.weather}
+                            <WeatherIcon weather={log.weather} /> <span className="text-sm">{log.weather}</span>
                           </span>
                           <span className="flex items-center gap-1.5" title="Manpower">
-                            <HardHat className="w-3.5 h-3.5" /> {log.manpower}
+                            <HardHat className="w-3.5 h-3.5" /> <span className="text-sm">{log.manpower}</span>
                           </span>
                           {photoCount > 0 && (
                             <span className="flex items-center gap-1.5" title="Photos">
-                              <ImageIcon className="w-3.5 h-3.5 text-blue-500" /> {photoCount}
+                              <ImageIcon className="w-3.5 h-3.5" /> <span className="text-sm">{photoCount}</span>
                             </span>
                           )}
                         </div>
@@ -234,10 +240,7 @@ const ProjectLogsTab = ({ projectId }) => {
                         <div className="flex items-center gap-2">
                           {submitter ? (
                             <>
-                              <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold">
-                                {submitter.name?.charAt(0)}
-                              </div>
-                              <span className="text-sm font-medium text-slate-700">{submitter.name}</span>
+                              <span className="text-sm text-slate-500">{submitter.name}</span>
                             </>
                           ) : (
                             <span className="text-sm text-slate-400">Unknown</span>
@@ -245,7 +248,7 @@ const ProjectLogsTab = ({ projectId }) => {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200">
+                        <span className="text-sm text-slate-500">
                           +{log.percentageCompleted}%
                         </span>
                       </td>

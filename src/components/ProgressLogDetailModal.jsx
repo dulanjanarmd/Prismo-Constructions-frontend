@@ -222,9 +222,7 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
                 ) : (
                   comments.map(c => (
                     <div key={c.id} className="flex gap-3">
-                      <div className="w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-                        {c.author?.charAt(0)}
-                      </div>
+
                       <div className="flex-1 bg-slate-50  rounded-lg p-3 border border-border">
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-xs font-bold text-slate-700 ">{c.author}</span>
