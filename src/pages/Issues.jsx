@@ -145,13 +145,11 @@ const Issues = () => {
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
             Site Issues
           </h1>
-          <p className="text-slate-500 mt-1">{openCount} active issues require attention.</p>
         </div>
         <button
           onClick={() => setIsAdding(true)}
           className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30 font-bold"
         >
-          <Plus className="w-5 h-5 mr-2" />
           Report Issue
         </button>
       </div>
