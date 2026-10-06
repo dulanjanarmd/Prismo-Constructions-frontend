@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { Calendar, Edit2, Activity, X, CheckSquare, AlertTriangle, Clock, FileText, Trash2 } from 'lucide-react';
+import { Calendar, Edit2, Activity, X, CheckSquare, AlertTriangle, Clock, FileText, Trash2, MapPin, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -24,8 +24,11 @@ const ProjectOverviewTab = ({ project }) => {
   const { updateProject, deleteProject, tasks, approvals, logs, users } = useData();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const isClient = currentUser?.role === 'client';
+  const userRole = currentUser?.role?.toLowerCase() || '';
+  const isClient = userRole === 'client';
+  const isPMorCEO = userRole === 'project_manager' || userRole === 'pm' || userRole === 'ceo';
 
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [modalType, setModalType] = useState(null);
   const [formData, setFormData] = useState({
     name: project.name,
@@ -121,71 +124,19 @@ const ProjectOverviewTab = ({ project }) => {
       </div>
 
       <div className="space-y-6">
-          {/* Details Card */}
-          <div className="glass-card overflow-hidden">
-            <div className="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-slate-800">Project Details</h2>
-              {!isClient && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      if (project.status === 'On Hold') {
-                        updateProject(project.id, { status: 'Planning' }); // State machine will auto-correct this if it should be In Progress
-                      } else {
-                        updateProject(project.id, { status: 'On Hold' });
-                      }
-                    }}
-                    className={`flex items-center px-3 py-1.5 text-xs font-bold ${project.status === 'On Hold' ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-amber-500 text-white hover:bg-amber-600'} rounded-md shadow-sm transition-all`}
-                  >
-                    {project.status === 'On Hold' ? 'Resume Project' : 'Hold Project'}
-                  </button>
-                  <button
-                    onClick={() => openModal('edit')}
-                    className="flex items-center px-3 py-1.5 text-xs font-bold bg-primary text-slate-900 hover:brightness-105 rounded-md shadow-sm transition-all"
-                  >
-                    Edit Details
-                  </button>
-                  <button
-                    onClick={handleDeleteProject}
-                    className="flex items-center px-3 py-1.5 text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 rounded-md shadow-sm transition-all"
-                  >
-                    Delete Project
-                  </button>
-                </div>
-              )}
+          {/* Details Card Summary */}
+          <div className="glass-card p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">Project Configuration</h2>
+              <p className="text-sm text-slate-500">View and manage project setup, location, and dates.</p>
             </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Description</p>
-                <p className="text-slate-800  text-sm leading-relaxed">{project.description || 'No description provided.'}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div>
-                  <p className="text-sm text-slate-500 mb-1">Client</p>
-                  <p className="font-medium">{project.client}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500 mb-1">Location</p>
-                  <p className="font-medium">{project.location}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500 mb-1">Start Date</p>
-                  <div className="flex items-center text-sm">
-                    <Calendar className="w-4 h-4 mr-2 text-slate-400" />
-                    <span>{project.startDate}</span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500 mb-1">End Date</p>
-                  <div className="flex items-center text-sm">
-                    <Calendar className="w-4 h-4 mr-2 text-slate-400" />
-                    <span>{project.endDate}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <button
+              onClick={() => setIsDetailsOpen(true)}
+              className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:brightness-105 transition-all shadow-sm whitespace-nowrap"
+            >
+              View Project Details
+            </button>
           </div>
-
       </div>
 
       {/* Modals */}
@@ -244,6 +195,114 @@ const ProjectOverviewTab = ({ project }) => {
               </form>
             </motion.div>
           </div>
+        )}
+
+        {/* Slide-over Project Details */}
+        {isDetailsOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setIsDetailsOpen(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100]"
+            />
+            <motion.div
+              initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 60 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="fixed inset-y-0 right-0 w-full max-w-lg bg-white shadow-2xl z-[101] flex flex-col h-full max-h-[calc(100vh)]"
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-white/80 backdrop-blur-md z-10">
+                <div className="flex-1 min-w-0 pr-4">
+                  <div className="flex items-center gap-2 flex-wrap mb-1 -ml-2">
+                    <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-sm ${
+                      project.status === 'Completed' ? 'bg-emerald-500 text-white' :
+                      project.status === 'In Progress' ? 'bg-amber-500 text-white' : 
+                      project.status === 'Planning' ? 'bg-purple-500 text-white' : 
+                      project.status === 'On Hold' ? 'bg-red-500 text-white' : 'bg-slate-500 text-white'
+                    }`}>
+                      {project.status}
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-bold text-slate-900 leading-tight">{project.name || 'Project Details'}</h2>
+                </div>
+                <div className="flex items-center shrink-0">
+                  {isPMorCEO && (
+                    <>
+                      <button onClick={() => { setIsDetailsOpen(false); openModal('edit'); }} className="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-full transition-colors" title="Edit project">
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button onClick={handleDeleteProject} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" title="Delete project">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                  <button onClick={() => setIsDetailsOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+              
+              {/* Body */}
+              <div className="flex-1 p-6 space-y-6 overflow-y-auto">
+                {project.description && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Description</h3>
+                    <p className="text-slate-700 text-sm leading-relaxed">{project.description}</p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-start gap-2">
+                    <User className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400">Client</p>
+                      <p className="text-sm font-semibold">{project.client}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400">Location</p>
+                      <p className="text-sm font-semibold">{project.location}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 col-span-2 sm:col-span-1">
+                    <Calendar className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400">Start Date</p>
+                      <p className="text-sm font-semibold">{project.startDate || '—'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 col-span-2 sm:col-span-1">
+                    <Calendar className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400">End Date</p>
+                      <p className="text-sm font-semibold">{project.endDate || '—'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer Actions */}
+              {isPMorCEO && (
+                <div className="p-6 border-t border-border bg-slate-50/50 sticky bottom-0">
+                  <button
+                    onClick={() => {
+                      if (project.status === 'On Hold') {
+                        updateProject(project.id, { status: 'Planning' });
+                      } else {
+                        updateProject(project.id, { status: 'On Hold' });
+                      }
+                    }}
+                    className={`w-full py-2.5 hover:opacity-90 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 ${project.status === 'On Hold' ? 'bg-green-500' : 'bg-amber-500'}`}
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    {project.status === 'On Hold' ? 'Resume Project' : 'Hold Project'}
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </>
         )}
 
       </AnimatePresence>

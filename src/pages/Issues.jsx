@@ -152,7 +152,7 @@ const Issues = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             Site Issues
           </h1>
         </div>
