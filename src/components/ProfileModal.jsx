@@ -164,21 +164,16 @@ const ProfileModal = ({ onClose }) => {
 
           {activeTab === 'details' ? (
             <form onSubmit={handleSaveDetails} className="space-y-6">
-              <div className="flex items-center gap-6">
-                <div className="relative group">
-                  <div 
-                    className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-slate-200 shadow-sm relative"
-                  >
+              <div className="flex flex-col gap-2">
+                <h3 className="block text-sm font-semibold text-slate-700">Profile Picture</h3>
+                <div className="flex flex-col items-start gap-3">
+                  <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-slate-200 shadow-sm relative">
                     {previewUrl ? (
                       <img src={previewUrl} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-3xl font-bold text-slate-400">{currentUser?.name?.charAt(0)}</span>
                     )}
                   </div>
-
-                </div>
-                <div className="flex flex-col justify-center">
-                  <h3 className="block text-sm font-semibold text-slate-700 mb-2">Profile Picture</h3>
                   <div className="flex gap-3">
                     <button type="button" onClick={() => fileInputRef.current?.click()} className="w-24 px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg shadow hover:opacity-90 transition-all text-sm flex items-center justify-center">
                       Edit
