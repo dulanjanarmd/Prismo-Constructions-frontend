@@ -363,6 +363,7 @@ const ProjectIssuesTab = ({ project }) => {
                   <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider text-right">Action</th>
                 </tr>
               </thead>
+              <tbody className="divide-y divide-border">
               {activeIssues.map((issue, idx) => {
                 const assigneeStr = String(issue.assignee || issue.assigneeId || '');
                 const assignedUser = users?.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
