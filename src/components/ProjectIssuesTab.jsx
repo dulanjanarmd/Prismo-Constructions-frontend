@@ -55,16 +55,12 @@ const ProjectIssuesTab = ({ project }) => {
     ? baseActiveIssues 
     : baseActiveIssues.filter(i => i.status?.replace('_', ' ').toUpperCase() === statusFilter.toUpperCase());
 
-  const [expandedId, setExpandedId] = useState(null);
+  const [selectedIssue, setSelectedIssue] = useState(null);
 
-  const handleExpand = (issue) => {
-    if (expandedId !== issue.id) {
-      setExpandedId(issue.id);
-      if (issue.status === 'Open' || issue.status === 'OPEN') {
-        updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
-      }
-    } else {
-      setExpandedId(null);
+  const handleView = (issue) => {
+    setSelectedIssue(issue);
+    if (issue.status === 'Open' || issue.status === 'OPEN') {
+      updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
     }
   };
   const [isAdding, setIsAdding] = useState(false);
@@ -355,69 +351,97 @@ const ProjectIssuesTab = ({ project }) => {
           <p className="text-lg font-medium">No issues reported yet.</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {activeIssues.map((issue, idx) => {
-            const assigneeStr = String(issue.assignee || issue.assigneeId || '');
-            const assignedUser = users?.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
+        <div className="glass-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-slate-100 bg-slate-50/50">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider">Issue</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider">Severity</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider">Reported Date</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider text-right">Action</th>
+                </tr>
+              </thead>
+              {activeIssues.map((issue, idx) => {
+                const assigneeStr = String(issue.assignee || issue.assigneeId || '');
+                const assignedUser = users?.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
 
-            return (
-              <motion.div
-              key={issue.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.04 }}
-              className={`glass-card overflow-hidden border-l-4 ${
-                issue.severity === 'High' ? 'border-l-red-500' :
-                issue.severity === 'Medium' ? 'border-l-amber-400' : 'border-l-blue-400'
-              }`}
-            >
-              {/* Issue header */}
-              <div className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${SEVERITY_STYLES[issue.severity]}`}>
+                return (
+                  <motion.tr
+                    key={issue.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: idx * 0.03 }}
+                    className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                    onClick={() => handleView(issue)}
+                  >
+                    <td className="px-6 py-5">
+                      <div className="flex items-start gap-3">
+                        <div className={`w-1 h-10 rounded-full shrink-0 ${
+                          issue.severity === 'High' ? 'bg-red-500' :
+                          issue.severity === 'Medium' ? 'bg-amber-400' : 'bg-blue-400'
+                        }`} />
+                        <div>
+                          <p className="font-bold text-slate-900 leading-tight">{issue.title}</p>
+                          <p className="text-xs text-slate-500 mt-1 line-clamp-1">{issue.description}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md border ${SEVERITY_STYLES[issue.severity]}`}>
                         {issue.severity}
                       </span>
-                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${STATUS_STYLES[issue.status]}`}>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md ${STATUS_STYLES[issue.status]}`}>
                         {issue.status}
                       </span>
-                      <span className="text-xs text-slate-400">{issue.reportedDate}</span>
-                    </div>
-                    <h3 className="font-bold text-slate-900 ">{issue.title}</h3>
-                    <p className="text-sm text-slate-600  mt-1">{issue.description}</p>
-                  </div>
-                  <div className="flex items-center gap-4 shrink-0">
-
+                    </td>
+                    <td className="px-6 py-5 text-slate-500 text-sm whitespace-nowrap">
+                      {issue.reportedDate}
+                    </td>
+                    <td className="px-6 py-5 text-right">
                       <button
-                        onClick={() => handleExpand(issue)}
-                        className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md transition-colors"
+                        onClick={(e) => { e.stopPropagation(); handleView(issue); }}
+                        className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow inline-flex items-center justify-center"
                       >
-                        {expandedId === issue.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                        View
                       </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Expandable: Show Details */}
-                <AnimatePresence>
-                  {expandedId === issue.id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <DetailedIssue issue={issue} projects={[project]} tasks={tasks} users={users || []} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
+                    </td>
+                  </motion.tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
+      </div>
       )}
-    </div>
+
+      {/* View Issue Modal */}
+      <AnimatePresence>
+        {selectedIssue && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-end p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 60 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="glass-card w-full max-w-2xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
+                <h2 className="text-xl font-bold">Issue Details</h2>
+                <button onClick={() => setSelectedIssue(null)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                <DetailedIssue issue={selectedIssue} projects={[project]} tasks={tasks} users={users || []} />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>    </div>
   );
 };
 
