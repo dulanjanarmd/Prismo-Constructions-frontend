@@ -13,6 +13,8 @@ const ProfileModal = ({ onClose }) => {
   // Details state
   const [name, setName] = useState(currentUser?.name || '');
   const [phone, setPhone] = useState(currentUser?.phone || '');
+  const [nic, setNic] = useState(currentUser?.nic || '');
+  const [address, setAddress] = useState(currentUser?.address || '');
   
   // Picture state
   const fileInputRef = useRef(null);
@@ -24,7 +26,7 @@ const ProfileModal = ({ onClose }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
@@ -39,39 +41,6 @@ const ProfileModal = ({ onClose }) => {
         setPreviewUrl(reader.result);
       };
       reader.readAsDataURL(file);
-
-      // Auto-upload immediately
-      setLoading(true);
-      setMessage(null);
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const uploadRes = await fetch('http://localhost:8080/api/files/upload', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${currentUser.token}`
-          },
-          body: formData
-        });
-
-        if (!uploadRes.ok) {
-          throw new Error('Failed to upload image to server');
-        }
-
-        const uploadData = await uploadRes.json();
-        const finalUrl = uploadData.fullUrl || uploadData.url;
-
-        await updateProfile({ profilePictureUrl: finalUrl });
-        setMessage({ type: 'success', text: 'Profile picture updated!' });
-        setSelectedFile(null);
-      } catch (err) {
-        setMessage({ type: 'error', text: err.message || 'Failed to update picture' });
-        // Revert preview on failure
-        setPreviewUrl(currentUser?.profilePictureUrl || '');
-      } finally {
-        setLoading(false);
-      }
     }
   };
 
@@ -80,11 +49,29 @@ const ProfileModal = ({ onClose }) => {
     setLoading(true);
     setMessage(null);
     try {
+      let finalUrl = currentUser?.profilePictureUrl || '';
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        const uploadRes = await fetch('http://localhost:8080/api/files/upload', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` },
+          body: formData
+        });
+        if (!uploadRes.ok) throw new Error('Failed to upload image to server');
+        const uploadData = await uploadRes.json();
+        finalUrl = uploadData.fullUrl || uploadData.url;
+      }
+
       await updateProfile({ 
         name, 
-        phone 
+        phone,
+        nic,
+        address,
+        profilePictureUrl: finalUrl
       });
-      setMessage({ type: 'success', text: 'Profile details updated successfully!' });
+      setMessage({ type: 'success', text: 'profile info update' });
+      setSelectedFile(null);
     } catch (err) {
       setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
     } finally {
@@ -168,10 +155,9 @@ const ProfileModal = ({ onClose }) => {
 
         <div className="p-6">
           {message && (
-            <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 text-sm font-medium ${
-              message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
+            <div className={`mb-6 text-sm text-center py-1.5 px-3 rounded ${
+              message.type === 'success' ? 'bg-slate-200 text-slate-700' : 'bg-red-50 text-red-600'
             }`}>
-              {message.type === 'success' ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <AlertTriangle className="w-5 h-5 shrink-0" />}
               {message.text}
             </div>
           )}
@@ -229,7 +215,27 @@ const ProfileModal = ({ onClose }) => {
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-slate-700"
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="+94 7X XXX XXXX"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">NIC Number</label>
+                  <input
+                    type="text"
+                    value={nic}
+                    onChange={e => setNic(e.target.value)}
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-slate-700"
+                    placeholder="e.g. 199012345678 or 901234567V"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Address</label>
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={e => setAddress(e.target.value)}
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-slate-700"
+                    placeholder="123 Galle Road, Colombo"
                   />
                 </div>
                 <div className="md:col-span-2">
