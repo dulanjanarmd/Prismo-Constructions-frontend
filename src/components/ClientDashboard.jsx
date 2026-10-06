@@ -111,47 +111,53 @@ const ClientDashboard = () => {
               <p className="font-medium">No projects assigned to you yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {myProjects.map((project, idx) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="glass-card p-4 cursor-pointer hover:shadow-lg transition-all border border-border group"
-                  onClick={() => navigate(`/portal/projects/${project.id}`)}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-bold text-lg text-slate-900 group-hover:text-primary transition-colors">{project.name}</h3>
-                      <p className="text-sm text-slate-500">{project.location || 'Location Not Specified'}</p>
-                    </div>
-                    <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${STATUS_STYLE[project.status] || 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
-                      {project.status}
-                    </span>
-                  </div>
-
-                  <div className="space-y-1 mb-4">
-                    <div className="flex justify-between text-xs font-medium">
-                      <span className="text-slate-500">Progress</span>
-                      <span className="text-primary">{project.progress || 0}%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-2">
-                      <div className="bg-primary h-2 rounded-full transition-all duration-500" style={{ width: `${project.progress || 0}%` }}></div>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t border-border mt-auto space-y-3">
-                    <div className="flex items-center text-xs text-slate-500">
-                      <Calendar className="w-4 h-4 mr-1.5" />
-                      End Date: {project.endDate || 'TBD'}
-                    </div>
-                    <button className="w-full py-2 bg-slate-100 hover:bg-primary hover:text-white text-slate-700 rounded-md text-sm font-semibold transition-colors flex items-center justify-center group-hover:bg-primary group-hover:text-white">
-                      View Project <ArrowRight className="w-4 h-4 ml-1" />
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
+            <div className="glass-card overflow-x-auto mt-2 border border-slate-200">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="text-xs text-slate-400 border-b border-slate-100 bg-slate-50/50">
+                    <th className="px-4 py-4 font-medium">Project Name</th>
+                    <th className="px-4 py-4 font-medium">Location</th>
+                    <th className="px-4 py-4 font-medium">Status</th>
+                    <th className="px-4 py-4 font-medium">Progress</th>
+                    <th className="px-4 py-4 font-medium">Start Date</th>
+                    <th className="px-4 py-4 font-medium">End Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {myProjects.map((project, idx) => (
+                    <motion.tr
+                      key={project.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="hover:bg-slate-50 transition-colors cursor-pointer group bg-white"
+                      onClick={() => navigate(`/portal/projects/${project.id}`)}
+                    >
+                      <td className="px-4 py-4 font-bold text-slate-900 group-hover:text-amber-500 transition-colors">{project.name}</td>
+                      <td className="px-4 py-4 text-slate-600 font-medium">{project.location || 'Location Not Specified'}</td>
+                      <td className="px-4 py-4">
+                        <span className={`px-2.5 py-1 text-[10px] uppercase tracking-wider font-bold rounded shadow-sm whitespace-nowrap ${
+                          project.status === 'Completed' ? 'bg-emerald-500 text-white' :
+                          project.status === 'In Progress' ? 'bg-blue-500 text-white' : 
+                          project.status === 'Planning' ? 'bg-purple-500 text-white' : 'bg-red-500 text-white'
+                        }`}>
+                          {project.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-24 bg-slate-100 rounded-full h-1.5">
+                            <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: `${project.progress || 0}%` }}></div>
+                          </div>
+                          <span className="text-xs text-amber-500 font-bold">{project.progress || 0}%</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-slate-500 font-medium whitespace-nowrap">{project.startDate || 'TBD'}</td>
+                      <td className="px-4 py-4 text-slate-500 font-medium whitespace-nowrap">{project.endDate || 'TBD'}</td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

@@ -380,14 +380,14 @@ const ProjectIssuesTab = ({ project }) => {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse whitespace-nowrap">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wider">
-                <th className="px-6 py-4">Issue</th>
-                <th className="px-6 py-4">Severity</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Reported Date</th>
-                <th className="px-6 py-4 text-right">Action</th>
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-slate-100 text-xs text-slate-400">
+              <tr>
+                <th className="px-6 py-4 font-semibold tracking-wider">Issue</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Severity</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Status</th>
+                <th className="px-6 py-4 font-semibold tracking-wider">Reported Date</th>
+                <th className="px-6 py-4 font-semibold tracking-wider text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -404,8 +404,8 @@ const ProjectIssuesTab = ({ project }) => {
                     className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
                     onClick={() => handleView(issue)}
                   >
-                    <td className="px-6 py-5">
-                      <p className="font-bold text-slate-900 leading-tight">{issue.title}</p>
+                    <td className="px-6 py-5 font-bold text-slate-900 group-hover:text-primary transition-colors">
+                      {issue.title}
                     </td>
                     <td className="px-6 py-5">
                       <span className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded shadow-sm w-28 inline-block text-center ${SEVERITY_STYLES[issue.severity]}`}>
@@ -417,13 +417,13 @@ const ProjectIssuesTab = ({ project }) => {
                         {issue.status.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="px-6 py-5 text-slate-500 text-sm whitespace-nowrap">
+                    <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap">
                       {issue.reportedDate}
                     </td>
                     <td className="px-6 py-5 text-right">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleView(issue); }}
-                        className="px-6 py-1.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all ml-auto shadow-sm hover:shadow inline-flex items-center justify-center"
+                        className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow inline-flex items-center justify-center"
                       >
                         View
                       </button>
