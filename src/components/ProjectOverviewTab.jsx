@@ -199,16 +199,12 @@ const ProjectOverviewTab = ({ project }) => {
 
         {/* Slide-over Project Details */}
         {isDetailsOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setIsDetailsOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100]"
-            />
+          <div className="fixed inset-0 z-[100] flex items-center justify-end p-4 bg-black/50 backdrop-blur-sm" onClick={() => setIsDetailsOpen(false)}>
             <motion.div
               initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 60 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed inset-y-0 right-0 w-full max-w-lg bg-white shadow-2xl z-[101] flex flex-col h-full max-h-[calc(100vh)]"
+              className="glass-card w-full max-w-lg h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
+              onClick={e => e.stopPropagation()}
             >
               {/* Header */}
               <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-white/80 backdrop-blur-md z-10">
@@ -302,7 +298,7 @@ const ProjectOverviewTab = ({ project }) => {
                 </div>
               )}
             </motion.div>
-          </>
+          </div>
         )}
 
       </AnimatePresence>
