@@ -22,8 +22,8 @@ const DashboardHeader = ({ rightElement }) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
       <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 pb-1">
-          {greeting}, <span className="text-primary">{currentUser?.name || 'User'}</span>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 pb-1">
+          {greeting}, {currentUser?.name || 'User'}
         </h1>
         <div className="flex items-center gap-3 mt-1.5">
           <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 shadow-sm rounded-full text-slate-600 text-sm font-medium">
