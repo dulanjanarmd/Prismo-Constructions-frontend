@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { AlertTriangle, Plus, ChevronDown, ChevronUp, X, MessageSquare, MapPin, Wrench, Clock, User as UserIcon, Calendar, UploadCloud, Video, Edit, Trash2, CheckCircle } from 'lucide-react';
+import { AlertTriangle, Plus, ChevronDown, ChevronUp, X, MessageSquare, MapPin, Wrench, Clock, User as UserIcon, Calendar, UploadCloud, Video, Edit, Trash2, CheckCircle, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const DetailedIssue = ({ issue, projects, tasks, users }) => {
@@ -17,6 +17,7 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
   
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [meetingData, setMeetingData] = useState({ title: '', scheduledTime: '', meetingLink: '' });
+  const [showAttachMenu, setShowAttachMenu] = useState(false);
 
   const [uploading, setUploading] = useState(false);
   const [commentPhoto, setCommentPhoto] = useState('');
@@ -90,6 +91,14 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
   
   const reporterStr = String(issue.reportedBy || issue.reportedById || '');
   const reporterUser = users.find(u => String(u.id) === reporterStr) || { name: 'Unknown', role: '' };
+  
+  const isReporter = String(currentUser.id).replace(/^u/, '') === reporterStr.replace(/^u/, '');
+
+  useEffect(() => {
+    if ((issue.status === 'OPEN' || issue.status === 'Open') && !isReporter) {
+      updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
+    }
+  }, [issue.status, issue.id, isReporter, updateIssueStatus]);
   const getFileUrl = (url) => url?.startsWith('/uploads/') ? `http://localhost:8080${url}` : url;
   const isImageFile = (url) => /\.(png|jpe?g|gif|webp|bmp)(\?.*)?$/i.test(url || '');
 
@@ -238,152 +247,227 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this issue?')) {
-      await deleteIssue(issue.id);
-    }
+    await deleteIssue(issue.id);
   };
 
   const handleResolve = async () => {
-    if (window.confirm('Mark this issue as resolved?')) {
-      await updateIssueStatus(String(issue.id).replace('i', ''), 'RESOLVED', null);
-    }
+    await updateIssueStatus(String(issue.id).replace('i', ''), 'RESOLVED', null);
   };
 
-  const isReporter = String(currentUser.id).replace(/^u/, '') === reporterStr.replace(/^u/, '');
+
 
   return (
-    <div className="border-t border-border bg-slate-50/50 px-5 py-6 relative">
-      {/* Actions Toolbar */}
-      {isReporter && (
-        <div className="flex gap-2 justify-end mb-4">
-          {issue.status !== 'RESOLVED' && issue.status !== 'Resolved' && (
-            <>
-              <button onClick={handleResolve} className="flex items-center text-xs font-semibold px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded-md transition-colors">
-                <CheckCircle className="w-3 h-3 mr-1" /> Resolve
-              </button>
-              <button onClick={() => setIsEditModalOpen(true)} className="px-4 py-1.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow">
-                Edit
-              </button>
-            </>
-          )}
-          <button onClick={handleDelete} className="px-4 py-1.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow">
-            Delete
-          </button>
-        </div>
-      )}
-
-      {/* Details Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-sm">
-        {issue.location && (
-          <div className="flex items-start gap-2">
-            <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
-            <div>
-              <p className="font-semibold text-slate-700">Location</p>
-              <p className="text-slate-600">{issue.location}</p>
-            </div>
-          </div>
-        )}
-        {issue.equipmentInvolved && (
-          <div className="flex items-start gap-2">
-            <Wrench className="w-4 h-4 text-slate-400 mt-0.5" />
-            <div>
-              <p className="font-semibold text-slate-700">Equipment</p>
-              <p className="text-slate-600">{issue.equipmentInvolved}</p>
-            </div>
-          </div>
-        )}
-        {issue.estimatedDelayDays && (
-          <div className="flex items-start gap-2">
-            <Clock className="w-4 h-4 text-slate-400 mt-0.5" />
-            <div>
-              <p className="font-semibold text-slate-700">Estimated Delay</p>
-              <p className="text-slate-600">{issue.estimatedDelayDays} days</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="flex gap-6 mb-8 flex-col lg:flex-row">
-        {(issue.photoUrl || issue.documentUrl) && (
-          <div className="w-full lg:w-1/3 flex flex-col gap-3 shrink-0">
-            {issue.photoUrl && issue.photoUrl.split(',').map((url, idx) => (
-              <div key={`photo-${idx}`} className="w-full rounded-lg overflow-hidden border border-border bg-slate-50 flex items-center justify-center">
-                {isImageFile(url) ? (
-                  <img src={getFileUrl(url)} alt={`Issue Evidence ${idx + 1}`} className="w-full h-auto object-cover max-h-64" />
-                ) : (
-                  <a href={getFileUrl(url)} target="_blank" rel="noreferrer" className="block p-4 text-sm text-indigo-600 hover:underline w-full text-center">
-                    Open issue attachment {idx + 1}
-                  </a>
-                )}
-              </div>
-            ))}
-            {issue.documentUrl && issue.documentUrl.split(',').map((url, idx) => (
-              <a key={`doc-${idx}`} href={getFileUrl(url)} target="_blank" rel="noreferrer" className="block p-3 text-sm text-indigo-600 hover:underline bg-indigo-50 border border-indigo-100 rounded-lg text-center w-full font-medium">
-                View Document {idx + 1}
-              </a>
-            ))}
-          </div>
-        )}
-        <div className="flex-1">
+    <div className="flex flex-col h-full relative">
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6 flex flex-col gap-6">
+        {/* Description Section */}
+        <div className="glass-card p-6">
           <h4 className="font-bold text-slate-800 mb-2">Description</h4>
           <p className="text-slate-600 whitespace-pre-wrap">{issue.description}</p>
         </div>
-      </div>
+
+        {/* Details Grid */}
+        <div className="glass-card p-6">
+          <h4 className="font-bold text-slate-800 mb-4">Issue Details</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+            <div className="flex items-start gap-2">
+              <UserIcon className="w-4 h-4 text-slate-400 mt-0.5" />
+              <div>
+                <p className="font-semibold text-slate-700">Reported By</p>
+                <p className="text-slate-600">{users?.find(u => String(u.id) === String(issue.reportedBy || issue.reportedById || ''))?.name || 'Unknown'}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <Calendar className="w-4 h-4 text-slate-400 mt-0.5" />
+              <div>
+                <p className="font-semibold text-slate-700">Reported Date</p>
+                <p className="text-slate-600">{issue.reportedDate || issue.createdAt || '—'}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-slate-400 mt-0.5" />
+              <div>
+                <p className="font-semibold text-slate-700">Status</p>
+                <p className="text-slate-600">{issue.status}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-slate-400 mt-0.5" />
+              <div>
+                <p className="font-semibold text-slate-700">Issue Type</p>
+                <p className="text-slate-600">{issue.issueType || 'Safety'}</p>
+              </div>
+            </div>
+            {issue.tradeInvolved && (
+              <div className="flex items-start gap-2">
+                <Wrench className="w-4 h-4 text-slate-400 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-slate-700">Subcontractor / Trade</p>
+                  <p className="text-slate-600">{issue.tradeInvolved}</p>
+                </div>
+              </div>
+            )}
+            {issue.costImpact && (
+              <div className="flex items-start gap-2">
+                <span className="text-slate-400 font-bold mt-0.5 text-sm">$</span>
+                <div>
+                  <p className="font-semibold text-slate-700">Est. Cost Impact</p>
+                  <p className="text-slate-600">${Number(issue.costImpact).toLocaleString()}</p>
+                </div>
+              </div>
+            )}
+            {issue.location && (
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-slate-700">Location</p>
+                  <p className="text-slate-600">{issue.location}</p>
+                </div>
+              </div>
+            )}
+            {issue.equipmentInvolved && (
+              <div className="flex items-start gap-2">
+                <Wrench className="w-4 h-4 text-slate-400 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-slate-700">Equipment</p>
+                  <p className="text-slate-600">{issue.equipmentInvolved}</p>
+                </div>
+              </div>
+            )}
+            {issue.estimatedDelayDays && (
+              <div className="flex items-start gap-2">
+                <Clock className="w-4 h-4 text-slate-400 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-slate-700">Estimated Delay</p>
+                  <p className="text-slate-600">{issue.estimatedDelayDays} days</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Media & Documents */}
+        {(issue.photoUrl || issue.documentUrl) && (
+          <div className="glass-card p-6">
+            <h4 className="font-bold text-slate-800 mb-4">Supporting Evidence</h4>
+            <div className="flex flex-col gap-3">
+              {issue.photoUrl && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {issue.photoUrl.split(',').map((url, idx) => (
+                    <div key={`photo-${idx}`} className="w-full rounded-lg overflow-hidden border border-border bg-slate-50 flex items-center justify-center">
+                      {isImageFile(url) ? (
+                        <img src={getFileUrl(url)} alt={`Issue Evidence ${idx + 1}`} className="w-full h-32 object-cover" />
+                      ) : (
+                        <a href={getFileUrl(url)} target="_blank" rel="noreferrer" className="block p-4 text-sm text-amber-600 hover:underline w-full text-center">
+                          Attachment {idx + 1}
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {issue.documentUrl && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {issue.documentUrl.split(',').map((url, idx) => (
+                    <a key={`doc-${idx}`} href={getFileUrl(url)} target="_blank" rel="noreferrer" className="inline-flex p-3 text-sm text-amber-600 hover:underline bg-amber-50 border border-amber-100 rounded-lg font-medium">
+                      View Document {idx + 1}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
       {/* Timeline */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+      <div className="glass-card p-6">
         <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-indigo-500" /> Resolution Timeline
+          Resolution Timeline
         </h4>
         
         {loading ? (
           <p className="text-slate-400 text-sm">Loading timeline...</p>
         ) : (
           <div className="space-y-4 mb-6 max-h-96 overflow-y-auto pr-2">
-            {[...comments, ...meetings].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).map(item => {
-              const isMeeting = !!item.meetingLink;
-              
-              if (isMeeting) {
-                return (
-                  <div key={`m${item.id}`} className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-3">
-                    <Video className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-blue-900">{item.title}</p>
-                      <p className="text-xs text-blue-700 mb-2">Organized by {item.organizer?.name || 'Unknown'} for {new Date(item.scheduledTime).toLocaleString()}</p>
-                      <a href={item.meetingLink} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline font-medium">Join Meeting →</a>
-                    </div>
-                  </div>
-                );
-              }
+            {(() => {
+              const sortedItems = [...comments, ...meetings].sort((a, b) => new Date(a.createdAt || a.scheduledTime) - new Date(b.createdAt || b.scheduledTime));
+              let lastDate = null;
 
-              const isInfoReq = item.commentType === 'INFO_REQUEST';
-              const isSolution = item.commentType === 'SOLUTION';
-              
-              return (
-                <div key={`c${item.id}`} className={`p-3 rounded-lg border ${isSolution ? 'bg-green-50 border-green-200' : isInfoReq ? 'bg-orange-50 border-orange-200' : 'bg-slate-50 border-slate-100'}`}>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold text-sm text-slate-800">{item.sender?.name || 'User'} <span className="text-xs text-slate-500 font-normal">({item.sender?.role || ''})</span></span>
-                    <span className="text-xs text-slate-400">{new Date(item.createdAt).toLocaleString()}</span>
-                  </div>
-                  {isSolution && <span className="text-xs font-bold text-green-700 uppercase mb-1 block">Solution Provided</span>}
-                  {isInfoReq && <span className="text-xs font-bold text-orange-700 uppercase mb-1 block">Information Requested</span>}
-                  <p className="text-sm text-slate-700">{item.message}</p>
-                  {item.photoUrl && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {item.photoUrl.split(',').map((url, idx) => (
-                        isImageFile(url) ? (
-                          <img key={idx} src={getFileUrl(url)} alt={`Attached ${idx+1}`} className="rounded max-w-xs max-h-40 border border-slate-200" />
-                        ) : (
-                          <a key={idx} href={getFileUrl(url)} target="_blank" rel="noreferrer" className="inline-block text-sm text-indigo-600 hover:underline bg-indigo-50 px-3 py-1.5 rounded border border-indigo-100 font-medium">
-                            View Attached File {idx + 1}
-                          </a>
-                        )
-                      ))}
+              return sortedItems.map(item => {
+                const itemDate = new Date(item.createdAt || item.scheduledTime);
+                const dateString = itemDate.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const timeString = itemDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const showDateHeader = lastDate !== dateString;
+                lastDate = dateString;
+                
+                const isMeeting = !!item.meetingLink;
+                
+                const renderItem = () => {
+                  if (isMeeting) {
+                    return (
+                      <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-3 w-full">
+                        <Video className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-blue-900">{item.title}</p>
+                          <p className="text-xs text-blue-700 mb-2">Organized by {item.organizer?.name || 'Unknown'} for {timeString}</p>
+                          <a href={item.meetingLink} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline font-medium">Join Meeting →</a>
+                        </div>
+                        <span className="text-xs text-blue-400 mt-auto">{timeString}</span>
+                      </div>
+                    );
+                  }
+
+                  const isInfoReq = item.commentType === 'INFO_REQUEST';
+                  const isSolution = item.commentType === 'SOLUTION';
+                  const isOwn = String(item.sender?.id) === String(currentUser?.id) || String(item.senderId) === String(currentUser?.id);
+                  
+                  return (
+                    <div className={`flex w-full ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`p-3 rounded-lg shadow-sm border max-w-[85%] min-w-[120px] relative pb-6 ${
+                        isSolution ? 'bg-green-50 border-green-200' : 
+                        isInfoReq ? 'bg-orange-50 border-orange-200' : 
+                        isOwn ? 'bg-amber-100 border-amber-200' : 'bg-slate-100 border-slate-200'
+                      }`}>
+                        <div className="flex justify-between items-center mb-1 gap-4">
+                          <span className="font-semibold text-sm text-slate-800">{isOwn ? 'You' : item.sender?.name || 'User'} {!isOwn && <span className="text-xs text-slate-500 font-normal">({item.sender?.role || ''})</span>}</span>
+                        </div>
+                        {isSolution && <span className="text-xs font-bold text-green-700 uppercase mb-1 block">Solution Provided</span>}
+                        {isInfoReq && <span className="text-xs font-bold text-orange-700 uppercase mb-1 block">Information Requested</span>}
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{item.message}</p>
+                        {item.photoUrl && (
+                          <div className={`flex flex-wrap gap-2 mt-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                            {item.photoUrl.split(',').map((url, idx) => (
+                              isImageFile(url) ? (
+                                <img key={idx} src={getFileUrl(url)} alt={`Attached ${idx+1}`} className="rounded max-w-xs max-h-40 border border-slate-200" />
+                              ) : (
+                                <a key={idx} href={getFileUrl(url)} target="_blank" rel="noreferrer" className="inline-block text-sm text-amber-600 hover:underline bg-amber-50 px-3 py-1.5 rounded border border-amber-100 font-medium">
+                                  View Attached File {idx + 1}
+                                </a>
+                              )
+                            ))}
+                          </div>
+                        )}
+                        <span className="text-[10px] text-slate-500 absolute bottom-1.5 right-3 whitespace-nowrap">{timeString}</span>
+                      </div>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                };
+
+                return (
+                  <React.Fragment key={`${isMeeting ? 'm' : 'c'}${item.id}`}>
+                    {showDateHeader && (
+                      <div className="flex justify-center my-4">
+                        <span className="bg-slate-50 border border-slate-200 text-slate-500 text-xs px-3 py-1 rounded shadow-sm font-medium">
+                          {dateString}
+                        </span>
+                      </div>
+                    )}
+                    {renderItem()}
+                  </React.Fragment>
+                );
+              });
+            })()}
             {comments.length === 0 && meetings.length === 0 && <p className="text-sm text-slate-400 italic">No updates yet.</p>}
           </div>
         )}
@@ -391,65 +475,114 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
         {/* Comment Box */}
         {issue.status !== 'RESOLVED' && (
           <div className="border-t border-slate-100 pt-4">
-            <div className="flex gap-2 mb-2">
-              <select className="text-sm border border-slate-200 rounded px-2 py-1 outline-none bg-slate-50" value={commentType} onChange={e => setCommentType(e.target.value)}>
-                <option value="GENERAL">General Comment</option>
-                {(currentUser.role === 'PROJECT_MANAGER' || currentUser.role === 'CEO') && <option value="INFO_REQUEST">Request Info</option>}
-                <option value="SOLUTION">Provide Solution</option>
-              </select>
-              <button onClick={() => setIsMeetingModalOpen(true)} className="text-sm border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded px-3 py-1 flex items-center transition-colors">
-                <Calendar className="w-3 h-3 mr-1" /> Schedule Meeting
-              </button>
-              {(currentUser.role === 'PROJECT_MANAGER') && (
-                <button onClick={handleEscalateToCEO} className="text-sm border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded px-3 py-1 transition-colors ml-auto">
-                  Escalate to CEO
-                </button>
+            <div className="border border-slate-300 rounded-lg bg-white overflow-visible focus-within:ring-2 focus-within:ring-amber-500 transition-all shadow-sm relative">
+              <textarea
+                rows="2"
+                className="w-full p-3 text-sm outline-none resize-none bg-transparent"
+                placeholder="Type your message..."
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+              />
+              
+              {commentPhoto && (
+                <div className="flex flex-wrap gap-2 px-3 pb-2">
+                  {commentPhoto.split(',').map((url, idx) => (
+                    <div key={idx} className="relative group flex items-center bg-slate-50 border border-slate-200 rounded px-2 py-1 pr-7">
+                      {isImageFile(url) ? (
+                        <img src={getFileUrl(url)} alt="upload" className="h-6 w-6 object-cover rounded mr-2" />
+                      ) : (
+                        <UploadCloud className="w-4 h-4 text-slate-400 mr-2" />
+                      )}
+                      <span className="text-xs truncate max-w-[150px] text-slate-600">File {idx + 1}</span>
+                      <button type="button" onClick={() => removeCommentFile(idx)} className="absolute right-1 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 p-0.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
-            </div>
-            
-            <textarea
-              rows="2"
-              className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
-              placeholder="Type your message..."
-              value={newComment}
-              onChange={e => setNewComment(e.target.value)}
-            />
-            
-            {commentPhoto && (
-              <div className="flex flex-wrap gap-2 mt-2 mb-2">
-                {commentPhoto.split(',').map((url, idx) => (
-                  <div key={idx} className="relative group flex items-center bg-slate-50 border border-slate-200 rounded px-2 py-1 pr-7">
-                    {isImageFile(url) ? (
-                      <img src={getFileUrl(url)} alt="upload" className="h-6 w-6 object-cover rounded mr-2" />
-                    ) : (
-                      <UploadCloud className="w-4 h-4 text-slate-400 mr-2" />
+              
+              <div className="flex justify-between items-center p-2 bg-slate-50 border-t border-slate-100 rounded-b-lg">
+                <div className="flex items-center relative">
+                  <button 
+                    type="button"
+                    onClick={() => setShowAttachMenu(!showAttachMenu)}
+                    className={`p-2 rounded-md transition-colors ${showAttachMenu ? 'bg-slate-200 text-slate-700' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-200'}`}
+                    title="Attach"
+                  >
+                    <Paperclip className="w-5 h-5" />
+                  </button>
+                  
+                  <AnimatePresence>
+                    {showAttachMenu && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden z-20"
+                      >
+                        <div className="flex flex-col">
+                          <label htmlFor={`upload-${issue.id}`} className="cursor-pointer px-4 py-3 flex items-center gap-3 hover:bg-slate-50 text-sm text-slate-700 transition-colors border-b border-slate-100">
+                            <UploadCloud className="w-4 h-4 text-amber-500" />
+                            Upload File
+                          </label>
+                          <input type="file" id={`upload-${issue.id}`} className="hidden" onChange={(e) => { handleFileUpload(e); setShowAttachMenu(false); }} disabled={uploading || (commentPhoto && commentPhoto.split(',').length >= 5)} />
+                          
+                          <button type="button" onClick={() => { setIsMeetingModalOpen(true); setShowAttachMenu(false); }} className="px-4 py-3 flex items-center gap-3 hover:bg-slate-50 text-sm text-slate-700 transition-colors text-left border-b border-slate-100">
+                            <Calendar className="w-4 h-4 text-amber-500" />
+                            Schedule Meeting
+                          </button>
+
+                          {(currentUser.role === 'PROJECT_MANAGER') && (
+                            <button type="button" onClick={() => { handleEscalateToCEO(); setShowAttachMenu(false); }} className="px-4 py-3 flex items-center gap-3 hover:bg-slate-50 text-sm text-slate-700 transition-colors text-left">
+                              <AlertTriangle className="w-4 h-4 text-red-500" />
+                              Escalate to CEO
+                            </button>
+                          )}
+                        </div>
+                      </motion.div>
                     )}
-                    <span className="text-xs truncate max-w-[150px] text-slate-600">File {idx + 1}</span>
-                    <button type="button" onClick={() => removeCommentFile(idx)} className="absolute right-1 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 p-0.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors">
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
+                  </AnimatePresence>
+                  
+                  {uploading && <span className="text-xs text-amber-600 ml-3 font-medium">Uploading...</span>}
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <select className="text-xs border border-slate-200 rounded px-2 py-1.5 outline-none bg-white text-slate-700 font-medium shadow-sm cursor-pointer" value={commentType} onChange={e => setCommentType(e.target.value)}>
+                    <option value="GENERAL">General Comment</option>
+                    {(currentUser.role === 'PROJECT_MANAGER' || currentUser.role === 'CEO') && <option value="INFO_REQUEST">Request Info</option>}
+                    <option value="SOLUTION">Provide Solution</option>
+                  </select>
+                  <button onClick={submitComment} disabled={uploading || (!newComment.trim() && !commentPhoto)} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white px-5 py-1.5 rounded-lg text-sm font-bold transition-all shadow-sm flex items-center gap-2">
+                    Send
+                  </button>
+                </div>
               </div>
-            )}
-            
-            <div className="flex justify-between items-center mt-2">
-              <div className="flex items-center gap-2">
-                <input type="file" id={`upload-${issue.id}`} className="hidden" onChange={handleFileUpload} disabled={uploading || (commentPhoto && commentPhoto.split(',').length >= 5)} />
-                <label htmlFor={`upload-${issue.id}`} className={`cursor-pointer flex items-center text-sm font-medium transition-colors ${commentPhoto && commentPhoto.split(',').length >= 5 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-500 hover:text-slate-700'}`}>
-                  <UploadCloud className="w-4 h-4 mr-1" />
-                  {uploading ? 'Uploading...' : 'Attach File'}
-                </label>
-              </div>
-              <button onClick={submitComment} disabled={uploading || (!newComment.trim() && !commentPhoto)} className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">
-                Send
-              </button>
             </div>
           </div>
         )}
       </div>
+      </div> {/* End scrollable area */}
 
-      {/* Meeting Modal */}
+      {/* Sticky Footer for Actions */}
+      {isReporter && (
+        <div className="p-4 border-t border-border bg-slate-50/50 flex w-full gap-4 shrink-0">
+          {issue.status !== 'RESOLVED' && issue.status !== 'Resolved' && (
+            <>
+              <button onClick={handleResolve} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-green-500 text-white hover:bg-green-600 rounded-lg transition-all shadow-sm hover:shadow">
+                Resolved
+              </button>
+              <button onClick={() => setIsEditModalOpen(true)} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow">
+                Edit
+              </button>
+            </>
+          )}
+          <button onClick={handleDelete} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow">
+            Delete
+          </button>
+        </div>
+      )}      {/* Meeting Modal */}
       <AnimatePresence>
         {isMeetingModalOpen && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
@@ -461,22 +594,22 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
               <form onSubmit={submitMeeting} className="p-6 space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Meeting Title</label>
-                  <input required type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={meetingData.title} onChange={e => setMeetingData({...meetingData, title: e.target.value})} />
+                  <input required type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500" value={meetingData.title} onChange={e => setMeetingData({...meetingData, title: e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Date & Time</label>
-                  <input required type="datetime-local" min={minMeetingDate} max={maxMeetingDate} className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={meetingData.scheduledTime} onChange={e => setMeetingData({...meetingData, scheduledTime: e.target.value})} />
+                  <input required type="datetime-local" min={minMeetingDate} max={maxMeetingDate} className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500" value={meetingData.scheduledTime} onChange={e => setMeetingData({...meetingData, scheduledTime: e.target.value})} />
                   <p className="text-xs text-slate-500 mt-1">
                     {minMeetingDate && maxMeetingDate ? `Must be between ${new Date(minMeetingDate).toLocaleDateString()} and ${new Date(maxMeetingDate).toLocaleDateString()}` : ''}
                   </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Meeting Link (Zoom/Meet)</label>
-                  <input required type="url" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={meetingData.meetingLink} onChange={e => setMeetingData({...meetingData, meetingLink: e.target.value})} />
+                  <input required type="url" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500" value={meetingData.meetingLink} onChange={e => setMeetingData({...meetingData, meetingLink: e.target.value})} />
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
                   <button type="button" onClick={() => setIsMeetingModalOpen(false)} className="px-4 py-2 text-sm font-medium hover:bg-slate-100 rounded-md">Cancel</button>
-                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-md">Schedule</button>
+                  <button type="submit" className="px-4 py-2 text-sm font-medium bg-amber-600 text-white rounded-md">Schedule</button>
                 </div>
               </form>
             </motion.div>
@@ -496,7 +629,7 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
               <form onSubmit={handleEdit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                 <div>
                   <label className="block text-sm font-medium mb-1">Related Task</label>
-                  <select className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={editData.taskId || ''} onChange={e => setEditData({...editData, taskId: e.target.value})}>
+                  <select className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500" value={editData.taskId || ''} onChange={e => setEditData({...editData, taskId: e.target.value})}>
                     <option value="">General Site Issue</option>
                     {tasks.filter(t => String(t.projectId).replace('p', '') === String(issue.projectId).replace('p', '')).map(t => (
                       <option key={t.id} value={t.id}>{t.title}</option>
@@ -505,16 +638,16 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Title</label>
-                  <input required type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={editData.title} onChange={e => setEditData({...editData, title: e.target.value})} />
+                  <input required type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500" value={editData.title} onChange={e => setEditData({...editData, title: e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Description</label>
-                  <textarea required rows="3" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500 resize-none" value={editData.description} onChange={e => setEditData({...editData, description: e.target.value})} />
+                  <textarea required rows="3" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500 resize-none" value={editData.description} onChange={e => setEditData({...editData, description: e.target.value})} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Severity</label>
-                    <select className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={editData.severity} onChange={e => setEditData({...editData, severity: e.target.value})}>
+                    <select className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500" value={editData.severity} onChange={e => setEditData({...editData, severity: e.target.value})}>
                       <option value="High">High</option>
                       <option value="Medium">Medium</option>
                       <option value="Low">Low</option>
@@ -522,15 +655,15 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Location</label>
-                    <input type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={editData.location || ''} onChange={e => setEditData({...editData, location: e.target.value})} />
+                    <input type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500" value={editData.location || ''} onChange={e => setEditData({...editData, location: e.target.value})} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Equipment</label>
-                    <input type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={editData.equipmentInvolved || ''} onChange={e => setEditData({...editData, equipmentInvolved: e.target.value})} />
+                    <input type="text" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500" value={editData.equipmentInvolved || ''} onChange={e => setEditData({...editData, equipmentInvolved: e.target.value})} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Est. Delay (Days)</label>
-                    <input type="number" min="0" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-indigo-500" value={editData.estimatedDelayDays || ''} onChange={e => setEditData({...editData, estimatedDelayDays: e.target.value ? parseInt(e.target.value) : null})} />
+                    <input type="number" min="0" className="w-full border border-slate-300 rounded p-2 text-sm outline-none focus:border-amber-500" value={editData.estimatedDelayDays || ''} onChange={e => setEditData({...editData, estimatedDelayDays: e.target.value ? parseInt(e.target.value) : null})} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-4">

@@ -7,21 +7,27 @@ import { motion, AnimatePresence } from 'framer-motion';
 import DetailedIssue from './DetailedIssue';
 
 const SEVERITY_STYLES = {
-  High: 'bg-red-100 text-red-700 border-red-200',
-  Medium: 'bg-amber-100 text-amber-700 border-amber-200',
-  Low: 'bg-blue-100 text-blue-700 border-blue-200'
+  High: 'bg-red-500 text-white shadow-sm',
+  Medium: 'bg-amber-500 text-white shadow-sm',
+  Low: 'bg-blue-500 text-white shadow-sm'
 };
 
 const STATUS_STYLES = {
-  Open: 'bg-red-50 text-red-600',
-  'In Progress': 'bg-amber-50 text-amber-600',
-  Resolved: 'bg-green-50 text-green-600'
+  Open: 'bg-red-500 text-white shadow-sm',
+  OPEN: 'bg-red-500 text-white shadow-sm',
+  'In Progress': 'bg-amber-500 text-white shadow-sm',
+  IN_PROGRESS: 'bg-amber-500 text-white shadow-sm',
+  Resolved: 'bg-emerald-500 text-white shadow-sm',
+  RESOLVED: 'bg-emerald-500 text-white shadow-sm'
 };
 
 const STATUS_NEXT = {
   Open: 'In Progress',
+  OPEN: 'IN_PROGRESS',
   'In Progress': 'Resolved',
-  Resolved: 'Open'
+  IN_PROGRESS: 'RESOLVED',
+  Resolved: 'Open',
+  RESOLVED: 'OPEN'
 };
 
 const ProjectIssuesTab = ({ project }) => {
@@ -67,7 +73,7 @@ const ProjectIssuesTab = ({ project }) => {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
   const [formData, setFormData] = useState({
-    title: '', description: '', severity: 'Medium', location: '', equipmentInvolved: '', estimatedDelayDays: '', taskId: '', photoUrl: '', documentUrl: ''
+    title: '', description: '', severity: 'Medium', location: '', equipmentInvolved: '', estimatedDelayDays: '', taskId: '', photoUrl: '', documentUrl: '', issueType: 'Safety', costImpact: '', tradeInvolved: ''
   });
 
   const openCount = baseActiveIssues.filter(i => i.status === 'Open' || i.status === 'OPEN').length;
@@ -94,7 +100,7 @@ const ProjectIssuesTab = ({ project }) => {
     const newIssue = { ...formData, projectId: project.id, status: 'OPEN' };
     try {
       await addIssue(newIssue);
-      setFormData({ taskId: '', title: '', description: '', severity: 'Medium', location: '', equipmentInvolved: '', estimatedDelayDays: '', photoUrl: '', documentUrl: '' });
+      setFormData({ taskId: '', title: '', description: '', severity: 'Medium', location: '', equipmentInvolved: '', estimatedDelayDays: '', photoUrl: '', documentUrl: '', issueType: 'Safety', costImpact: '', tradeInvolved: '' });
       setIsAdding(false);
     } catch (err) {
       console.error(err);
@@ -160,8 +166,8 @@ const ProjectIssuesTab = ({ project }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header & Filters */}
-      <div className="glass-card flex flex-col overflow-hidden mb-6">
+      {/* Combined Header, Form & Table */}
+      <div className="glass-card flex flex-col overflow-hidden mb-6 bg-white">
         <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
           <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
             <h2 className="text-xl font-bold leading-tight shrink-0">
@@ -222,7 +228,6 @@ const ProjectIssuesTab = ({ project }) => {
             )}
           </div>
         </div>
-      </div>
 
       {/* Add form */}
       <AnimatePresence>
@@ -232,7 +237,7 @@ const ProjectIssuesTab = ({ project }) => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             onSubmit={handleSubmit}
-            className="glass-card p-6 border-2 border-red-300/40 overflow-hidden"
+            className="p-6 border-b border-slate-200 bg-red-50/30 overflow-hidden"
           >
             <h3 className="font-semibold mb-4 flex items-center text-lg">
               <AlertTriangle className="w-5 h-5 mr-2 text-red-500" />
@@ -259,6 +264,29 @@ const ProjectIssuesTab = ({ project }) => {
                 <div>
                   <label className="block text-sm font-medium mb-1">Est. Delay (Days) <span className="text-red-500">*</span></label>
                   <input required type="number" min="0" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.estimatedDelayDays} onChange={e => setFormData({ ...formData, estimatedDelayDays: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Issue Type <span className="text-red-500">*</span></label>
+                  <select required className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.issueType} onChange={e => setFormData({ ...formData, issueType: e.target.value })}>
+                    <option value="Safety">Safety</option>
+                    <option value="Quality">Quality Control</option>
+                    <option value="Material">Material Shortage</option>
+                    <option value="Equipment">Equipment Failure</option>
+                    <option value="Design">Design Change</option>
+                    <option value="Weather">Weather Delay</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Subcontractor / Trade</label>
+                  <input type="text" placeholder="e.g. Electrical, Plumbing" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.tradeInvolved} onChange={e => setFormData({ ...formData, tradeInvolved: e.target.value })} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Est. Cost Impact ($)</label>
+                  <input type="number" min="0" placeholder="e.g. 5000" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.costImpact} onChange={e => setFormData({ ...formData, costImpact: e.target.value })} />
                 </div>
               </div>
 
@@ -346,24 +374,23 @@ const ProjectIssuesTab = ({ project }) => {
 
       {/* Issues list */}
       {activeIssues.length === 0 ? (
-        <div className="glass-card p-12 text-center text-slate-500">
+        <div className="p-12 text-center text-slate-500 bg-white">
           <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-40" />
           <p className="text-lg font-medium">No issues reported yet.</p>
         </div>
       ) : (
-        <div className="glass-card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-100 bg-slate-50/50">
-                <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider">Issue</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider">Severity</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider">Reported Date</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 tracking-wider text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse whitespace-nowrap">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wider">
+                <th className="px-6 py-4">Issue</th>
+                <th className="px-6 py-4">Severity</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Reported Date</th>
+                <th className="px-6 py-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
               {activeIssues.map((issue, idx) => {
                 const assigneeStr = String(issue.assignee || issue.assigneeId || '');
                 const assignedUser = users?.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
@@ -378,25 +405,16 @@ const ProjectIssuesTab = ({ project }) => {
                     onClick={() => handleView(issue)}
                   >
                     <td className="px-6 py-5">
-                      <div className="flex items-start gap-3">
-                        <div className={`w-1 h-10 rounded-full shrink-0 ${
-                          issue.severity === 'High' ? 'bg-red-500' :
-                          issue.severity === 'Medium' ? 'bg-amber-400' : 'bg-blue-400'
-                        }`} />
-                        <div>
-                          <p className="font-bold text-slate-900 leading-tight">{issue.title}</p>
-                          <p className="text-xs text-slate-500 mt-1 line-clamp-1">{issue.description}</p>
-                        </div>
-                      </div>
+                      <p className="font-bold text-slate-900 leading-tight">{issue.title}</p>
                     </td>
                     <td className="px-6 py-5">
-                      <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md border ${SEVERITY_STYLES[issue.severity]}`}>
+                      <span className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded shadow-sm w-28 inline-block text-center ${SEVERITY_STYLES[issue.severity]}`}>
                         {issue.severity}
                       </span>
                     </td>
                     <td className="px-6 py-5">
-                      <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md ${STATUS_STYLES[issue.status]}`}>
-                        {issue.status}
+                      <span className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded shadow-sm w-28 inline-block text-center ${STATUS_STYLES[issue.status] || STATUS_STYLES['Open']}`}>
+                        {issue.status.replace('_', ' ')}
                       </span>
                     </td>
                     <td className="px-6 py-5 text-slate-500 text-sm whitespace-nowrap">
@@ -405,7 +423,7 @@ const ProjectIssuesTab = ({ project }) => {
                     <td className="px-6 py-5 text-right">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleView(issue); }}
-                        className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow inline-flex items-center justify-center"
+                        className="px-6 py-1.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all ml-auto shadow-sm hover:shadow inline-flex items-center justify-center"
                       >
                         View
                       </button>
@@ -416,8 +434,8 @@ const ProjectIssuesTab = ({ project }) => {
             </tbody>
           </table>
         </div>
-      </div>
       )}
+      </div>
 
       {/* View Issue Modal */}
       <AnimatePresence>
@@ -432,21 +450,30 @@ const ProjectIssuesTab = ({ project }) => {
             >
               <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
                 <div className="flex-1 min-w-0 pr-4">
-                  <h2 className="text-xl font-bold text-slate-900 leading-tight">{selectedIssue.title}</h2>
-                  {selectedIssue.taskId && tasks?.find(t => String(t.id) === String(selectedIssue.taskId).replace('t', '')) && (
-                    <div className="flex items-center gap-2 flex-wrap mt-2">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Related Task</span>
-                      <span className="text-xs font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                        {tasks.find(t => String(t.id) === String(selectedIssue.taskId).replace('t', '')).title}
+                  <div className="flex flex-col gap-2">
+                    <h2 className="text-xl font-bold text-slate-900 leading-tight">{selectedIssue.title}</h2>
+                    <div>
+                      <span className="text-xs font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 inline-block">
+                        {(selectedIssue.taskId && tasks?.find(t => String(t.id) === String(selectedIssue.taskId).replace('t', '')))
+                          ? tasks.find(t => String(t.id) === String(selectedIssue.taskId).replace('t', '')).title
+                          : "General Site Issue"}
                       </span>
                     </div>
-                  )}
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${SEVERITY_STYLES[selectedIssue.severity]}`}>
+                        {selectedIssue.severity}
+                      </span>
+                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${STATUS_STYLES[selectedIssue.status] || STATUS_STYLES['Open']}`}>
+                        {selectedIssue.status.replace('_', ' ')}
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 <button onClick={() => setSelectedIssue(null)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1 shrink-0">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 flex flex-col min-h-0">
                 <DetailedIssue issue={selectedIssue} projects={[project]} tasks={tasks} users={users || []} />
               </div>
             </motion.div>
