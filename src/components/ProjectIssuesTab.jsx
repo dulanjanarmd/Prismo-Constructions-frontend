@@ -430,9 +430,19 @@ const ProjectIssuesTab = ({ project }) => {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="glass-card w-full max-w-2xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
             >
-              <div className="flex items-center justify-between p-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
-                <h2 className="text-xl font-bold">Issue Details</h2>
-                <button onClick={() => setSelectedIssue(null)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1">
+              <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
+                <div className="flex-1 min-w-0 pr-4">
+                  <h2 className="text-xl font-bold text-slate-900 leading-tight">{selectedIssue.title}</h2>
+                  {selectedIssue.taskId && tasks?.find(t => String(t.id) === String(selectedIssue.taskId).replace('t', '')) && (
+                    <div className="flex items-center gap-2 flex-wrap mt-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Related Task</span>
+                      <span className="text-xs font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                        {tasks.find(t => String(t.id) === String(selectedIssue.taskId).replace('t', '')).title}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <button onClick={() => setSelectedIssue(null)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1 shrink-0">
                   <X className="w-5 h-5" />
                 </button>
               </div>
