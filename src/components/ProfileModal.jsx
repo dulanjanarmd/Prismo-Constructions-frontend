@@ -167,22 +167,18 @@ const ProfileModal = ({ onClose }) => {
               <div className="flex items-center gap-6">
                 <div className="relative group">
                   <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-slate-200 shadow-sm relative cursor-pointer"
+                    className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-slate-200 shadow-sm relative"
                   >
                     {previewUrl ? (
                       <img src={previewUrl} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-3xl font-bold text-slate-400">{currentUser?.name?.charAt(0)}</span>
                     )}
-                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                      <Camera className="w-6 h-6 text-white" />
-                    </div>
                   </div>
 
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h3 className="font-bold text-slate-900 mb-3">Profile Picture</h3>
+                  <h3 className="block text-sm font-semibold text-slate-700 mb-2">Profile Picture</h3>
                   <div className="flex gap-3">
                     <button type="button" onClick={() => fileInputRef.current?.click()} className="w-24 px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg shadow hover:opacity-90 transition-all text-sm flex items-center justify-center">
                       Edit

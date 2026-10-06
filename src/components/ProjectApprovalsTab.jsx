@@ -203,21 +203,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
         </div>
       </div>
 
-      {/* Alert banner */}
-      {(pendingCount > 0 || changesCount > 0) && isPM && (
-        <div className={`rounded-lg p-4 border flex items-center gap-3 ${
-          changesCount > 0 ? 'bg-orange-50 border-orange-200  ' :
-          'bg-amber-50 border-amber-200  '
-        }`}>
-          <Clock className={`w-5 h-5 shrink-0 ${changesCount > 0 ? 'text-orange-500' : 'text-amber-500'}`} />
-          <p className="text-sm font-medium text-slate-700 ">
-            {changesCount > 0
-              ? `${changesCount} approval${changesCount > 1 ? 's' : ''} need your attention — client requested changes.`
-              : `${pendingCount} approval${pendingCount > 1 ? 's' : ''} awaiting client response.`
-            }
-          </p>
-        </div>
-      )}
+
 
       {/* Approvals list */}
       {filteredApprovals.length === 0 ? (
