@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
-import { AlertTriangle, Plus, ChevronDown, ChevronUp, X, MessageSquare, MapPin, Wrench, Clock, User as UserIcon, Calendar, UploadCloud, Video } from 'lucide-react';
+import { AlertTriangle, Plus, ChevronDown, ChevronUp, X, MessageSquare, MapPin, Wrench, Clock, User as UserIcon, Calendar, UploadCloud, Video, Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SEVERITY_STYLES = {
@@ -56,6 +56,9 @@ const Issues = () => {
     }
   };
   const [activeTab, setActiveTab] = useState(currentUser?.role === 'ceo' ? 'pm' : 'se'); // 'se' or 'pm'
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [projectFilter, setProjectFilter] = useState('All');
 
   const myProjects = projects;
   
@@ -71,6 +74,13 @@ const Issues = () => {
   const pmIssues = sortedIssues.filter(i => getReporterRole(i) === 'project_manager' || getReporterRole(i) === 'pm');
 
   const myIssues = activeTab === 'se' ? seIssues : pmIssues;
+
+  const filteredIssues = myIssues.filter(issue => {
+    const matchSearch = (issue.title && issue.title.toLowerCase().includes(searchTerm.toLowerCase())) || 
+                        (issue.description && issue.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchProject = projectFilter === 'All' || String(issue.projectId).replace('p', '') === String(projectFilter).replace('p', '');
+    return matchSearch && matchProject;
+  });
 
   const openCount = myIssues.filter(i => i.status !== 'RESOLVED').length;
 
@@ -140,18 +150,12 @@ const Issues = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
             Site Issues
           </h1>
         </div>
-        <button
-          onClick={() => setIsAdding(true)}
-          className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-lg shadow-red-500/30 font-bold"
-        >
-          Report Issue
-        </button>
       </div>
 
       {/* Tabs */}
@@ -299,15 +303,52 @@ const Issues = () => {
         )}
       </AnimatePresence>
 
-      {/* Issues list */}
-      {myIssues.length === 0 ? (
-        <div className="glass-card p-12 text-center text-slate-500">
-          <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-40" />
-          <p className="text-lg font-medium">No issues reported yet.</p>
+      {/* Filter and Issues List Container */}
+      <div className="glass-card flex flex-col overflow-hidden">
+        {/* Filters Section */}
+        <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
+          <div className="flex items-center gap-3 ml-auto min-w-max">
+            <select
+              className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all"
+              value={projectFilter}
+              onChange={e => setProjectFilter(e.target.value)}
+            >
+              <option value="All">All Projects</option>
+              {myProjects.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+            
+            <div className="relative w-48 shrink-0 h-12">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search issues..."
+                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <button
+              onClick={() => setIsAdding(true)}
+              className="flex items-center justify-center h-12 px-5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm font-bold whitespace-nowrap"
+            >
+              Report Issue
+            </button>
+          </div>
         </div>
-      ) : (
-        <div className="space-y-3">
-          {myIssues.map((issue, idx) => {
+
+        {/* Issues list */}
+        <div className="p-5 bg-slate-50/50">
+          {filteredIssues.length === 0 ? (
+            <div className="py-12 text-center text-slate-500">
+              <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-40" />
+              <p className="text-lg font-medium">No issues found.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredIssues.map((issue, idx) => {
             const project = projects.find(p => String(p.id) === String(issue.projectId));
             const task = tasks.find(t => String(t.id) === String(issue.taskId));
             
@@ -371,6 +412,8 @@ const Issues = () => {
           })}
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };
