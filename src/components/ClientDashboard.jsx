@@ -92,9 +92,9 @@ const ClientDashboard = () => {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div>
         {/* Main Content (Projects) */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-slate-900 flex items-center">
               <Briefcase className="w-5 h-5 mr-2 text-primary" />
@@ -155,41 +155,7 @@ const ClientDashboard = () => {
             </div>
           )}
         </div>
-
-        {/* Sidebar Content (Notifications & Approvals) */}
-        <div className="space-y-4">
-          <div className="glass-card p-4 border-t-4 border-t-amber-500">
-            <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center">
-              <CheckSquare className="w-5 h-5 mr-2 text-amber-500" />
-              Action Required
-            </h2>
-
-            {pendingApprovals.length > 0 ? (
-              <div className="space-y-3">
-                {pendingApprovals.slice(0, 3).map(approval => (
-                  <div key={approval.id} className="p-3 bg-amber-50 rounded-lg border border-amber-100">
-                    <h4 className="font-semibold text-sm text-slate-900 mb-1">{approval.title}</h4>
-                    <p className="text-xs text-slate-600 mb-3 line-clamp-2">{approval.description}</p>
-                    <button
-                      onClick={() => navigate('/portal/approvals')}
-                      className="text-xs font-bold text-amber-700 hover:underline"
-                    >
-                      Review &amp; Respond &rarr;
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6 text-slate-500">
-                <CheckSquare className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                <p className="text-sm">You're all caught up!</p>
-              </div>
-            )}
-          </div>
-
-        </div>
       </div>
-
       {/* Request Info Modal */}
       <AnimatePresence>
         {isRequestModalOpen && (

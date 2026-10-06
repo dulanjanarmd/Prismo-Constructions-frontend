@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Calendar } from 'lucide-react';
+import { Search, Filter, Calendar, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ProjectTable = ({ projects, title = "Projects" }) => {
@@ -51,57 +51,55 @@ const ProjectTable = ({ projects, title = "Projects" }) => {
           </div>
         </div>
       </div>
-      <div className="overflow-x-auto p-6 pt-0">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="text-xs text-slate-400 border-b border-slate-100">
-              <th className="px-4 py-3 font-medium">Project Name</th>
-              <th className="px-4 py-3 font-medium">Client</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Progress</th>
-              <th className="px-4 py-3 font-medium">Start Date</th>
-              <th className="px-4 py-3 font-medium">End Date</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50">
-            {filteredProjects.map(project => (
-              <tr 
-                key={project.id} 
-                className="hover:bg-slate-50/50 transition-colors cursor-pointer group"
-                onClick={() => navigate(`/portal/projects/${project.id}`)}
-              >
-                <td className="px-4 py-5 font-bold text-slate-900 group-hover:text-primary transition-colors">{project.name}</td>
-                <td className="px-4 py-5 text-slate-600 font-medium">{project.client}</td>
-                <td className="px-4 py-5">
-                  <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-28 inline-block text-center ${
-                    project.status === 'Completed' ? 'bg-emerald-500 text-white' :
-                    project.status === 'In Progress' ? 'bg-amber-500 text-white' : 
-                    project.status === 'Planning' ? 'bg-purple-500 text-white' : 'bg-red-500 text-white'
-                  }`}>
-                    {project.status}
-                  </span>
-                </td>
-                <td className="px-4 py-5">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-24 bg-slate-100 rounded-full h-1.5">
-                      <div className="bg-slate-900 h-1.5 rounded-full" style={{ width: `${project.progress}%` }}></div>
-                    </div>
-                    <span className="text-xs text-slate-500 font-bold">{project.progress}%</span>
-                  </div>
-                </td>
-                <td className="px-4 py-5 text-slate-500 font-medium whitespace-nowrap">{project.startDate}</td>
-                <td className="px-4 py-5 text-slate-500 font-medium whitespace-nowrap">{project.endDate}</td>
-              </tr>
-            ))}
-            {filteredProjects.length === 0 && (
-              <tr>
-                <td colSpan="7" className="px-6 py-8 text-center text-slate-500">
-                  No projects found matching the criteria.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="p-6 pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project, idx) => (
+            <div
+              key={project.id}
+              className="glass-card p-4 cursor-pointer hover:shadow-lg transition-all border border-slate-200 group flex flex-col bg-white"
+              onClick={() => navigate(`/portal/projects/${project.id}`)}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="font-bold text-lg text-slate-900 group-hover:text-amber-500 transition-colors">{project.name}</h3>
+                  <p className="text-sm text-slate-500">{project.client}</p>
+                </div>
+                <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded shadow-sm whitespace-nowrap ml-2 ${
+                  project.status === 'Completed' ? 'bg-emerald-500 text-white' :
+                  project.status === 'In Progress' ? 'bg-blue-500 text-white' : 
+                  project.status === 'Planning' ? 'bg-purple-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                  {project.status}
+                </span>
+              </div>
+
+              <div className="space-y-1 mb-4 flex-1">
+                <div className="flex justify-between text-xs font-medium">
+                  <span className="text-slate-500">Progress</span>
+                  <span className="text-amber-500 font-bold">{project.progress || 0}%</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-2">
+                  <div className="bg-amber-500 h-2 rounded-full transition-all duration-500" style={{ width: `${project.progress || 0}%` }}></div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 mt-auto space-y-3">
+                <div className="flex items-center text-xs text-slate-500">
+                  <Calendar className="w-4 h-4 mr-1.5" />
+                  End Date: {project.endDate || 'TBD'}
+                </div>
+                <button className="w-full py-2 bg-slate-50 text-slate-700 rounded-md text-sm font-semibold transition-colors flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white">
+                  View Project <ArrowRight className="w-4 h-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          ))}
+          {filteredProjects.length === 0 && (
+            <div className="col-span-full py-12 text-center text-slate-500">
+              No projects found matching the criteria.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
