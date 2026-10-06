@@ -162,21 +162,21 @@ const Tasks = () => {
           <p className="text-lg font-medium">No tasks match your filters.</p>
         </div>
       ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto p-6 pt-0">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-100">
+              <thead className="border-b border-slate-100 text-xs text-slate-400">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Task</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Project</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Milestone</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Priority</th>
-                  {!isSiteEngineer && <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Assignee</th>}
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider">Due Date</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 tracking-wider text-right">Action</th>
+                  <th className="px-6 py-4 font-semibold tracking-wider">Task</th>
+                  <th className="px-6 py-4 font-semibold tracking-wider">Project</th>
+                  <th className="px-6 py-4 font-semibold tracking-wider">Milestone</th>
+                  <th className="px-6 py-4 font-semibold tracking-wider">Priority</th>
+                  {!isSiteEngineer && <th className="px-6 py-4 font-semibold tracking-wider">Assignee</th>}
+                  <th className="px-6 py-4 font-semibold tracking-wider">Status</th>
+                  <th className="px-6 py-4 font-semibold tracking-wider">Due Date</th>
+                  <th className="px-6 py-4 font-semibold tracking-wider text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-slate-50">
                   {displayTasks.map((task, idx) => {
                     const project = projects.find(p =>
                       String(p.id) === String(task.projectId).replace('p', '') || `p${p.id}` === String(task.projectId)
@@ -204,40 +204,40 @@ const Tasks = () => {
                           {needsReview && <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" title="Needs PM review" />}
                           {task.status === 'Closed' && <Lock className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />}
                           <div>
-                            <p className="font-semibold text-slate-900 ">{task.title}</p>
+                            <p className="font-bold text-slate-900 ">{task.title}</p>
                             {task.description && (
-                              <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{task.description}</p>
+                              <p className="text-xs text-slate-500 mt-0.5 line-clamp-1 font-medium">{task.description}</p>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-5">
+                      <td className="px-6 py-5 font-medium">
                         {project ? (
                           <button
                             onClick={() => navigate(`/portal/projects/${project.id}`)}
-                            className="text-slate-700 hover:text-primary hover:underline text-xs font-medium transition-colors text-left"
+                            className="text-slate-700 hover:text-primary hover:underline text-sm font-medium transition-colors text-left"
                           >
                             {project.name}
                           </button>
                         ) : '—'}
                       </td>
-                      <td className="px-6 py-5 text-slate-500 text-sm">
+                      <td className="px-6 py-5 text-slate-600 font-medium text-sm">
                         {task.milestoneName || (projects?.find(p => String(p.id) === String(task.projectId).replace('p', ''))?.milestones?.find(m => String(m.id) === String(task.milestoneId)?.replace('m', ''))?.name) || '—'}
                       </td>
                       <td className="px-6 py-5">
-                        <span className={`px-2 py-1 text-xs font-bold rounded shadow-sm w-20 inline-block text-center ${PRIORITY_STYLES[task.priority] || ''}`}>
+                        <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-28 inline-block text-center ${PRIORITY_STYLES[task.priority] || ''}`}>
                           {task.priority}
                         </span>
                       </td>
                       {!isSiteEngineer && (
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-sm text-slate-700 ">{assignee?.name || '—'}</span>
+                            <span className="text-sm text-slate-700 font-medium">{assignee?.name || '—'}</span>
                           </div>
                         </td>
                       )}
                       <td className="px-6 py-5">
-                        <span className={`px-2.5 py-1.5 text-xs font-bold rounded shadow-sm w-28 inline-block text-center ${STATUS_STYLES[task.status] || ''}`}>
+                        <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-28 inline-block text-center ${STATUS_STYLES[task.status] || ''}`}>
                           {task.status}
                         </span>
                       </td>

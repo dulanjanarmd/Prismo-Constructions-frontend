@@ -5,18 +5,21 @@ import { useNavigate } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import {
   Briefcase, ArrowRight, Bell, Calendar, CheckSquare, MessageSquare,
-  FileText, Plus, X, Send
+  FileText, Plus, X, Send, Search
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ClientDashboard = () => {
-  const { projects, approvals, logs, sendGlobalMessage } = useData();
+  const { projects, approvals, logs } = useData();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [requestText, setRequestText] = useState('');
   const [requestSent, setRequestSent] = useState(false);
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
 
   const STATUS_STYLE = {
     Completed:   'bg-green-100 text-green-700',
@@ -49,6 +52,13 @@ const ClientDashboard = () => {
   const completed = myProjects.filter(p => p.status === 'Completed').length;
   const pendingCount = pendingApprovals.length;
 
+  const filteredProjects = myProjects.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          (p.location && p.location.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesStatus = statusFilter === 'All' || p.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
 
 
   const handleSendRequest = async () => {
@@ -56,7 +66,7 @@ const ClientDashboard = () => {
     // Send as global message on the first project (or generic)
     const firstProjectId = myProjects[0]?.id;
     if (firstProjectId) {
-      await sendGlobalMessage(firstProjectId, `[CLIENT REQUEST] ${requestText}`);
+      // Message sending removed
     }
     setRequestSent(true);
     setRequestText('');
@@ -95,69 +105,119 @@ const ClientDashboard = () => {
       <div>
         {/* Main Content (Projects) */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-slate-900 flex items-center">
-              <Briefcase className="w-5 h-5 mr-2 text-primary" />
-              My Projects
-            </h2>
-            <button onClick={() => navigate('/portal/projects')} className="text-sm text-primary hover:underline font-medium">
-              View all
-            </button>
-          </div>
-
           {myProjects.length === 0 ? (
-            <div className="glass-card p-8 text-center text-slate-500">
-              <Briefcase className="w-10 h-10 mx-auto mb-3 opacity-20" />
-              <p className="font-medium">No projects assigned to you yet.</p>
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-slate-900 flex items-center">
+                  My Projects
+                </h2>
+                <button onClick={() => navigate('/portal/projects')} className="text-sm text-primary hover:underline font-medium">
+                  View all
+                </button>
+              </div>
+              <div className="glass-card p-8 text-center text-slate-500">
+                <Briefcase className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                <p className="font-medium">No projects assigned to you yet.</p>
+              </div>
             </div>
           ) : (
-            <div className="glass-card overflow-x-auto mt-2 border border-slate-200">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="text-xs text-slate-400 border-b border-slate-100 bg-slate-50/50">
-                    <th className="px-4 py-4 font-medium">Project Name</th>
-                    <th className="px-4 py-4 font-medium">Location</th>
-                    <th className="px-4 py-4 font-medium">Status</th>
-                    <th className="px-4 py-4 font-medium">Progress</th>
-                    <th className="px-4 py-4 font-medium">Start Date</th>
-                    <th className="px-4 py-4 font-medium">End Date</th>
+            <div className="glass-card flex flex-col mt-6 overflow-hidden border border-slate-200">
+              <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-xl font-bold text-slate-900 flex items-center">
+                    My Projects
+                  </h2>
+                  <button onClick={() => navigate('/portal/projects')} className="text-sm text-primary hover:underline font-medium">
+                    View all
+                  </button>
+                </div>
+                <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center w-full lg:w-auto justify-end">
+                  <div className="flex flex-wrap md:flex-nowrap space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto">
+                    {['All', 'Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(status => {
+                      const count = status === 'All' ? myProjects.length : myProjects.filter(p => p.status === status).length;
+                      return (
+                        <button
+                          key={status}
+                          onClick={() => setStatusFilter(status)}
+                          className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                            statusFilter === status 
+                              ? 'bg-white shadow-sm text-slate-900 font-bold' 
+                              : 'hover:text-slate-900 text-slate-600 font-medium'
+                          }`}
+                        >
+                          {status} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="relative w-full md:w-auto h-12">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <input 
+                      type="text" 
+                      placeholder="Search projects..." 
+                      className="pl-9 pr-4 h-full w-full md:w-64 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="overflow-x-auto p-6 pt-0">
+                <table className="w-full text-left text-sm mt-4">
+                <thead className="border-b border-slate-100 text-xs text-slate-400">
+                  <tr>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Project Name</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Location</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Status</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Progress</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Start Date</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">End Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {myProjects.map((project, idx) => (
-                    <motion.tr
+                <tbody className="divide-y divide-slate-50">
+                  {filteredProjects.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="px-6 py-12 text-center text-slate-500 font-medium">
+                        No projects match your current filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredProjects.map((project, idx) => (
+                      <motion.tr
                       key={project.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="hover:bg-slate-50 transition-colors cursor-pointer group bg-white"
+                      className="hover:bg-slate-50/50 transition-colors cursor-pointer group"
                       onClick={() => navigate(`/portal/projects/${project.id}`)}
                     >
-                      <td className="px-4 py-4 font-bold text-slate-900 group-hover:text-amber-500 transition-colors">{project.name}</td>
-                      <td className="px-4 py-4 text-slate-600 font-medium">{project.location || 'Location Not Specified'}</td>
-                      <td className="px-4 py-4">
-                        <span className={`px-2.5 py-1 text-[10px] uppercase tracking-wider font-bold rounded shadow-sm whitespace-nowrap ${
+                      <td className="px-6 py-5 font-bold text-slate-900">{project.name}</td>
+                      <td className="px-6 py-5 text-slate-600 font-medium">{project.location || 'Location Not Specified'}</td>
+                      <td className="px-6 py-5">
+                        <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-28 inline-block text-center ${
                           project.status === 'Completed' ? 'bg-emerald-500 text-white' :
-                          project.status === 'In Progress' ? 'bg-blue-500 text-white' : 
+                          project.status === 'In Progress' ? 'bg-amber-500 text-white' : 
                           project.status === 'Planning' ? 'bg-purple-500 text-white' : 'bg-red-500 text-white'
                         }`}>
                           {project.status}
                         </span>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-6 py-5">
                         <div className="flex items-center space-x-3">
                           <div className="w-24 bg-slate-100 rounded-full h-1.5">
-                            <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: `${project.progress || 0}%` }}></div>
+                            <div className="bg-slate-900 h-1.5 rounded-full" style={{ width: `${project.progress || 0}%` }}></div>
                           </div>
-                          <span className="text-xs text-amber-500 font-bold">{project.progress || 0}%</span>
+                          <span className="text-xs text-slate-500 font-bold">{project.progress || 0}%</span>
                         </div>
                       </td>
-                      <td className="px-4 py-4 text-slate-500 font-medium whitespace-nowrap">{project.startDate || 'TBD'}</td>
-                      <td className="px-4 py-4 text-slate-500 font-medium whitespace-nowrap">{project.endDate || 'TBD'}</td>
+                      <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap">{project.startDate || 'TBD'}</td>
+                      <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap">{project.endDate || 'TBD'}</td>
                     </motion.tr>
-                  ))}
+                    ))
+                  )}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </div>

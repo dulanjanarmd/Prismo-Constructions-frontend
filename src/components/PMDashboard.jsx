@@ -8,7 +8,7 @@ import DashboardHeader from './DashboardHeader';
 import { MessageSquare, Send } from 'lucide-react';
 
 const PMDashboard = () => {
-  const { projects, tasks, logs, approvals, issues, getGlobalMessages, sendGlobalMessage } = useData();
+  const { projects, tasks, logs, approvals, issues } = useData();
   const { currentUser } = useAuth();
 
   return (

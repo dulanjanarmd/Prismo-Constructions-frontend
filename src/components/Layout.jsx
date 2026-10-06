@@ -18,7 +18,7 @@ import {
   Bell
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import FloatingChatWidget from './FloatingChatWidget';
+
 import ProfileModal from './ProfileModal';
 import NotificationDrawer from './NotificationDrawer';
 
@@ -214,7 +214,7 @@ const Layout = () => {
           <Outlet />
         </main>
 
-        <FloatingChatWidget />
+
       </div>
     </ErrorBoundary>
   );

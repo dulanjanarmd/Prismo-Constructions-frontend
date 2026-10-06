@@ -42,7 +42,9 @@ export const AuthProvider = ({ children }) => {
         name: data.name,
         email: data.email,
         role: data.role.toLowerCase(),
-        token: data.token
+        token: data.token,
+        phone: data.phone,
+        profilePictureUrl: data.profilePictureUrl
       };
 
       setCurrentUser(user);
@@ -73,7 +75,9 @@ export const AuthProvider = ({ children }) => {
         name: data.name,
         email: data.email,
         role: data.role.toLowerCase(),
-        token: data.token
+        token: data.token,
+        phone: data.phone,
+        profilePictureUrl: data.profilePictureUrl
       };
 
       setCurrentUser(user);
