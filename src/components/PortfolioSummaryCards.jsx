@@ -7,9 +7,9 @@ const StatCard = ({ title, value, icon: Icon, delay, colorClass, iconColorClass 
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay }}
-    className={`glass-card p-5 border-l-4 ${colorClass} relative overflow-hidden group`}
+    className={`glass-card p-5 border-l-4 ${colorClass} relative overflow-hidden group flex justify-center items-center`}
   >
-    <div className="relative z-10">
+    <div className="relative z-10 text-center">
       <p className="text-sm font-semibold text-slate-500 mb-1">{title}</p>
       <p className="text-3xl font-bold text-slate-800 ">{value}</p>
     </div>
