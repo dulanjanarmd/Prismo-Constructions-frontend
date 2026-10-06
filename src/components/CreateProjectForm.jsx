@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
-import MilestoneFormList from './MilestoneFormList';
+
 import { useNavigate } from 'react-router-dom';
 import { Loader2, ArrowLeft, Upload } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -24,7 +24,7 @@ const CreateProjectForm = () => {
     progressPercentage: 0
   });
   
-  const [milestones, setMilestones] = useState([]);
+
   const [proposalDoc, setProposalDoc] = useState(null);
   const [budgetDoc, setBudgetDoc] = useState(null);
 
@@ -71,8 +71,7 @@ const CreateProjectForm = () => {
         endDate: formData.endDate,
         description: formData.description,
         status: formData.status,
-        progressPercentage: Number(formData.progressPercentage),
-        milestones: milestones.length > 0 ? milestones : undefined
+        progressPercentage: Number(formData.progressPercentage)
       };
 
       const newProject = await addProject(projectPayload);
@@ -218,10 +217,7 @@ const CreateProjectForm = () => {
               </div>
             </div>
           </div>
-          <div className="p-8 border-t border-border bg-slate-50/50">
-            <MilestoneFormList milestones={milestones} setMilestones={setMilestones} projectStartDate={formData.startDate} projectEndDate={formData.endDate} />
-          </div>
-          
+
           <div className="p-8 flex flex-col sm:flex-row justify-end items-center gap-4 bg-slate-50 border-t border-border rounded-b-2xl">
             <button 
               type="button" 

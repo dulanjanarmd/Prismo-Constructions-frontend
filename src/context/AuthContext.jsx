@@ -92,41 +92,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const requestPasswordReset = async (email) => {
-    try {
-      const response = await fetch('http://localhost:8080/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      
-      if (!response.ok) {
-        const errorMsg = await response.text();
-        throw new Error(errorMsg || 'Failed to send OTP');
-      }
-      return await response.text();
-    } catch (err) {
-      throw new Error(err.message);
-    }
-  };
-
-  const resetPassword = async (email, otp, newPassword) => {
-    try {
-      const response = await fetch('http://localhost:8080/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp, newPassword })
-      });
-      
-      if (!response.ok) {
-        const errorMsg = await response.text();
-        throw new Error(errorMsg || 'Password reset failed');
-      }
-      return true;
-    } catch (err) {
-      throw new Error(err.message);
-    }
-  };
 
   const updateProfile = async (updates) => {
     try {
@@ -173,8 +138,6 @@ export const AuthProvider = ({ children }) => {
     currentUser,
     login,
     register,
-    requestPasswordReset,
-    resetPassword,
     updateProfile,
     logout,
     loading

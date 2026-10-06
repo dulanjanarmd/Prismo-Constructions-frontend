@@ -290,9 +290,8 @@ const ProfileModal = ({ onClose }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-2 bg-slate-900 text-white font-bold rounded-lg shadow hover:bg-slate-800 transition-all flex items-center disabled:opacity-50"
+                  className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-lg shadow hover:opacity-90 transition-all flex items-center justify-center disabled:opacity-50"
                 >
-                  <Key className="w-4 h-4 mr-2" />
                   {loading ? 'Updating...' : 'Update Password'}
                 </button>
               </div>

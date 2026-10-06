@@ -11,13 +11,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [view, setView] = useState('login'); // 'login', 'request-otp', 'reset-password'
-  
-  const [resetEmail, setResetEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
 
-  const { login, requestPasswordReset, resetPassword } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -36,41 +31,6 @@ const Login = () => {
     }
   };
 
-  const handleRequestOtp = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-    setSuccessMsg('');
-    
-    try {
-      await requestPasswordReset(resetEmail);
-      setView('reset-password');
-      setSuccessMsg('OTP sent to your email.');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-    setSuccessMsg('');
-    
-    try {
-      await resetPassword(resetEmail, otp, newPassword);
-      setView('login');
-      setSuccessMsg('Password reset successful. Please sign in.');
-      setOtp('');
-      setNewPassword('');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="h-screen flex flex-col bg-transparent text-slate-900 relative font-sans overflow-hidden">
@@ -94,9 +54,7 @@ const Login = () => {
             <div className="text-center">
             <h1 className="text-4xl font-bold text-slate-900 mb-3 tracking-tight">Prismo Constructions</h1>
             <p className="text-slate-500 text-lg">
-              {view === 'login' ? 'Welcome back. Please sign in.' : 
-               view === 'request-otp' ? 'Enter your email to receive an OTP.' : 
-               'Enter OTP and new password.'}
+              Welcome back. Please sign in.
             </p>
           </div>
 
@@ -112,8 +70,7 @@ const Login = () => {
             </div>
           )}
 
-          {view === 'login' && (
-            <form onSubmit={handleLogin} className="flex-1 flex flex-col justify-center space-y-4 my-6">
+          <form onSubmit={handleLogin} className="flex-1 flex flex-col justify-center space-y-4 my-6">
               <div>
                 <input 
                   required 
@@ -133,15 +90,6 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <div className="flex justify-end">
-                  <button 
-                    type="button" 
-                    onClick={() => { setView('request-otp'); setError(''); setSuccessMsg(''); }}
-                    className="text-sm text-primary font-semibold hover:underline bg-transparent border-none cursor-pointer"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
               </div>
 
               <button 
@@ -156,91 +104,7 @@ const Login = () => {
                 )}
               </button>
             </form>
-          )}
 
-          {view === 'request-otp' && (
-            <form onSubmit={handleRequestOtp} className="flex-1 flex flex-col justify-center space-y-4 my-6">
-              <div>
-                <input 
-                  required 
-                  type="email" 
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
-                  placeholder="Email address..."
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                />
-              </div>
-
-              <button 
-                disabled={isLoading}
-                type="submit" 
-                className="w-full flex items-center justify-center px-4 py-4 bg-primary text-[#022c22] rounded-xl font-bold text-lg hover:bg-[#1e2a35] hover:text-white transition-colors disabled:opacity-70 mt-2 shadow-md"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-[#022c22]/30 border-t-[#022c22] rounded-full animate-spin"></div>
-                ) : (
-                  "SEND OTP"
-                )}
-              </button>
-
-              <div className="flex justify-center mt-4">
-                <button 
-                  type="button" 
-                  onClick={() => { setView('login'); setError(''); setSuccessMsg(''); }}
-                  className="text-sm text-slate-500 font-semibold hover:text-slate-800 hover:underline bg-transparent border-none cursor-pointer"
-                >
-                  Back to Sign In
-                </button>
-              </div>
-            </form>
-          )}
-
-          {view === 'reset-password' && (
-            <form onSubmit={handleResetPassword} className="flex-1 flex flex-col justify-center space-y-4 my-6">
-              <div>
-                <input 
-                  required 
-                  type="text" 
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
-                  placeholder="Enter OTP..."
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                />
-              </div>
-              <div>
-                <input 
-                  required 
-                  type="password" 
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
-                  placeholder="New Password..."
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-              </div>
-
-              <button 
-                disabled={isLoading}
-                type="submit" 
-                className="w-full flex items-center justify-center px-4 py-4 bg-primary text-[#022c22] rounded-xl font-bold text-lg hover:bg-[#1e2a35] hover:text-white transition-colors disabled:opacity-70 mt-2 shadow-md"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-[#022c22]/30 border-t-[#022c22] rounded-full animate-spin"></div>
-                ) : (
-                  "RESET PASSWORD"
-                )}
-              </button>
-
-              <div className="flex justify-center mt-4">
-                <button 
-                  type="button" 
-                  onClick={() => { setView('login'); setError(''); setSuccessMsg(''); }}
-                  className="text-sm text-slate-500 font-semibold hover:text-slate-800 hover:underline bg-transparent border-none cursor-pointer"
-                >
-                  Back to Sign In
-                </button>
-              </div>
-            </form>
-          )}
 
             <div className="text-center text-sm text-slate-500">
             </div>

@@ -22,16 +22,16 @@ const DashboardHeader = ({ rightElement }) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 pb-1">
-          {greeting}, {currentUser?.name || 'User'}
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 pb-1 flex items-center gap-2">
+          {greeting}, <span className="text-primary">{currentUser?.name || 'User'}</span>
         </h1>
-        <div className="flex items-center gap-3 mt-1.5">
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 shadow-sm rounded-full text-slate-600 text-sm font-medium">
-            <Calendar className="w-4 h-4 text-slate-400" />
+        <div className="flex items-center gap-4 mt-2 text-slate-500 text-sm font-medium">
+          <div className="flex items-center gap-1.5">
+            <Calendar className="w-4 h-4 text-primary opacity-80" />
             {dateStr}
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 shadow-sm rounded-full text-slate-600 text-sm font-medium">
-            <Clock className="w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-4 h-4 text-primary opacity-80" />
             {timeStr}
           </div>
         </div>

@@ -127,7 +127,7 @@ const Navbar = () => {
             </button>
             <button 
               onClick={() => setShowProfileModal(true)}
-              className="relative w-10 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all overflow-hidden border border-slate-200"
+              className="relative w-10 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all overflow-hidden"
             >
               {currentUser?.profilePictureUrl ? (
                 <img src={currentUser.profilePictureUrl} alt="Profile" className="w-full h-full rounded-lg object-cover" />
@@ -139,7 +139,7 @@ const Navbar = () => {
             </button>
             <button 
               onClick={logout}
-              className="px-6 py-2 bg-primary text-[#022c22] rounded-lg transition-colors uppercase h-full flex items-center hover:opacity-90 font-bold"
+              className="px-6 py-2 bg-primary text-white rounded-lg transition-colors uppercase h-full flex items-center hover:opacity-90 font-bold"
             >
               SIGN OUT
             </button>
