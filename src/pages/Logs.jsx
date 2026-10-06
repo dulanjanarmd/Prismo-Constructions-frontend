@@ -232,12 +232,8 @@ const Logs = () => {
       </div>
 
       <div className="glass-card flex flex-col overflow-hidden">
-        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold whitespace-nowrap">Daily Logs</h2>
-          </div>
-          
-          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-3 items-start xl:items-center w-full lg:w-auto justify-end">
+        <div className="flex items-center p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-3 items-start xl:items-center w-full lg:w-auto ml-auto min-w-max">
             <div className="relative w-full lg:w-64 h-11 shrink-0">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
