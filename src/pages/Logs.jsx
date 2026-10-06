@@ -228,7 +228,6 @@ const Logs = () => {
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 ">
             Site Progress Logs
           </h1>
-          <p className="text-slate-500 mt-1">Daily field capture and issue reporting.</p>
         </div>
       </div>
 
@@ -314,19 +313,12 @@ const Logs = () => {
                     </td>
                     <td className="px-6 py-5 text-right">
                       <div className="flex items-center justify-end space-x-3">
-                        <button onClick={() => setSelectedLog(log)} className="text-primary hover:text-primary-dark font-medium flex items-center text-sm transition-colors" title="View Details">
-                          <Eye className="w-4 h-4" />
+                        <button 
+                          onClick={() => setSelectedLog(log)} 
+                          className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
+                        >
+                          View
                         </button>
-                        {isSiteEngineer && (
-                          <>
-                            <button onClick={() => openEditModal(log)} className="text-amber-500 hover:text-amber-600 transition-colors" title="Edit Log">
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => handleDelete(log.id)} className="text-red-500 hover:text-red-600 transition-colors" title="Delete Log">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
                       </div>
                     </td>
                   </motion.tr>
@@ -554,22 +546,35 @@ const Logs = () => {
       </AnimatePresence>
       <AnimatePresence>
         {selectedLog && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-center justify-end p-4 bg-black/50 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white border border-border w-full max-w-4xl p-6 relative max-h-[90vh] overflow-y-auto rounded shadow-2xl"
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 60 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="glass-card w-full max-w-2xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col p-6 relative"
             >
               <button onClick={() => setSelectedLog(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">
                 <X className="w-6 h-6" />
               </button>
 
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-900">Daily Progress Log Details</h2>
-                <p className="text-sm text-slate-500 font-medium mt-1">
-                  {new Date(selectedLog.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                </p>
+              <div className="mb-6 flex justify-between items-start pr-8">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900">Daily Progress Log Details</h2>
+                  <p className="text-sm text-slate-500 font-medium mt-1">
+                    {new Date(selectedLog.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  </p>
+                </div>
+                {isSiteEngineer && (
+                  <div className="flex items-center space-x-2">
+                    <button onClick={() => { setSelectedLog(null); openEditModal(selectedLog); }} className="px-4 py-1.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow">
+                      Edit
+                    </button>
+                    <button onClick={() => { setSelectedLog(null); handleDelete(selectedLog.id); }} className="px-4 py-1.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow">
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-border mb-6">
