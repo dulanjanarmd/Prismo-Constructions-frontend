@@ -261,13 +261,13 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
               <button onClick={handleResolve} className="flex items-center text-xs font-semibold px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 rounded-md transition-colors">
                 <CheckCircle className="w-3 h-3 mr-1" /> Resolve
               </button>
-              <button onClick={() => setIsEditModalOpen(true)} className="flex items-center text-xs font-semibold px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-md transition-colors">
-                <Edit className="w-3 h-3 mr-1" /> Edit
+              <button onClick={() => setIsEditModalOpen(true)} className="px-4 py-1.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow">
+                Edit
               </button>
             </>
           )}
-          <button onClick={handleDelete} className="flex items-center text-xs font-semibold px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-md transition-colors">
-            <Trash2 className="w-3 h-3 mr-1" /> Delete
+          <button onClick={handleDelete} className="px-4 py-1.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow">
+            Delete
           </button>
         </div>
       )}

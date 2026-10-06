@@ -131,7 +131,8 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
           {/* Header */}
           <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
             <div className="flex-1 min-w-0 pr-4">
-              <div className="flex items-center gap-2 flex-wrap mb-1 -ml-2">
+              <h2 className="text-xl font-bold text-slate-900 leading-tight mb-2">{task.title}</h2>
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-sm ${STATUS_STYLES[task.status] || STATUS_STYLES['To Do']}`}>
                   {task.status}
                 </span>
@@ -139,17 +140,16 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
                   {task.priority}
                 </span>
               </div>
-              <h2 className="text-xl font-bold text-slate-900  leading-tight">{task.title}</h2>
             </div>
             <div className="flex items-center shrink-0">
               {onEdit && (
-                <button onClick={onEdit} className="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-full transition-colors" title="Edit task">
-                  <Edit className="w-4 h-4" />
+                <button onClick={onEdit} className="px-4 py-1.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow">
+                  Edit
                 </button>
               )}
               {onDelete && task.status === 'To Do' && (
-                <button onClick={onDelete} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" title="Delete task">
-                  <Trash2 className="w-4 h-4" />
+                <button onClick={onDelete} className="px-4 py-1.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow">
+                  Delete
                 </button>
               )}
               <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1">

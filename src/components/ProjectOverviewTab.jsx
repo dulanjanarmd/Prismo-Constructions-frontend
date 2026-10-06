@@ -209,7 +209,8 @@ const ProjectOverviewTab = ({ project }) => {
               {/* Header */}
               <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-white/80 backdrop-blur-md z-10">
                 <div className="flex-1 min-w-0 pr-4">
-                  <div className="flex items-center gap-2 flex-wrap mb-1 -ml-2">
+                  <h2 className="text-xl font-bold text-slate-900 leading-tight mb-2">{project.name || 'Project Details'}</h2>
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md shadow-sm ${
                       project.status === 'Completed' ? 'bg-emerald-500 text-white' :
                       project.status === 'In Progress' ? 'bg-amber-500 text-white' : 
@@ -219,19 +220,8 @@ const ProjectOverviewTab = ({ project }) => {
                       {project.status}
                     </span>
                   </div>
-                  <h2 className="text-xl font-bold text-slate-900 leading-tight">{project.name || 'Project Details'}</h2>
                 </div>
-                <div className="flex items-center shrink-0">
-                  {isPMorCEO && (
-                    <>
-                      <button onClick={() => { setIsDetailsOpen(false); openModal('edit'); }} className="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-full transition-colors" title="Edit project">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button onClick={handleDeleteProject} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" title="Delete project">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </>
-                  )}
+                <div className="flex items-center space-x-2 shrink-0">
                   <button onClick={() => setIsDetailsOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1">
                     <X className="w-5 h-5" />
                   </button>
@@ -281,7 +271,13 @@ const ProjectOverviewTab = ({ project }) => {
 
               {/* Footer Actions */}
               {isPMorCEO && (
-                <div className="p-6 border-t border-border bg-slate-50/50 sticky bottom-0">
+                <div className="p-6 border-t border-border bg-slate-50/50 sticky bottom-0 flex gap-2">
+                  <button onClick={() => { setIsDetailsOpen(false); openModal('edit'); }} className="flex-1 py-2.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm flex items-center justify-center">
+                    Edit
+                  </button>
+                  <button onClick={handleDeleteProject} className="flex-1 py-2.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm flex items-center justify-center">
+                    Delete
+                  </button>
                   <button
                     onClick={() => {
                       if (project.status === 'On Hold') {
@@ -290,10 +286,9 @@ const ProjectOverviewTab = ({ project }) => {
                         updateProject(project.id, { status: 'On Hold' });
                       }
                     }}
-                    className={`w-full py-2.5 hover:opacity-90 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 ${project.status === 'On Hold' ? 'bg-green-500' : 'bg-amber-500'}`}
+                    className={`flex-1 py-2.5 hover:opacity-90 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 ${project.status === 'On Hold' ? 'bg-green-500' : 'bg-orange-500'}`}
                   >
-                    <AlertTriangle className="w-4 h-4" />
-                    {project.status === 'On Hold' ? 'Resume Project' : 'Hold Project'}
+                    {project.status === 'On Hold' ? 'Resume' : 'Hold'}
                   </button>
                 </div>
               )}

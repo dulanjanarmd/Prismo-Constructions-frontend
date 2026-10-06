@@ -284,25 +284,22 @@ const AdminPortal = () => {
                           <div className="flex justify-end gap-2">
                             <button 
                               onClick={() => handleEditUser(user)}
-                              className="text-blue-500 hover:text-blue-700 transition-colors p-2 rounded-md hover:bg-blue-50"
-                              title="Edit User"
+                              className="px-4 py-1.5 text-xs font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow"
                             >
-                              <Edit className="w-4 h-4" />
+                              Edit
                             </button>
                             <button 
                               onClick={() => handleResetPassword(user)}
-                              className="text-green-500 hover:text-green-700 transition-colors p-2 rounded-md hover:bg-green-50"
-                              title="Reset Password"
+                              className="px-4 py-1.5 text-xs font-bold bg-green-500 text-white hover:bg-green-600 rounded-lg transition-all shadow-sm hover:shadow"
                             >
-                              <Key className="w-4 h-4" />
+                              Reset Pass
                             </button>
                             {user.role !== 'admin' && user.role !== 'ceo' && (
                               <button 
                                 onClick={() => handleDeleteUser(user.id)}
-                                className="text-red-500 hover:text-red-700 transition-colors p-2 rounded-md hover:bg-red-50"
-                                title="Delete User"
+                                className="px-4 py-1.5 text-xs font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                Delete
                               </button>
                             )}
                           </div>
