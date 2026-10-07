@@ -8,11 +8,11 @@ import {
 } from 'lucide-react';
 
 const STATUS_STYLES = {
-  Pending: 'bg-amber-100 text-amber-700 border-amber-200',
-  Approved: 'bg-green-100 text-green-700 border-green-200',
-  Rejected: 'bg-red-100 text-red-700 border-red-200',
-  'Changes Requested': 'bg-orange-100 text-orange-700 border-orange-200',
-  Closed: 'bg-slate-100 text-slate-600 border-slate-200'
+  Pending: 'bg-amber-500 text-white',
+  Approved: 'bg-emerald-500 text-white',
+  Rejected: 'bg-red-500 text-white',
+  'Changes Requested': 'bg-orange-500 text-white',
+  Closed: 'bg-slate-500 text-white'
 };
 
 const STATUS_ICON = {
@@ -213,19 +213,20 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
           {/* Header */}
           <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-md px-6 py-5 border-b border-border flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border flex items-center gap-1 ${STATUS_STYLES[approval.status] || STATUS_STYLES.Pending}`}>
-                  <StatusIcon className="w-3 h-3" />
+              <h2 className="text-xl font-bold text-slate-900 leading-tight">{approval.title}</h2>
+              {project && <p className="text-sm text-slate-500 mt-0.5">{project.name}</p>}
+              
+              <div className="flex items-center gap-3 mt-3 flex-wrap">
+                <span className={`px-2.5 py-1 text-xs font-bold rounded shadow-sm flex items-center gap-1 ${STATUS_STYLES[approval.status] || STATUS_STYLES.Pending}`}>
+                  <StatusIcon className="w-3.5 h-3.5" />
                   {approval.status}
                 </span>
                 {approval.dueDate && (
-                  <span className="text-xs text-slate-500 flex items-center gap-1">
-                    <Calendar className="w-3 h-3" /> Due: {approval.dueDate}
+                  <span className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4" /> Due: {approval.dueDate}
                   </span>
                 )}
               </div>
-              <h2 className="text-xl font-bold text-slate-900  leading-tight">{approval.title}</h2>
-              {project && <p className="text-sm text-slate-500 mt-0.5">{project.name}</p>}
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {isPM && !isEditing && approval.status !== 'Closed' && (
