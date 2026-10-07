@@ -328,7 +328,7 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
                     const isSEComment = comment.role === 'site_engineer';
                     const isOwnComment = currentUser.name === comment.author;
 
-                    const alignmentClass = isPMComment ? 'self-end items-end' : 'self-start items-start';
+                    const alignmentClass = isOwnComment ? 'self-end items-end' : 'self-start items-start';
                     const bubbleBg = comment.isCompletionNote ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200';
 
                     return (
