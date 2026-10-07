@@ -255,7 +255,7 @@ const Tasks = () => {
       {/* Task Detail Modal */}
       {selectedTask && (
         <TaskDetailModal
-          task={selectedTask}
+          task={tasks.find(t => String(t.id) === String(selectedTask.id)) || selectedTask}
           project={projects.find(p =>
             String(p.id) === String(selectedTask.projectId) || p.id === `p${selectedTask.projectId}`
           )}

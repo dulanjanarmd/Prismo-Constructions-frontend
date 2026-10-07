@@ -200,19 +200,6 @@ const ProjectTasksTab = ({ projectId, project }) => {
     }
   };
 
-  const handleDrop = async (e, newStatus) => {
-    e.preventDefault();
-    const taskId = e.dataTransfer.getData('taskId');
-    if (!taskId) return;
-    const task = tasks.find(t => String(t.id) === String(taskId));
-    if (!task || task.status === newStatus) return;
-
-    try {
-      await updateTask(task.id, { status: newStatus });
-    } catch (err) {
-      console.error('Error updating task status:', err);
-    }
-  };
 
   // Count per column
   const columnCounts = STATUS_COLUMNS.reduce((acc, s) => {
@@ -296,9 +283,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
           return (
             <div 
               key={col} 
-              className={`rounded-lg flex flex-col bg-white border border-slate-200 shadow-sm min-h-[300px] overflow-hidden ${isSiteEngineer ? 'transition-colors hover:shadow-md' : ''}`}
-              onDragOver={(e) => { if (isSiteEngineer) e.preventDefault(); }}
-              onDrop={(e) => handleDrop(e, col)}
+              className="rounded-lg flex flex-col bg-white border border-slate-200 shadow-sm min-h-[300px] overflow-hidden"
             >
               <h3 className={`font-bold text-sm flex items-center justify-center px-4 py-3 uppercase tracking-wider ${STATUS_HEADER_STYLE[col] || 'bg-slate-500 text-white'}`}>
                 {col}
@@ -316,10 +301,8 @@ const ProjectTasksTab = ({ projectId, project }) => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className={`${STATUS_CARD_BG[col] || 'bg-white'} rounded-lg shadow-sm hover:shadow-md border border-slate-200/40 cursor-pointer transition-all flex flex-col group overflow-hidden ${isSiteEngineer ? 'cursor-grab active:cursor-grabbing' : ''}`}
+                        className={`${STATUS_CARD_BG[col] || 'bg-white'} rounded-lg shadow-sm hover:shadow-md border border-slate-200/40 cursor-pointer transition-all flex flex-col group overflow-hidden`}
                         onClick={() => setSelectedTask(task)}
-                        draggable={isSiteEngineer}
-                        onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
                       >
                         <div className={`px-4 py-2 flex justify-between items-center ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
                           <span className="text-[10px] font-bold uppercase tracking-wider">
@@ -440,7 +423,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
       {/* Task Detail Modal */}
       {selectedTask && !isEditing && (
         <TaskDetailModal
-          task={selectedTask}
+          task={tasks.find(t => String(t.id) === String(selectedTask.id)) || selectedTask}
           project={project}
           onClose={() => setSelectedTask(null)}
           onEdit={isPM ? () => { setSelectedTask(null); openEditTask(selectedTask); } : undefined}

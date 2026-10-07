@@ -120,7 +120,8 @@ export const DataProvider = ({ children }) => {
             assignedTo: `u${t.assignee?.id}`,
             milestoneId: t.milestone?.id,
             milestoneName: t.milestone?.name || t.milestone?.title || null,
-            evidence: t.completionEvidence
+            evidence: t.completionEvidence,
+            comments: t.comments ? JSON.parse(t.comments) : []
           })));
         }
 
@@ -510,7 +511,8 @@ export const DataProvider = ({ children }) => {
       dueDate: updates.dueDate ?? currentTask?.dueDate ?? null,
       status: statusValues[updates.status] || updates.status,
       completionEvidence: updates.evidence ?? currentTask?.evidence ?? null,
-      assignedTo: updates.assignedTo ?? currentTask?.assignedTo ?? null
+      assignedTo: updates.assignedTo ?? currentTask?.assignedTo ?? null,
+      comments: updates.comments ? JSON.stringify(updates.comments) : (currentTask?.comments ? JSON.stringify(currentTask.comments) : null)
     };
     const response = await fetch(`http://localhost:8080/api/tasks/${taskId}`, {
       method: 'PUT',
@@ -525,7 +527,8 @@ export const DataProvider = ({ children }) => {
       ...task,
       ...updates,
       status: updates.status || task.status,
-      evidence: updates.evidence ?? task.evidence
+      evidence: updates.evidence ?? task.evidence,
+      comments: updates.comments ?? task.comments
     } : task));
   };
   const deleteTask = async (id) => {
