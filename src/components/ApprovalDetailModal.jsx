@@ -208,7 +208,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 80 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="glass-card w-full max-w-2xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
+          className="glass-card w-full max-w-5xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
         >
           {/* Header */}
           <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-md px-6 py-5 border-b border-border flex items-start justify-between gap-4">
@@ -231,15 +231,15 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
             <div className="flex items-center gap-2 shrink-0">
               {isPM && !isEditing && approval.status !== 'Closed' && (
                 <>
-                  <button onClick={() => setIsEditing(true)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors" title="Edit Request">
-                    <Edit className="w-5 h-5" />
+                  <button onClick={() => setIsEditing(true)} className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-sm font-bold text-sm" title="Edit Request">
+                    Edit
                   </button>
-                  <button onClick={handleDelete} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors" title="Delete Request">
-                    <Trash2 className="w-5 h-5" />
+                  <button onClick={handleDelete} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm font-bold text-sm" title="Delete Request">
+                    Delete
                   </button>
                 </>
               )}
-              <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0">
+              <button onClick={onClose} className="p-2 ml-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -247,6 +247,8 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
 
           {/* Body */}
           <div className="flex-1 p-6 space-y-7">
+            {/* Main Details */}
+            <div className="space-y-7 min-w-0">
             {/* Edit Form or Description */}
             {isEditing ? (
               <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-200 shadow-sm space-y-4">
@@ -388,55 +390,105 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
               </div>
             )}
 
-            {/* Client feedback (if responded) */}
-            {approval.feedback && (
-              <div className={`rounded-lg p-4 border ${
-                approval.status === 'Approved' ? 'bg-green-50 border-green-200  ' :
-                approval.status === 'Rejected' ? 'bg-red-50 border-red-200  ' :
-                'bg-orange-50 border-orange-200  '
-              }`}>
-                <p className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-600  flex items-center gap-1">
-                  <MessageSquare className="w-3 h-3" /> Client Feedback
-                </p>
-                <p className="text-sm text-slate-700 ">{approval.feedback}</p>
-              </div>
-            )}
+            </div>
 
-            {/* PM Reply (if exists) */}
-            {approval.pmReply && (
-              <div className="bg-blue-50  border border-blue-200  rounded-lg p-4">
-                <p className="text-xs font-bold uppercase tracking-wider mb-1 text-blue-700  flex items-center gap-1">
-                  <Send className="w-3 h-3" /> PM Reply
-                </p>
-                <p className="text-sm text-slate-700 ">{approval.pmReply}</p>
+            {/* Unified Audit Trail with Messages */}
+            <div className="pt-6 border-t border-border">
+              {/* Grid header */}
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 mb-6">
+                <div className="hidden lg:block" />
+                <div>
+                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                    <Clock className="w-4 h-4" /> Audit Trail
+                  </h3>
+                </div>
               </div>
-            )}
 
-            {/* Audit Trail */}
-            <div>
-              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Clock className="w-4 h-4" /> Audit Trail
-              </h3>
+              {/* Grid body */}
               <div className="relative">
-                {/* Vertical line */}
-                <div className="absolute left-3 top-0 bottom-0 w-px bg-border" />
-                <div className="space-y-4">
-                  {auditTrail.map((entry, idx) => (
-                    <div key={idx} className="flex gap-4 relative">
-                      <div className={`relative z-10 w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${AUDIT_COLORS[entry.type] || 'bg-slate-400'}`}>
-                        <div className="w-2 h-2 rounded-full bg-white" />
+                {/* Continuous Vertical Line for Desktop */}
+                <div className="hidden lg:block absolute right-[320px] top-0 bottom-0 w-px bg-border" />
+                {/* Continuous Vertical Line for Mobile */}
+                <div className="lg:hidden absolute left-3 top-0 bottom-0 w-px bg-border" />
+
+                <div className="space-y-8">
+                  {auditTrail.map((entry, idx) => {
+                    const hasComment = entry.action.includes(': "');
+                    let commentText = '';
+                    if (hasComment) {
+                      commentText = entry.action.substring(entry.action.indexOf(': "') + 3, entry.action.length - 1);
+                    }
+                    
+                    const isClientResponse = ['approve', 'reject', 'changes'].includes(entry.type);
+                    const isPmReply = entry.type === 'reply';
+
+                    return (
+                      <div key={idx} className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 relative z-10">
+                        {/* Left Side: Message Box */}
+                        <div className="min-w-0 flex flex-col justify-center">
+                          {isClientResponse && hasComment && (
+                            <div className={`rounded-lg p-4 border ${
+                              entry.type === 'approve' ? 'bg-green-50 border-green-200 text-green-700' :
+                              entry.type === 'reject' ? 'bg-red-50 border-red-200 text-red-700' :
+                              'bg-orange-50 border-orange-200 text-orange-700'
+                            }`}>
+                              <p className="text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1 opacity-80">
+                                <MessageSquare className="w-3 h-3" /> Client Feedback
+                              </p>
+                              <p className="text-sm">{commentText}</p>
+                            </div>
+                          )}
+                          
+                          {isClientResponse && !hasComment && (
+                            <div className="rounded-lg p-3 border border-dashed border-slate-200 bg-slate-50/50 flex items-center justify-center opacity-70">
+                              <p className="text-sm italic text-slate-500">Status updated without additional comments.</p>
+                            </div>
+                          )}
+                          
+                          {isPmReply && hasComment && (
+                            <div className="bg-purple-50 border border-purple-200 text-purple-700 rounded-lg p-4">
+                              <p className="text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1 opacity-80">
+                                <Send className="w-3 h-3" /> PM Reply
+                              </p>
+                              <p className="text-sm">{commentText}</p>
+                            </div>
+                          )}
+
+                          {entry.type === 'create' && (
+                            <div className="rounded-lg p-3 border border-dashed border-slate-200 bg-slate-50/50 flex items-center justify-center opacity-70">
+                              <FileText className="w-4 h-4 mr-2 text-slate-400" />
+                              <span className="text-sm text-slate-500 font-medium">Initial Request Submitted</span>
+                            </div>
+                          )}
+
+                          {entry.type === 'close' && (
+                            <div className="rounded-lg p-3 border border-dashed border-slate-200 bg-slate-50/50 flex items-center justify-center opacity-70">
+                              <Lock className="w-4 h-4 mr-2 text-slate-400" />
+                              <span className="text-sm text-slate-500 font-medium">Approval Process Concluded</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Right Side: Audit Node */}
+                        <div className="relative">
+                          <div className="flex gap-4 relative">
+                            <div className={`relative z-10 w-6 h-6 rounded-full flex items-center justify-center shrink-0 lg:-ml-3 ${AUDIT_COLORS[entry.type] || 'bg-slate-400'}`}>
+                              <div className="w-2 h-2 rounded-full bg-white" />
+                            </div>
+                            <div className="flex-1 pb-1">
+                              <p className="text-sm font-semibold text-slate-900">{entry.actor}</p>
+                              <p className="text-sm text-slate-600">{entry.action}</p>
+                              <p className="text-xs text-slate-400 mt-0.5">{entry.timestamp}</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-1 pb-1">
-                        <p className="text-sm font-semibold text-slate-900 ">{entry.actor}</p>
-                        <p className="text-sm text-slate-600 ">{entry.action}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{entry.timestamp}</p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
-          </div>
+        </div>
 
           {/* Footer — Actions */}
           <div className="sticky bottom-0 z-20 bg-slate-50/80 backdrop-blur-md px-6 py-5 border-t border-border space-y-3">
