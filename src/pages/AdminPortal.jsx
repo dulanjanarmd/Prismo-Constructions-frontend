@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 
 const AdminPortal = () => {
-  const { users, projects, tasks, issues, logs, addUser, deleteUser, updateUser, resetUserPassword } = useData();
+  const { users, projects, tasks, issues, logs, addUser, deleteUser, updateUser, resetUserPassword, suspendUser, activateUser } = useData();
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   
@@ -261,6 +261,7 @@ const AdminPortal = () => {
                       <th className="px-6 py-4 font-medium">Name</th>
                       <th className="px-6 py-4 font-medium">Email</th>
                       <th className="px-6 py-4 font-medium">Role</th>
+                      <th className="px-6 py-4 font-medium">Status</th>
                       <th className="px-6 py-4 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
@@ -280,8 +281,15 @@ const AdminPortal = () => {
                             {user.role.replace('_', ' ')}
                           </span>
                         </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full flex items-center w-fit capitalize ${
+                            user.status === 'SUSPENDED' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'
+                          }`}>
+                            {user.status === 'SUSPENDED' ? 'Suspended' : 'Active'}
+                          </span>
+                        </td>
                         <td className="px-6 py-4 text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-end gap-2 flex-wrap">
                             <button 
                               onClick={() => handleEditUser(user)}
                               className="px-4 py-1.5 text-xs font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow"
@@ -290,17 +298,34 @@ const AdminPortal = () => {
                             </button>
                             <button 
                               onClick={() => handleResetPassword(user)}
-                              className="px-4 py-1.5 text-xs font-bold bg-green-500 text-white hover:bg-green-600 rounded-lg transition-all shadow-sm hover:shadow"
+                              className="px-4 py-1.5 text-xs font-bold bg-blue-500 text-white hover:bg-blue-600 rounded-lg transition-all shadow-sm hover:shadow"
                             >
                               Reset Pass
                             </button>
                             {user.role !== 'admin' && user.role !== 'ceo' && (
-                              <button 
-                                onClick={() => handleDeleteUser(user.id)}
-                                className="px-4 py-1.5 text-xs font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow"
-                              >
-                                Delete
-                              </button>
+                              <>
+                                {user.status === 'SUSPENDED' ? (
+                                  <button 
+                                    onClick={() => activateUser(user.id)}
+                                    className="px-4 py-1.5 text-xs font-bold bg-emerald-500 text-white hover:bg-emerald-600 rounded-lg transition-all shadow-sm hover:shadow"
+                                  >
+                                    Activate
+                                  </button>
+                                ) : (
+                                  <button 
+                                    onClick={() => suspendUser(user.id)}
+                                    className="px-4 py-1.5 text-xs font-bold bg-slate-500 text-white hover:bg-slate-600 rounded-lg transition-all shadow-sm hover:shadow"
+                                  >
+                                    Suspend
+                                  </button>
+                                )}
+                                <button 
+                                  onClick={() => handleDeleteUser(user.id)}
+                                  className="px-4 py-1.5 text-xs font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow"
+                                >
+                                  Delete
+                                </button>
+                              </>
                             )}
                           </div>
                         </td>

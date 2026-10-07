@@ -405,6 +405,40 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const suspendUser = async (id) => {
+    try {
+      const userId = String(id).replace('u', '');
+      const res = await fetch(`http://localhost:8080/api/admin/users/${userId}/suspend`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to suspend user');
+      setUsers(users.map(u => String(u.id) === String(id) ? { ...u, status: 'SUSPENDED' } : u));
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const activateUser = async (id) => {
+    try {
+      const userId = String(id).replace('u', '');
+      const res = await fetch(`http://localhost:8080/api/admin/users/${userId}/activate`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to activate user');
+      setUsers(users.map(u => String(u.id) === String(id) ? { ...u, status: 'ACTIVE' } : u));
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
   const updateUser = async (id, userData) => {
     try {
       const userId = String(id).replace('u', '');
@@ -1046,6 +1080,8 @@ export const DataProvider = ({ children }) => {
     deleteUser,
     updateUser,
     resetUserPassword,
+    suspendUser,
+    activateUser,
     addIssue,
     updateIssue,
     deleteIssue,

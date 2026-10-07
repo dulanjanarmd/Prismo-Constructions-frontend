@@ -108,8 +108,8 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
 
   const storedAuditTrail = typeof approval.auditTrail === 'string'
     ? (() => {
-        try { return JSON.parse(approval.auditTrail); } catch { return []; }
-      })()
+      try { return JSON.parse(approval.auditTrail); } catch { return []; }
+    })()
     : approval.auditTrail;
   const [auditTrail, setAuditTrail] = useState(storedAuditTrail?.length ? storedAuditTrail : [
     {
@@ -215,7 +215,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-bold text-slate-900 leading-tight">{approval.title}</h2>
               {project && <p className="text-sm text-slate-500 mt-0.5">{project.name}</p>}
-              
+
               <div className="flex items-center gap-3 mt-3 flex-wrap">
                 <span className={`px-2.5 py-1 text-xs font-bold rounded shadow-sm flex items-center gap-1 ${STATUS_STYLES[approval.status] || STATUS_STYLES.Pending}`}>
                   <StatusIcon className="w-3.5 h-3.5" />
@@ -249,146 +249,145 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
           <div className="flex-1 p-6 space-y-7">
             {/* Main Details */}
             <div className="space-y-7 min-w-0">
-            {/* Edit Form or Description */}
-            {isEditing ? (
-              <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-200 shadow-sm space-y-4">
-                <h3 className="font-bold text-lg mb-2 text-slate-800 flex items-center gap-2">
-                  <Edit className="w-5 h-5 text-blue-600" /> Edit Approval Request
-                </h3>
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-700">Title <span className="text-red-500">*</span></label>
-                  <input required type="text" className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.title} onChange={e => setEditData({...editData, title: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-700">Description <span className="text-red-500">*</span></label>
-                  <textarea required rows="3" className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" value={editData.description} onChange={e => setEditData({...editData, description: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-700">Response Due Date <span className="text-red-500">*</span></label>
-                  <input required type="date" min={minDateStr} max={maxDateStr} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.dueDate} onChange={e => setEditData({...editData, dueDate: e.target.value})} />
-                  <p className="text-xs text-slate-500 mt-1">Must be within 1 week and project timeline.</p>
-                </div>
+              {/* Edit Form or Description */}
+              {isEditing ? (
+                <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-200 shadow-sm space-y-4">
+                  <h3 className="font-bold text-lg mb-2 text-slate-800 flex items-center gap-2">
+                    <Edit className="w-5 h-5 text-blue-600" /> Edit Approval Request
+                  </h3>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-slate-700">Title <span className="text-red-500">*</span></label>
+                    <input required type="text" className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.title} onChange={e => setEditData({ ...editData, title: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-slate-700">Description <span className="text-red-500">*</span></label>
+                    <textarea required rows="3" className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" value={editData.description} onChange={e => setEditData({ ...editData, description: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-slate-700">Response Due Date <span className="text-red-500">*</span></label>
+                    <input required type="date" min={minDateStr} max={maxDateStr} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editData.dueDate} onChange={e => setEditData({ ...editData, dueDate: e.target.value })} />
+                    <p className="text-xs text-slate-500 mt-1">Must be within 1 week and project timeline.</p>
+                  </div>
 
-                {/* Edit Attachments */}
-                <div className="pt-2 border-t border-blue-200/50">
-                  <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-slate-700">
-                    <Paperclip className="w-4 h-4 text-slate-500" /> Attachments
-                  </label>
-                  <label className="flex items-center justify-center w-full border-2 border-dashed border-blue-300 rounded-lg py-3 px-4 cursor-pointer hover:border-blue-400 hover:bg-white transition-colors bg-white/50">
-                    <span className="text-sm text-blue-600 font-medium">
-                      {isUploading ? 'Uploading...' : 'Click to add files or photos'}
-                    </span>
-                    <input type="file" multiple className="hidden" disabled={isUploading} onChange={e => handleFileUpload(e, 'document')} />
-                  </label>
-                  {editData.attachments.length > 0 && (
-                    <div className="mt-3 space-y-2">
-                      {editData.attachments.map((file, i) => (
-                        <div key={i} className="flex items-center justify-between bg-white border border-blue-200 rounded px-3 py-2 shadow-sm">
-                          <span className="text-sm text-slate-700 truncate flex items-center gap-2">
-                            {file.category === 'image' || file.type?.startsWith('image/') ? <ImageIcon className="w-4 h-4 text-blue-500 shrink-0" /> : <FileText className="w-4 h-4 text-blue-500 shrink-0" />} 
-                            {file.originalName || file.name || 'Attachment'}
-                          </span>
-                          <button type="button" onClick={() => removeAttachment(i)} className="text-slate-400 hover:text-red-500 shrink-0 p-1 rounded hover:bg-red-50">
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Edit Linked Logs */}
-                <div className="pt-2 border-t border-blue-200/50">
-                  <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-slate-700">
-                    <ListTodo className="w-4 h-4 text-slate-500" /> Linked Progress Logs
-                  </label>
-                  <div className="max-h-48 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                    {logs.filter(l => String(l.projectId) === String(project?.id) || l.projectId === `p${project?.id}`).length === 0 ? (
-                      <p className="text-sm text-slate-500 italic">No progress logs available for this project.</p>
-                    ) : (
-                      logs.filter(l => String(l.projectId) === String(project?.id) || l.projectId === `p${project?.id}`).map(log => {
-                        const isLinked = editData.linkedLogIds.includes(log.id);
-                        return (
-                          <div
-                            key={log.id}
-                            onClick={() => toggleLog(log.id)}
-                            className={`flex flex-col p-3 rounded-lg border cursor-pointer transition-colors ${
-                              isLinked ? 'bg-blue-50 border-blue-400 shadow-sm' : 'bg-white border-slate-200 hover:border-blue-300'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm font-bold text-slate-800">{log.date}</span>
-                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isLinked ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
-                                +{log.percentageCompleted}%
-                              </span>
-                            </div>
-                            <p className="text-sm text-slate-600 line-clamp-2">{log.workDone}</p>
+                  {/* Edit Attachments */}
+                  <div className="pt-2 border-t border-blue-200/50">
+                    <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-slate-700">
+                      <Paperclip className="w-4 h-4 text-slate-500" /> Attachments
+                    </label>
+                    <label className="flex items-center justify-center w-full border-2 border-dashed border-blue-300 rounded-lg py-3 px-4 cursor-pointer hover:border-blue-400 hover:bg-white transition-colors bg-white/50">
+                      <span className="text-sm text-blue-600 font-medium">
+                        {isUploading ? 'Uploading...' : 'Click to add files or photos'}
+                      </span>
+                      <input type="file" multiple className="hidden" disabled={isUploading} onChange={e => handleFileUpload(e, 'document')} />
+                    </label>
+                    {editData.attachments.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {editData.attachments.map((file, i) => (
+                          <div key={i} className="flex items-center justify-between bg-white border border-blue-200 rounded px-3 py-2 shadow-sm">
+                            <span className="text-sm text-slate-700 truncate flex items-center gap-2">
+                              {file.category === 'image' || file.type?.startsWith('image/') ? <ImageIcon className="w-4 h-4 text-blue-500 shrink-0" /> : <FileText className="w-4 h-4 text-blue-500 shrink-0" />}
+                              {file.originalName || file.name || 'Attachment'}
+                            </span>
+                            <button type="button" onClick={() => removeAttachment(i)} className="text-slate-400 hover:text-red-500 shrink-0 p-1 rounded hover:bg-red-50">
+                              <X className="w-4 h-4" />
+                            </button>
                           </div>
-                        );
-                      })
+                        ))}
+                      </div>
                     )}
                   </div>
-                </div>
 
-                <div className="flex justify-end gap-2 pt-4">
-                  <button onClick={() => setIsEditing(false)} disabled={isUploading} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors disabled:opacity-50">Cancel</button>
-                  <button onClick={handleSaveEdit} disabled={isUploading} className="px-4 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors shadow-sm disabled:opacity-50">Save Changes</button>
-                </div>
-              </div>
-            ) : (
-              approval.description && (
-                <div>
-                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <FileText className="w-4 h-4" /> Request Details
-                  </h3>
-                  <div className="bg-slate-50  rounded-lg p-4 border border-border">
-                    <p className="text-sm text-slate-700  leading-relaxed">{approval.description}</p>
+                  {/* Edit Linked Logs */}
+                  <div className="pt-2 border-t border-blue-200/50">
+                    <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-slate-700">
+                      <ListTodo className="w-4 h-4 text-slate-500" /> Linked Progress Logs
+                    </label>
+                    <div className="max-h-48 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                      {logs.filter(l => String(l.projectId) === String(project?.id) || l.projectId === `p${project?.id}`).length === 0 ? (
+                        <p className="text-sm text-slate-500 italic">No progress logs available for this project.</p>
+                      ) : (
+                        logs.filter(l => String(l.projectId) === String(project?.id) || l.projectId === `p${project?.id}`).map(log => {
+                          const isLinked = editData.linkedLogIds.includes(log.id);
+                          return (
+                            <div
+                              key={log.id}
+                              onClick={() => toggleLog(log.id)}
+                              className={`flex flex-col p-3 rounded-lg border cursor-pointer transition-colors ${isLinked ? 'bg-blue-50 border-blue-400 shadow-sm' : 'bg-white border-slate-200 hover:border-blue-300'
+                                }`}
+                            >
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-bold text-slate-800">{log.date}</span>
+                                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isLinked ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+                                  +{log.percentageCompleted}%
+                                </span>
+                              </div>
+                              <p className="text-sm text-slate-600 line-clamp-2">{log.workDone}</p>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <button onClick={() => setIsEditing(false)} disabled={isUploading} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-md transition-colors disabled:opacity-50">Cancel</button>
+                    <button onClick={handleSaveEdit} disabled={isUploading} className="px-4 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors shadow-sm disabled:opacity-50">Save Changes</button>
                   </div>
                 </div>
-              )
-            )}
-
-            {attachments.length > 0 && (
-              <div>
-                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Paperclip className="w-4 h-4" /> Attachments ({attachments.length})
-                </h3>
-                <div className="space-y-3">
-                  {attachments.map((attachment, index) => {
-                    const url = attachment.fullUrl || `http://localhost:8080${attachment.url || ''}`;
-                    const isImage = attachment.category === 'image' || attachment.type?.startsWith('image/');
-                    return (
-                      <div key={`${url}-${index}`} className="border border-border rounded-lg p-3 bg-slate-50">
-                        {isImage && <img src={url} alt={attachment.originalName || 'Approval attachment'} className="max-h-56 w-full object-contain rounded mb-2" />}
-                        <a href={url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2">
-                          {isImage ? <ImageIcon className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                          {attachment.originalName || 'Open attachment'}
-                        </a>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Linked Progress Logs */}
-            {linkedLogs.length > 0 && (
-              <div>
-                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <ListTodo className="w-4 h-4" /> Linked Progress Logs ({linkedLogs.length})
-                </h3>
-                <div className="space-y-2">
-                  {linkedLogs.map(log => (
-                    <div key={log.id} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50  border border-border text-sm">
-                      <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                      <span className="font-medium">{log.date}</span>
-                      <span className="text-slate-500 truncate">{log.workDone}</span>
-                      <span className="ml-auto text-primary font-semibold shrink-0">+{log.percentageCompleted}%</span>
+              ) : (
+                approval.description && (
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                      <FileText className="w-4 h-4" /> Request Details
+                    </h3>
+                    <div className="bg-slate-50  rounded-lg p-4 border border-border">
+                      <p className="text-sm text-slate-700  leading-relaxed">{approval.description}</p>
                     </div>
-                  ))}
+                  </div>
+                )
+              )}
+
+              {attachments.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Paperclip className="w-4 h-4" /> Attachments ({attachments.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {attachments.map((attachment, index) => {
+                      const url = attachment.fullUrl || `http://localhost:8080${attachment.url || ''}`;
+                      const isImage = attachment.category === 'image' || attachment.type?.startsWith('image/');
+                      return (
+                        <div key={`${url}-${index}`} className="border border-border rounded-lg p-3 bg-slate-50">
+                          {isImage && <img src={url} alt={attachment.originalName || 'Approval attachment'} className="max-h-56 w-full object-contain rounded mb-2" />}
+                          <a href={url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2">
+                            {isImage ? <ImageIcon className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                            {attachment.originalName || 'Open attachment'}
+                          </a>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Linked Progress Logs */}
+              {linkedLogs.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <ListTodo className="w-4 h-4" /> Linked Progress Logs ({linkedLogs.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {linkedLogs.map(log => (
+                      <div key={log.id} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50  border border-border text-sm">
+                        <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                        <span className="font-medium">{log.date}</span>
+                        <span className="text-slate-500 truncate">{log.workDone}</span>
+                        <span className="ml-auto text-primary font-semibold shrink-0">+{log.percentageCompleted}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
             </div>
 
@@ -418,7 +417,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
                     if (hasComment) {
                       commentText = entry.action.substring(entry.action.indexOf(': "') + 3, entry.action.length - 1);
                     }
-                    
+
                     const isClientResponse = ['approve', 'reject', 'changes'].includes(entry.type);
                     const isPmReply = entry.type === 'reply';
 
@@ -427,24 +426,23 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
                         {/* Left Side: Message Box */}
                         <div className="min-w-0 flex flex-col justify-center">
                           {isClientResponse && hasComment && (
-                            <div className={`rounded-lg p-4 border ${
-                              entry.type === 'approve' ? 'bg-green-50 border-green-200 text-green-700' :
-                              entry.type === 'reject' ? 'bg-red-50 border-red-200 text-red-700' :
-                              'bg-orange-50 border-orange-200 text-orange-700'
-                            }`}>
+                            <div className={`rounded-lg p-4 border ${entry.type === 'approve' ? 'bg-green-50 border-green-200 text-green-700' :
+                                entry.type === 'reject' ? 'bg-red-50 border-red-200 text-red-700' :
+                                  'bg-orange-50 border-orange-200 text-orange-700'
+                              }`}>
                               <p className="text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1 opacity-80">
                                 <MessageSquare className="w-3 h-3" /> Client Feedback
                               </p>
                               <p className="text-sm">{commentText}</p>
                             </div>
                           )}
-                          
+
                           {isClientResponse && !hasComment && (
                             <div className="rounded-lg p-3 border border-dashed border-slate-200 bg-slate-50/50 flex items-center justify-center opacity-70">
                               <p className="text-sm italic text-slate-500">Status updated without additional comments.</p>
                             </div>
                           )}
-                          
+
                           {isPmReply && hasComment && (
                             <div className="bg-purple-50 border border-purple-200 text-purple-700 rounded-lg p-4">
                               <p className="text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1 opacity-80">
@@ -462,6 +460,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
                           )}
 
                           {entry.type === 'close' && (
+
                             <div className="rounded-lg p-3 border border-dashed border-slate-200 bg-slate-50/50 flex items-center justify-center opacity-70">
                               <Lock className="w-4 h-4 mr-2 text-slate-400" />
                               <span className="text-sm text-slate-500 font-medium">Approval Process Concluded</span>
@@ -488,7 +487,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
                 </div>
               </div>
             </div>
-        </div>
+          </div>
 
           {/* Footer — Actions */}
           <div className="sticky bottom-0 z-20 bg-slate-50/80 backdrop-blur-md px-6 py-5 border-t border-border space-y-3">
@@ -501,13 +500,12 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
                     <button
                       key={decision}
                       onClick={() => setClientDecision(decision)}
-                      className={`py-2 px-3 rounded-lg text-xs font-bold border-2 transition-all ${
-                        clientDecision === decision
+                      className={`py-2 px-3 rounded-lg text-xs font-bold border-2 transition-all ${clientDecision === decision
                           ? decision === 'Approved' ? 'bg-green-500 text-white border-green-500' :
                             decision === 'Rejected' ? 'bg-red-500 text-white border-red-500' :
-                            'bg-orange-500 text-white border-orange-500'
+                              'bg-orange-500 text-white border-orange-500'
                           : 'border-border text-slate-600  hover:border-slate-400'
-                      }`}
+                        }`}
                     >
                       {decision === 'Approved' && <CheckCircle2 className="w-3.5 h-3.5 inline mr-1" />}
                       {decision === 'Rejected' && <XCircle className="w-3.5 h-3.5 inline mr-1" />}
