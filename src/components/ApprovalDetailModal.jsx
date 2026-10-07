@@ -4,7 +4,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import {
   X, FileText, Calendar, CheckCircle2, XCircle, RotateCcw,
-  Lock, Send, MessageSquare, Clock, ListTodo, Paperclip, Image as ImageIcon, Edit
+  Lock, Send, MessageSquare, Clock, ListTodo, Paperclip, Image as ImageIcon, Edit, Trash2
 } from 'lucide-react';
 
 const STATUS_STYLES = {
@@ -25,7 +25,18 @@ const STATUS_ICON = {
 
 const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClose, onUpdate }) => {
   const { currentUser } = useAuth();
-  const { logs } = useData();
+  const { logs, deleteApprovalRequest } = useData();
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this approval request?')) {
+      try {
+        await deleteApprovalRequest(approval.id);
+        onClose();
+      } catch (err) {
+        alert('Failed to delete approval request.');
+      }
+    }
+  };
 
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
   const isClient = currentUser?.role === 'client';
@@ -218,9 +229,14 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {isPM && !isEditing && approval.status !== 'Closed' && (
-                <button onClick={() => setIsEditing(true)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors" title="Edit Request">
-                  <Edit className="w-5 h-5" />
-                </button>
+                <>
+                  <button onClick={() => setIsEditing(true)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors" title="Edit Request">
+                    <Edit className="w-5 h-5" />
+                  </button>
+                  <button onClick={handleDelete} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors" title="Delete Request">
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </>
               )}
               <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors shrink-0">
                 <X className="w-5 h-5" />

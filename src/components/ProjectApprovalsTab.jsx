@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ApprovalDetailModal from './ApprovalDetailModal';
 
 const STATUS_STYLES = {
-  Pending: 'bg-amber-100 text-amber-700',
-  Approved: 'bg-green-100 text-green-700',
-  Rejected: 'bg-red-100 text-red-700',
-  'Changes Requested': 'bg-orange-100 text-orange-700',
-  Closed: 'bg-slate-100 text-slate-600'
+  Pending: 'bg-amber-500 text-white',
+  Approved: 'bg-emerald-500 text-white',
+  Rejected: 'bg-red-500 text-white',
+  'Changes Requested': 'bg-orange-500 text-white',
+  Closed: 'bg-slate-500 text-white'
 };
 
 const STATUS_ICON = {
@@ -148,8 +148,8 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header & Filters */}
-      <div className="glass-card flex flex-col overflow-hidden mb-6">
+      <div className="glass-card flex flex-col overflow-hidden">
+        {/* Header & Filters */}
         <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
           <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
             <h2 className="text-xl font-bold leading-tight shrink-0">
@@ -158,7 +158,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
           </div>
           
           <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-3 items-start xl:items-center w-full lg:w-auto justify-end">
-            <div className="relative w-full lg:w-40">
+            <div className="relative w-full lg:w-48">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
@@ -179,7 +179,7 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
                   <button 
                     key={s}
                     onClick={() => setStatusFilter(s)}
-                    className={`relative px-2.5 py-1.5 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                    className={`relative px-3 py-1.5 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
                       statusFilter === s
                         ? 'bg-white shadow-sm text-slate-900 font-bold'
                         : 'hover:text-slate-900'
@@ -194,93 +194,86 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
             {isPM && (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="h-12 flex items-center px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
+                className="h-12 flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-lg shadow-amber-500/30 font-bold shrink-0"
               >
                 Request Approval
               </button>
             )}
           </div>
         </div>
-      </div>
 
-
-
-      {/* Approvals list */}
-      {filteredApprovals.length === 0 ? (
-        <div className="glass-card p-12 text-center text-slate-500">
-          <FileText className="w-12 h-12 mx-auto mb-4 opacity-40" />
-          <p className="text-lg font-medium">No approval requests yet.</p>
-          <p className="text-sm mt-1">Create requests to get formal client sign-off.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filteredApprovals.map((approval, idx) => {
-            const StatusIcon = STATUS_ICON[approval.status] || Clock;
-            const needsAction = isPM && (approval.status === 'Pending' || approval.status === 'Changes Requested');
-            return (
-              <motion.div
-                key={approval.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                onClick={() => setSelectedApproval(approval)}
-                className={`glass-card p-5 cursor-pointer hover:shadow-md hover:border-primary/30 transition-all group border-l-4 ${
-                  approval.status === 'Changes Requested' ? 'border-l-orange-400' :
-                  approval.status === 'Pending' ? 'border-l-amber-400' :
-                  approval.status === 'Approved' ? 'border-l-green-500' :
-                  approval.status === 'Rejected' ? 'border-l-red-500' :
-                  'border-l-slate-300'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-2">
-                      <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full flex items-center gap-1 ${STATUS_STYLES[approval.status] || STATUS_STYLES.Pending}`}>
-                        <StatusIcon className="w-3 h-3" />
-                        {approval.status}
-                      </span>
-                      {approval.dueDate && (
-                        <span className="text-xs text-slate-400 flex items-center gap-1">
-                          Due: {approval.dueDate}
+        {/* Approvals list */}
+        {filteredApprovals.length === 0 ? (
+          <div className="p-12 text-center text-slate-500">
+            <FileText className="w-12 h-12 mx-auto mb-4 opacity-40" />
+            <p className="text-lg font-medium">No approval requests yet.</p>
+            <p className="text-sm mt-1">Create requests to get formal client sign-off.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-slate-100 text-slate-500">
+                <tr>
+                  <th className="px-6 py-3 font-medium">Title</th>
+                  <th className="px-6 py-3 font-medium">Status</th>
+                  <th className="px-6 py-3 font-medium">Requested</th>
+                  <th className="px-6 py-3 font-medium">Due</th>
+                  <th className="px-6 py-3 font-medium">Client Feedback</th>
+                  <th className="px-6 py-3 font-medium text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {filteredApprovals.map((approval, idx) => {
+                  const StatusIcon = STATUS_ICON[approval.status] || Clock;
+                  const needsAction = isPM && (approval.status === 'Pending' || approval.status === 'Changes Requested');
+                  return (
+                    <motion.tr
+                      key={approval.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: idx * 0.03 }}
+                      className={`hover:bg-slate-50/50 transition-colors ${needsAction ? 'bg-amber-50/40' : ''}`}
+                    >
+                      <td className="px-6 py-4">
+                        <p className="font-semibold text-slate-900">{approval.title}</p>
+                        {approval.description && (
+                          <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{approval.description}</p>
+                        )}
+                        {needsAction && (
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                            <span className="text-xs font-bold text-red-500">Action needed</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2.5 py-1.5 text-xs font-bold rounded shadow-sm flex items-center justify-center w-36 ${STATUS_STYLES[approval.status] || ''}`}>
+                          {approval.status}
                         </span>
-                      )}
-                    </div>
-                    <h3 className="font-bold text-slate-900  mb-1">{approval.title}</h3>
-                    {approval.description && (
-                      <p className="text-sm text-slate-500 line-clamp-1">{approval.description}</p>
-                    )}
-                    {approval.feedback && (
-                      <p className="text-xs text-slate-500 mt-2 italic">
-                        Client: "{approval.feedback}"
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-end gap-2 shrink-0">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-slate-400">{approval.dateRequested}</span>
-                      {isPM && (
-                        <button 
-                          onClick={(e) => handleDelete(e, approval.id)}
-                          className="text-slate-400 hover:text-red-500 transition-colors p-1"
-                          title="Delete Request"
+                      </td>
+                      <td className="px-6 py-4 text-slate-500 whitespace-nowrap text-xs">{approval.dateRequested}</td>
+                      <td className="px-6 py-4 text-slate-500 whitespace-nowrap text-xs">{approval.dueDate || '—'}</td>
+                      <td className="px-6 py-4">
+                        {approval.feedback ? (
+                          <p className="text-xs text-slate-500 italic max-w-[160px] truncate">"{approval.feedback}"</p>
+                        ) : '—'}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          onClick={() => setSelectedApproval(approval)}
+                          className="px-4 py-1.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                          View
                         </button>
-                      )}
-                    </div>
-                    {needsAction && (
-                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full animate-pulse">
-                        Action needed
-                      </span>
-                    )}
-                    <span className="text-primary text-sm font-medium group-hover:underline">View →</span>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
+                      </td>
+                    </motion.tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {/* Create Modal */}
       <AnimatePresence>

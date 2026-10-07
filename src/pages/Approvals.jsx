@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Clock, CheckCircle2, XCircle, RotateCcw, Lock, Filter, Eye } from 'lucide-react';
+import { Clock, CheckCircle2, XCircle, RotateCcw, Lock, Filter, Eye, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ApprovalDetailModal from '../components/ApprovalDetailModal';
 
@@ -29,6 +29,7 @@ const Approvals = () => {
 
   const [statusFilter, setStatusFilter] = useState('All');
   const [projectFilter, setProjectFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedApproval, setSelectedApproval] = useState(null);
 
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
@@ -37,10 +38,11 @@ const Approvals = () => {
   // For client: only show approvals for their projects
   const displayApprovals = useMemo(() => {
     let list = [...approvals].sort((a, b) => new Date(b.dateRequested) - new Date(a.dateRequested));
+    if (searchQuery) list = list.filter(a => a.title?.toLowerCase().includes(searchQuery.toLowerCase()) || a.description?.toLowerCase().includes(searchQuery.toLowerCase()));
     if (statusFilter !== 'All') list = list.filter(a => a.status === statusFilter);
     if (projectFilter !== 'All') list = list.filter(a => String(a.projectId).replace(/^p/, '') === String(projectFilter).replace(/^p/, ''));
     return list;
-  }, [approvals, statusFilter, projectFilter]);
+  }, [approvals, statusFilter, projectFilter, searchQuery]);
 
   const statusCounts = ['Pending', 'Approved', 'Changes Requested', 'Rejected', 'Closed'].reduce((acc, s) => {
     acc[s] = approvals.filter(a => a.status === s).length;
@@ -55,39 +57,49 @@ const Approvals = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-          {isClient ? 'Approval Requests' : 'Client Approvals'}
-        </h1>
-      </div>
-
-
-
       {/* Table & Filters Card */}
       <div className="glass-card flex flex-col overflow-hidden">
         
-        {/* Filters Section */}
-        <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
-          <div className="flex items-center gap-3 ml-auto min-w-max">
-            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600">
+        {/* Header & Filters Section */}
+        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
+            <h2 className="text-2xl font-bold leading-tight shrink-0">
+              {isClient ? 'Approval Requests' : 'Client Approvals'}
+            </h2>
+          </div>
+
+          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-3 items-start xl:items-center w-full lg:w-auto justify-end">
+            <div className="relative w-full lg:w-40">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search approvals..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 h-12 rounded-lg border border-slate-300 bg-white/80 focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-sm text-sm"
+              />
+            </div>
+
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto w-fit max-w-full shrink-0">
               {['All', 'Pending', 'Approved', 'Changes Requested', 'Rejected', 'Closed'].map(status => {
                 const count = status === 'All' ? displayApprovals.length : (statusCounts[status] || 0);
+                const displayLabel = status === 'Changes Requested' ? 'Changes' : status;
                 return (
                   <button
                     key={status}
                     onClick={() => setStatusFilter(status)}
-                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                    className={`relative px-2.5 py-1.5 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
                       statusFilter === status 
                         ? 'bg-white shadow-sm text-slate-900 font-bold' 
                         : 'hover:text-slate-900'
                     }`}
                   >
-                    {status} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                    {displayLabel} <span className="ml-1 opacity-60 font-normal">{count}</span>
                   </button>
                 );
               })}
             </div>
+            
             <select
               className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={projectFilter}
@@ -96,6 +108,15 @@ const Approvals = () => {
               <option value="All">All Projects</option>
               {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
+
+            {isPM && (
+              <button
+                className="h-12 flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-lg shadow-amber-500/30 font-bold shrink-0"
+                onClick={() => alert('Please go to a specific project to request an approval.')}
+              >
+                Request Approval
+              </button>
+            )}
           </div>
         </div>
 
@@ -141,7 +162,10 @@ const Approvals = () => {
                           <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{approval.description}</p>
                         )}
                         {needsAction && (
-                          <span className="text-xs font-bold text-amber-600 animate-pulse">⚡ Action needed</span>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                            <span className="text-xs font-bold text-red-500">Action needed</span>
+                          </div>
                         )}
                       </td>
                       <td className="px-6 py-4">
@@ -169,7 +193,7 @@ const Approvals = () => {
                       <td className="px-6 py-4 text-right">
                         <button
                           onClick={() => setSelectedApproval(approval)}
-                          className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
+                          className="px-4 py-1.5 text-sm font-bold bg-amber-500 text-white hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
                         >
                           View
                         </button>
