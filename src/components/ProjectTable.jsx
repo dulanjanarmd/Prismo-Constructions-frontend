@@ -21,6 +21,16 @@ const ProjectTable = ({ projects, title = "Projects" }) => {
           <h2 className="text-xl font-bold text-slate-900">{title}</h2>
         </div>
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 items-center w-full justify-end">
+          <div className="relative w-full md:w-auto h-12">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <input 
+              type="text" 
+              placeholder="Search projects..." 
+              className="pl-9 pr-4 h-full w-full md:w-64 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
           <div className="flex flex-wrap md:flex-nowrap space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto">
             {['All', 'Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(status => {
               const count = status === 'All' ? projects.length : projects.filter(p => p.status === status).length;
@@ -38,16 +48,6 @@ const ProjectTable = ({ projects, title = "Projects" }) => {
                 </button>
               );
             })}
-          </div>
-          <div className="relative w-full md:w-auto h-12">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-            <input 
-              type="text" 
-              placeholder="Search projects..." 
-              className="pl-9 pr-4 h-full w-full md:w-64 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
           </div>
         </div>
       </div>

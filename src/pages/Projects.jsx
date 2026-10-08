@@ -157,7 +157,18 @@ const Projects = () => {
       <div className="glass-card flex flex-col overflow-hidden">
         <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
           <div className="flex items-center gap-3 ml-auto min-w-max">
-            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600">
+            <div className="relative w-full lg:w-48 shrink-0 h-12">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search projects..."
+                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
+
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto">
               {['All', 'Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(status => {
                 const count = status === 'All' ? baseProjects.length : baseProjects.filter(p => p.status === status).length;
                 return (
@@ -175,17 +186,7 @@ const Projects = () => {
                 );
               })}
             </div>
-            
-            <div className="relative w-48 shrink-0 h-12">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search projects..."
-                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-            </div>
+
             {!isSiteEngineer && !isClient && (
               <button 
                 onClick={() => navigate('/portal/projects/new')}

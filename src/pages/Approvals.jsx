@@ -108,14 +108,6 @@ const Approvals = () => {
               {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
 
-            {isPM && (
-              <button
-                className="h-12 flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-lg shadow-amber-500/30 font-bold shrink-0"
-                onClick={() => alert('Please go to a specific project to request an approval.')}
-              >
-                Request Approval
-              </button>
-            )}
           </div>
         </div>
 
