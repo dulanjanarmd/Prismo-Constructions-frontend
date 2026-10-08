@@ -188,18 +188,6 @@ const CreateProjectForm = () => {
                 <textarea rows="4" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Brief scope and details of the project..."></textarea>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1">Initial Status <span className="text-red-500">*</span></label>
-                  <select required className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none appearance-none" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
-                    <option value="PLANNING">Planning</option>
-                    <option value="IN_PROGRESS">In Progress</option>
-                    <option value="ON_HOLD">On Hold</option>
-                    <option value="COMPLETED">Completed</option>
-                  </select>
-                </div>
-              </div>
-
               <h3 className="text-lg font-semibold border-b border-border pb-3 mt-6 mb-4">Attachments (Optional)</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

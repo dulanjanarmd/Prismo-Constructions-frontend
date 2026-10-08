@@ -227,6 +227,8 @@ export const DataProvider = ({ children }) => {
     };
 
     loadData();
+    const interval = setInterval(loadData, 10000); // Poll every 10 seconds for real-time updates
+    return () => clearInterval(interval);
   }, [currentUser]);
 
   useEffect(() => {

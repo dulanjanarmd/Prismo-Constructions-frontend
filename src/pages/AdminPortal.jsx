@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useData } from '../context/DataContext';
-import { UserPlus, Shield, Mail, Trash2, X, Edit, Key, Users, Briefcase, AlertCircle, FileText, Activity, LayoutDashboard } from 'lucide-react';
+import { UserPlus, Shield, Mail, Trash2, X, Edit, Key, Users, Briefcase, AlertCircle, FileText, Activity, LayoutDashboard, Search, Filter } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -20,9 +20,38 @@ const AdminPortal = () => {
   const [editUser, setEditUser] = useState({ name: '', email: '', role: 'CLIENT' });
   const [newPassword, setNewPassword] = useState('');
 
-  const displayUsers = users && users.length > 0 ? users : usersList;
+  // Filter State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState('ALL');
 
+  const displayUsers = useMemo(() => {
+    const baseList = users && users.length > 0 ? users : usersList;
+    
+    const filteredList = baseList.filter(user => {
+      const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRole = roleFilter === 'ALL' || user.role === roleFilter;
+      const matchesStatus = statusFilter === 'ALL' || (user.status || 'ACTIVE') === statusFilter;
+      return matchesSearch && matchesRole && matchesStatus;
+    });
 
+    return filteredList.sort((a, b) => {
+      const isAPinned = a.role === 'ceo' || a.role === 'admin';
+      const isBPinned = b.role === 'ceo' || b.role === 'admin';
+      
+      if (isAPinned && !isBPinned) return -1;
+      if (!isAPinned && isBPinned) return 1;
+      
+      // Secondary sort for pinned users (CEO first, then Admin)
+      if (isAPinned && isBPinned) {
+        if (a.role === 'ceo' && b.role === 'admin') return -1;
+        if (a.role === 'admin' && b.role === 'ceo') return 1;
+      }
+      
+      return 0; // Maintain original order for others
+    });
+  }, [users, usersList, searchTerm, roleFilter, statusFilter]);
 
   // --- Handlers ---
   const handleAddUser = async (e) => {
@@ -117,25 +146,8 @@ const AdminPortal = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-            System Administration
-          </h1>
-          <p className="text-slate-500 mt-1">Manage users and configure access control for the platform. Welcome back, {currentUser?.name || 'Admin'}</p>
-        </div>
-        <button 
-          onClick={() => setShowAddUserModal(true)}
-          className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 mt-4 md:mt-0"
-        >
-          <UserPlus className="w-5 h-5 mr-2" />
-          Add User
-        </button>
-      </div>
-
       {/* Content */}
       <AnimatePresence mode="wait">
-
 
         {activeTab === 'users' && (
           <motion.div
@@ -144,11 +156,69 @@ const AdminPortal = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="space-y-6"
+            className="glass-card flex flex-col overflow-hidden"
           >
+            {/* Header & Filters Section */}
+            <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+              
+              <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
+                <div>
+                  <h2 className="text-2xl font-bold leading-tight shrink-0">
+                    System Administration
+                  </h2>
+                  <p className="text-sm text-slate-600 mt-1">
+                    Manage users and configure access control. Welcome back, {currentUser?.name || 'Admin'}
+                  </p>
+                </div>
+              </div>
 
-            <div className="glass-card overflow-hidden">
-              <div className="overflow-x-auto">
+              <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-3 items-start xl:items-center w-full lg:w-auto justify-end">
+                <div className="relative w-full lg:w-48">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-9 pr-4 h-12 rounded-lg border border-slate-300 bg-white/80 focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-sm text-sm"
+                  />
+                </div>
+
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className="h-12 w-40 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="ALL">All Roles</option>
+                  <option value="admin">Admin</option>
+                  <option value="ceo">CEO</option>
+                  <option value="PROJECT_MANAGER">Project Manager</option>
+                  <option value="SITE_ENGINEER">Site Engineer</option>
+                  <option value="QUANTITY_SURVEYOR">Quantity Surveyor</option>
+                  <option value="CLIENT">Client</option>
+                </select>
+
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="SUSPENDED">Suspended</option>
+                </select>
+
+                <button 
+                  onClick={() => setShowAddUserModal(true)}
+                  className="h-12 flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-lg shadow-amber-500/30 font-bold shrink-0"
+                >
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  Add User
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-slate-50 text-slate-500 border-b border-border">
                     <tr>
@@ -200,14 +270,28 @@ const AdminPortal = () => {
                               <>
                                 {user.status === 'SUSPENDED' ? (
                                   <button 
-                                    onClick={() => activateUser(user.id)}
+                                    onClick={async () => {
+                                      try {
+                                        await activateUser(user.id);
+                                      } catch (error) {
+                                        console.error('Error activating user:', error);
+                                        alert('Failed to activate user. Please try again.');
+                                      }
+                                    }}
                                     className="px-4 py-1.5 text-xs font-bold bg-emerald-500 text-white hover:bg-emerald-600 rounded-lg transition-all shadow-sm hover:shadow"
                                   >
                                     Activate
                                   </button>
                                 ) : (
                                   <button 
-                                    onClick={() => suspendUser(user.id)}
+                                    onClick={async () => {
+                                      try {
+                                        await suspendUser(user.id);
+                                      } catch (error) {
+                                        console.error('Error suspending user:', error);
+                                        alert('Failed to suspend user. Please try again.');
+                                      }
+                                    }}
                                     className="px-4 py-1.5 text-xs font-bold bg-slate-500 text-white hover:bg-slate-600 rounded-lg transition-all shadow-sm hover:shadow"
                                   >
                                     Suspend
@@ -228,7 +312,6 @@ const AdminPortal = () => {
                   </tbody>
                 </table>
               </div>
-            </div>
           </motion.div>
         )}
 

@@ -7,17 +7,17 @@ const DashboardHeader = ({ rightElement }) => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 60000); // update every minute
+    const timer = setInterval(() => setTime(new Date()), 1000); // update every second
     return () => clearInterval(timer);
   }, []);
 
-  const hour = time.getHours();
+  const hour = new Date(time.toLocaleString('en-US', { timeZone: 'Asia/Colombo' })).getHours();
   let greeting = 'Good evening';
   if (hour < 12) greeting = 'Good morning';
   else if (hour < 17) greeting = 'Good afternoon';
 
-  const dateStr = time.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  const timeStr = time.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  const dateStr = time.toLocaleDateString('en-LK', { timeZone: 'Asia/Colombo', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const timeStr = time.toLocaleTimeString('en-LK', { timeZone: 'Asia/Colombo', hour: 'numeric', minute: '2-digit', hour12: true });
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center">

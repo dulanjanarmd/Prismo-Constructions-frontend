@@ -227,12 +227,21 @@ const ProjectMilestonesTab = ({ project }) => {
   };
 
   const handleDelete = async (id) => {
+    const linkedTasks = tasks.filter(t => String(t.milestoneId).replace('m', '') === String(id).replace('m', ''));
+    if (linkedTasks.length > 0) {
+      alert("Cannot delete milestone because it is linked to one or more tasks. Please remove the task links first.");
+      return;
+    }
+
     try {
       const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones/${id}`, {
         method: 'DELETE',
         headers: authHeaders
       });
-      if (!res.ok) throw new Error('Failed to delete milestone');
+      
+      if (!res.ok) {
+        throw new Error('Failed to delete milestone');
+      }
       
       const newMilestones = milestones.filter(x => x.id !== id);
       const completedCount = newMilestones.filter(x => x.status === 'Completed').length;
@@ -563,15 +572,7 @@ const ProjectMilestonesTab = ({ project }) => {
                     <option value="Pending">Pending</option>
                     <option value="Paid">Paid</option>
                   </select>
-                  <label className="flex items-center gap-2 text-sm text-slate-700 bg-slate-50 px-3 py-2 rounded-md border border-slate-200 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={newForm.inspectionRequired}
-                      onChange={e => setNewForm({ ...newForm, inspectionRequired: e.target.checked })}
-                      className="rounded border-slate-300 text-primary focus:ring-primary"
-                    />
-                    Inspection Req.
-                  </label>
+
                 </div>
               <textarea
                 required
@@ -716,15 +717,7 @@ const ProjectMilestonesTab = ({ project }) => {
                             <option value="Pending">Pending</option>
                             <option value="Paid">Paid</option>
                           </select>
-                          <label className="flex items-center gap-1 text-xs text-slate-700 bg-slate-50 px-2 py-1 rounded border border-slate-200 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={editForm.inspectionRequired}
-                              onChange={e => setEditForm({ ...editForm, inspectionRequired: e.target.checked })}
-                              className="rounded border-slate-300 text-primary focus:ring-primary w-3 h-3"
-                            />
-                            Inspection Req.
-                          </label>
+
                         </div>
                         <input
                           type="text"
@@ -780,11 +773,7 @@ const ProjectMilestonesTab = ({ project }) => {
                               {m.paymentStatus}
                             </span>
                           )}
-                          {m.inspectionRequired && (
-                            <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                              Inspection Required
-                            </span>
-                          )}
+
                           {m.deliverables && (
                             <span className="text-xs text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 max-w-[200px] sm:max-w-[300px] truncate" title={m.deliverables}>
                               Deliverables: {m.deliverables}
