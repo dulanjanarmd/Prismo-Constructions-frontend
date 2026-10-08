@@ -11,7 +11,7 @@ const statusColors = {
 };
 
 const ProjectMilestonesTab = ({ project }) => {
-  const { updateProject } = useData();
+  const { updateProject, tasks } = useData();
   const { currentUser } = useAuth();
   const isClient = currentUser?.role === 'client';
   const [isAdding, setIsAdding] = useState(false);
@@ -82,8 +82,8 @@ const ProjectMilestonesTab = ({ project }) => {
         }
       }
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const todayStr = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
+      const today = new Date(todayStr);
       if (msStart < today) {
         alert("Milestone start date cannot be in the past.");
         return;
@@ -112,8 +112,8 @@ const ProjectMilestonesTab = ({ project }) => {
         }
       }
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const todayStr = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
+      const today = new Date(todayStr);
       if (msDate < today) {
         alert("Milestone due date cannot be in the past.");
         return;
@@ -181,6 +181,19 @@ const ProjectMilestonesTab = ({ project }) => {
     const m = milestones.find(x => x.id === id);
     if (!m) return;
     const newStatus = m.status === 'Completed' ? 'Incomplete' : 'Completed';
+
+    if (newStatus === 'Completed') {
+      const milestoneTasks = tasks?.filter(t => 
+        (String(t.projectId) === String(project.id) || t.projectId === `p${project.id}`) && 
+        (String(t.milestoneId) === String(id) || t.milestoneId === `m${id}`)
+      ) || [];
+      
+      const hasIncompleteTasks = milestoneTasks.some(t => t.status !== 'Completed' && t.status !== 'Closed');
+      if (hasIncompleteTasks) {
+        alert("Cannot mark milestone as completed. All related tasks must be either 'Completed' or 'Closed'.");
+        return;
+      }
+    }
     try {
       const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones/${id}`, {
         method: 'PUT',
@@ -283,8 +296,8 @@ const ProjectMilestonesTab = ({ project }) => {
         }
       }
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const todayStr = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
+      const today = new Date(todayStr);
       if (msStart < today) {
         alert("Milestone start date cannot be in the past.");
         return;
@@ -313,8 +326,8 @@ const ProjectMilestonesTab = ({ project }) => {
         }
       }
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const todayStr = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
+      const today = new Date(todayStr);
       if (msDate < today) {
         alert("Milestone due date cannot be in the past.");
         return;
@@ -360,7 +373,7 @@ const ProjectMilestonesTab = ({ project }) => {
   const completedCount = milestones.filter(m => m.status === 'Completed').length;
   const pct = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
   let minDateStr = project?.startDate 
     ? new Date(project.startDate).toISOString().split('T')[0]
     : todayStr;

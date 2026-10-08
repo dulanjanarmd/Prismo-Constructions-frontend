@@ -217,7 +217,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
     return acc;
   }, {});
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
   let minDate = project?.startDate 
     ? (new Date(project.startDate) > new Date(today) ? new Date(project.startDate).toISOString().split('T')[0] : today)
     : today;

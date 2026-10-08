@@ -117,7 +117,7 @@ const CreateProjectForm = () => {
     }
   };
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().split('T')[0];
   const minEndDateStr = formData.startDate 
     ? new Date(new Date(formData.startDate).getTime() + 86400000).toISOString().split('T')[0] 
     : todayStr;
