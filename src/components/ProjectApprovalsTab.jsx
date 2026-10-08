@@ -114,11 +114,11 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
         projectId,
         status: 'Pending',
         feedback: '',
-        dateRequested: new Date().toISOString().split('T')[0],
+        dateRequested: new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0],
         auditTrail: [{
           actor: currentUser?.name || 'Project Manager',
           action: 'Created approval request',
-          timestamp: new Date().toLocaleString(),
+          timestamp: new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-LK'),
           type: 'create'
         }]
       });

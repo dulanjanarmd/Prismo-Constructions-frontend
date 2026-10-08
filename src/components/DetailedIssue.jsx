@@ -309,10 +309,10 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
             )}
             {issue.costImpact && (
               <div className="flex items-start gap-2">
-                <span className="text-slate-400 font-bold mt-0.5 text-sm">$</span>
+                <span className="text-slate-400 font-bold mt-0.5 text-sm">Rs.</span>
                 <div>
                   <p className="font-semibold text-slate-700">Est. Cost Impact</p>
-                  <p className="text-slate-600">${Number(issue.costImpact).toLocaleString()}</p>
+                  <p className="text-slate-600">LKR {Number(issue.costImpact).toLocaleString('en-LK')}</p>
                 </div>
               </div>
             )}

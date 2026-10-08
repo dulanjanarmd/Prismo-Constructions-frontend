@@ -116,8 +116,8 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
       actor: 'Project Manager',
       action: 'Created approval request',
       timestamp: approval.dateRequested
-        ? new Date(approval.dateRequested).toLocaleString()
-        : new Date().toLocaleString(),
+        ? new Date(approval.dateRequested).toLocaleString('en-LK')
+        : new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-LK'),
       type: 'create'
     }
   ]);
@@ -136,7 +136,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
     const entry = {
       actor: currentUser?.name || 'Client',
       action: `${clientDecision}${clientComment ? `: "${clientComment}"` : ''}`,
-      timestamp: new Date().toLocaleString(),
+      timestamp: new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-LK'),
       type: clientDecision === 'Approved' ? 'approve' : clientDecision === 'Rejected' ? 'reject' : 'changes'
     };
     const newTrail = [...auditTrail, entry];
@@ -162,7 +162,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
     const entry = {
       actor: currentUser?.name || 'Project Manager',
       action: `PM Reply: "${pmReply.trim()}"`,
-      timestamp: new Date().toLocaleString(),
+      timestamp: new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-LK'),
       type: 'reply'
     };
     const newTrail = [...auditTrail, entry];
@@ -176,7 +176,7 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
     const entry = {
       actor: 'Project Manager',
       action: 'Approval closed — cycle complete',
-      timestamp: new Date().toLocaleString(),
+      timestamp: new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-LK'),
       type: 'close'
     };
     const newTrail = [...auditTrail, entry];

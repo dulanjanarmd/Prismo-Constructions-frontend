@@ -23,7 +23,7 @@ const ReportIssueModal = ({ isOpen, onClose, defaultProjectId = '', assignedProj
       description: formData.description,
       severity: formData.severity,
       status: 'Open',
-      reportedDate: new Date().toISOString().split('T')[0],
+      reportedDate: new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0],
       resolution: '',
       photoUrl: formData.photoUrl,
       relatedTaskId: formData.taskId || null

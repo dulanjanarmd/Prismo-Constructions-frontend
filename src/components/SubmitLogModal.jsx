@@ -10,7 +10,7 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
   
   const [formData, setFormData] = useState({
     projectId: defaultProjectId || (assignedProjects.length > 0 ? assignedProjects[0].id : ''),
-    date: new Date().toISOString().split('T')[0],
+    date: new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0],
     weather: 'Sunny',
     manpower: '',
     workDone: '',
@@ -88,7 +88,7 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
     // Reset form
     setFormData({
       projectId: assignedProjects.length > 0 ? assignedProjects[0].id : '',
-      date: new Date().toISOString().split('T')[0],
+      date: new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0],
       weather: 'Sunny',
       manpower: '',
       workDone: '',

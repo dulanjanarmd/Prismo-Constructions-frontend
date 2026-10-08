@@ -67,7 +67,7 @@ const NotificationDrawer = ({ isOpen, onClose }) => {
                           <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${!notif.read ? 'bg-blue-500' : 'bg-transparent'}`}></div>
                           <div>
                             <p className={`text-sm ${!notif.read ? 'font-semibold text-slate-900' : 'text-slate-700'}`}>{notif.message}</p>
-                            <p className="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</p>
+                            <p className="text-xs text-slate-400 mt-1">{new Date(notif.createdAt).toLocaleString('en-LK', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Colombo' })}</p>
                           </div>
                         </div>
                         <button

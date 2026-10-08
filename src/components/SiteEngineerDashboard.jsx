@@ -28,7 +28,7 @@ const SiteEngineerDashboard = () => {
   const openTasks = myTasks.filter(t => t.status === 'To Do' || t.status === 'In Progress');
   
   const tasksDueToday = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
     return myTasks.filter(t => t.dueDate === today && t.status !== 'Completed' && t.status !== 'Closed').length;
   }, [myTasks]);
 

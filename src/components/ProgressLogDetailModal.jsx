@@ -58,7 +58,7 @@ const ProgressLogDetailModal = ({ log, users, onClose }) => {
       id: Date.now(),
       author: currentUser?.name || 'PM',
       text: comment.trim(),
-      timestamp: new Date().toLocaleString()
+      timestamp: new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-LK')
     };
     setComments([...comments, newComment]);
     setComment('');
