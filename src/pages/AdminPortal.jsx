@@ -122,8 +122,15 @@ const AdminPortal = () => {
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
             System Administration
           </h1>
-          <p className="text-slate-500 mt-1">Welcome back, {currentUser?.name || 'Admin'}</p>
+          <p className="text-slate-500 mt-1">Manage users and configure access control for the platform. Welcome back, {currentUser?.name || 'Admin'}</p>
         </div>
+        <button 
+          onClick={() => setShowAddUserModal(true)}
+          className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 mt-4 md:mt-0"
+        >
+          <UserPlus className="w-5 h-5 mr-2" />
+          Add User
+        </button>
       </div>
 
       {/* Content */}
@@ -139,19 +146,7 @@ const AdminPortal = () => {
             transition={{ duration: 0.2 }}
             className="space-y-6"
           >
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-bold">Manage Users & Roles</h2>
-                <p className="text-sm text-slate-500">Configure access control for the platform.</p>
-              </div>
-              <button 
-                onClick={() => setShowAddUserModal(true)}
-                className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
-              >
-                <UserPlus className="w-5 h-5 mr-2" />
-                Add User
-              </button>
-            </div>
+
             <div className="glass-card overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
