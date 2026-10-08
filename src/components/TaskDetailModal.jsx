@@ -45,6 +45,7 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
   const [showReAssign, setShowReAssign] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editCommentText, setEditCommentText] = useState('');
+  const [activeActionCommentId, setActiveActionCommentId] = useState(null);
 
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
   const isSiteEngineer = currentUser?.role === 'site_engineer';
@@ -408,68 +409,95 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
                 </div>
                 
                 <div className="p-4 pt-0 space-y-4 flex flex-col">
-                {(task.comments && task.comments.filter(c => !c.isCompletionNote).length > 0) ? (
-                  task.comments.filter(c => !c.isCompletionNote).map((comment) => {
+                {(() => {
+                  const chatComments = task.comments ? task.comments.filter(c => !c.isCompletionNote) : [];
+                  if (chatComments.length === 0) {
+                    return <p className="text-[13px] text-slate-400 italic text-center py-8">No comments yet.</p>;
+                  }
+
+                  let lastDateStr = null;
+                  
+                  return chatComments.map((comment) => {
+                    const commentDate = new Date(comment.date);
+                    const currentDateStr = commentDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+                    const showDateHeader = currentDateStr !== lastDateStr;
+                    lastDateStr = currentDateStr;
+
                     const isPMComment = comment.role === 'pm' || comment.role === 'project_manager';
                     const isSEComment = comment.role === 'site_engineer';
                     const isOwnComment = currentUser.name === comment.author;
 
                     const alignmentClass = isOwnComment ? 'self-end items-end' : 'self-start items-start';
-                    const bubbleBg = 'bg-white border-slate-200';
+                    const bubbleBg = isOwnComment ? 'bg-primary text-white shadow-sm border border-transparent' : 'bg-slate-100 text-slate-800 border border-slate-200 shadow-sm';
+                    const textColor = isOwnComment ? 'text-white' : 'text-slate-800';
 
                     return (
-                    <div key={comment.id} className={`max-w-[85%] flex flex-col ${alignmentClass}`}>
-                      <div className="flex items-center gap-1.5 mb-1 px-1">
-                        <span className="font-semibold text-slate-700 text-[11px]">{comment.author}</span>
-                        {isPMComment && <span className="px-1 py-0.5 bg-blue-100 text-blue-700 rounded text-[9px] font-bold">PM</span>}
-                        {isSEComment && <span className="px-1 py-0.5 bg-orange-100 text-orange-700 rounded text-[9px] font-bold">SE</span>}
-                        <span className="text-[9px] text-slate-400 ml-1">{new Date(comment.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
-                      </div>
-                      
-                      <div className={`p-3 rounded-lg text-[13px] leading-relaxed border shadow-sm ${bubbleBg}`}>
-                        {editingCommentId === comment.id ? (
-                          <form onSubmit={(e) => handleEditCommentSubmit(e, comment.id)} className="flex flex-col gap-2 min-w-[200px]">
-                            <textarea
-                              rows="2"
-                              className="w-full rounded border border-input bg-white px-2 py-1 text-[13px] outline-none resize-none"
-                              value={editCommentText}
-                              onChange={e => setEditCommentText(e.target.value)}
-                              autoFocus
-                            />
-                            <div className="flex justify-end gap-2">
-                              <button type="button" onClick={() => setEditingCommentId(null)} className="text-[10px] text-slate-500 hover:underline">Cancel</button>
-                              <button type="submit" className="text-[10px] text-primary hover:underline font-medium">Save</button>
-                            </div>
-                          </form>
-                        ) : (
-                          <>
-                            {comment.text && <p className="text-slate-800 whitespace-pre-wrap break-words">{comment.text}</p>}
-                            {comment.fileUrl && (
-                              <div className="mt-1.5">
-                                {comment.fileUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) ? (
-                                  <img src={comment.fileUrl} alt="Attached" className="max-h-32 rounded-lg object-cover border border-slate-200" />
-                                ) : (
-                                  <a href={comment.fileUrl} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1">
-                                    <UploadCloud className="w-3 h-3" /> {comment.fileName || 'View Attachment'}
-                                  </a>
-                                )}
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-
-                      {isOwnComment && editingCommentId !== comment.id && !comment.isCompletionNote && (
-                        <div className={`flex gap-2 px-2 mt-1 ${isPMComment ? 'justify-end' : 'justify-start'}`}>
-                          <button onClick={() => { setEditingCommentId(comment.id); setEditCommentText(comment.text); }} className="text-[10px] text-slate-400 hover:text-primary transition-colors flex items-center gap-0.5"><Edit className="w-3 h-3" /> Edit</button>
-                          <button onClick={() => handleDeleteComment(comment.id)} className="text-[10px] text-slate-400 hover:text-red-500 transition-colors flex items-center gap-0.5"><Trash2 className="w-3 h-3" /> Delete</button>
+                    <React.Fragment key={comment.id}>
+                      {showDateHeader && (
+                        <div className="flex justify-center my-3 w-full">
+                          <span className="glass-card px-4 py-1.5 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+                            {currentDateStr}
+                          </span>
                         </div>
                       )}
-                    </div>
-                  )})
-                ) : (
-                  <p className="text-[13px] text-slate-400 italic text-center py-8">No comments yet.</p>
-                )}
+                      <div className={`max-w-[85%] flex flex-col ${alignmentClass}`}>
+                        <div 
+                          className={`p-3 rounded-lg text-[13px] leading-relaxed flex flex-col ${bubbleBg} select-none`}
+                          onDoubleClick={() => {
+                            if (isOwnComment) {
+                              setActiveActionCommentId(activeActionCommentId === comment.id ? null : comment.id);
+                            }
+                          }}
+                        >
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className={`font-bold text-[11px] ${isOwnComment ? 'text-white' : 'text-slate-700'}`}>{comment.author}</span>
+                          </div>
+                          {editingCommentId === comment.id ? (
+                            <form onSubmit={(e) => handleEditCommentSubmit(e, comment.id)} className="flex flex-col gap-2 min-w-[200px]">
+                              <textarea
+                                rows="2"
+                                className="w-full rounded border border-input bg-white px-2 py-1 text-[13px] outline-none resize-none text-slate-800"
+                                value={editCommentText}
+                                onChange={e => setEditCommentText(e.target.value)}
+                                autoFocus
+                              />
+                              <div className="flex justify-end gap-2">
+                                <button type="button" onClick={() => setEditingCommentId(null)} className="text-[10px] text-slate-500 hover:underline">Cancel</button>
+                                <button type="submit" className="text-[10px] text-primary hover:underline font-medium bg-white px-2 py-0.5 rounded">Save</button>
+                              </div>
+                            </form>
+                          ) : (
+                            <>
+                              {comment.text && <p className={`${textColor} whitespace-pre-wrap break-words`}>{comment.text}</p>}
+                              {comment.fileUrl && (
+                                <div className="mt-1.5">
+                                  {comment.fileUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) ? (
+                                    <img src={comment.fileUrl} alt="Attached" className="max-h-32 rounded-lg object-cover border border-slate-200" />
+                                  ) : (
+                                    <a href={comment.fileUrl} target="_blank" rel="noreferrer" className={`text-xs hover:underline flex items-center gap-1 ${isOwnComment ? 'text-white' : 'text-primary'}`}>
+                                      <UploadCloud className="w-3 h-3" /> {comment.fileName || 'View Attachment'}
+                                    </a>
+                                  )}
+                                </div>
+                              )}
+                            </>
+                          )}
+                          <div className={`text-[9px] mt-1.5 text-right ${isOwnComment ? 'text-white/80' : 'text-slate-400'}`}>
+                            {commentDate.toLocaleTimeString([], { timeStyle: 'short' })}
+                          </div>
+                        </div>
+
+                        {isOwnComment && activeActionCommentId === comment.id && editingCommentId !== comment.id && !comment.isCompletionNote && (
+                          <div className={`flex gap-2 px-2 mt-1 justify-end`}>
+                            <button onClick={() => { setEditingCommentId(comment.id); setEditCommentText(comment.text); setActiveActionCommentId(null); }} className="text-[10px] text-slate-400 hover:text-primary transition-colors flex items-center gap-0.5"><Edit className="w-3 h-3" /> Edit</button>
+                            <button onClick={() => { handleDeleteComment(comment.id); setActiveActionCommentId(null); }} className="text-[10px] text-slate-400 hover:text-red-500 transition-colors flex items-center gap-0.5"><Trash2 className="w-3 h-3" /> Delete</button>
+                          </div>
+                        )}
+                      </div>
+                    </React.Fragment>
+                    );
+                  });
+                })()}
               </div>
             </div>
 
@@ -491,7 +519,7 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
                     <button
                       type="submit"
                       disabled={(!newComment.trim() && !commentFileUrl) || uploadingCommentFile}
-                      className="px-4 py-2 bg-primary text-white rounded-md transition-colors disabled:opacity-50 hover:bg-blue-600 shadow-sm"
+                      className="px-4 py-2 bg-primary text-white rounded-md transition-all disabled:opacity-50 hover:opacity-90 shadow-sm"
                     >
                       <Send className="w-4 h-4" />
                     </button>

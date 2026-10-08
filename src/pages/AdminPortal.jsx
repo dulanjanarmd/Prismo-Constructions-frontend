@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const AdminPortal = () => {
   const { users, projects, tasks, issues, logs, addUser, deleteUser, updateUser, resetUserPassword, suspendUser, activateUser } = useData();
   const { currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('users');
   
   // User Management State
   const [usersList, setUsersList] = useState([]);
@@ -22,31 +22,7 @@ const AdminPortal = () => {
 
   const displayUsers = users && users.length > 0 ? users : usersList;
 
-  // Analytics Data Preparation
-  const userRoleData = useMemo(() => {
-    if (!users) return [];
-    const counts = users.reduce((acc, user) => {
-      const role = user.role.replace('_', ' ').toUpperCase();
-      acc[role] = (acc[role] || 0) + 1;
-      return acc;
-    }, {});
-    return Object.entries(counts).map(([name, value]) => ({ name, value }));
-  }, [users]);
 
-  const projectStatusData = useMemo(() => {
-    if (!projects) return [];
-    const counts = projects.reduce((acc, project) => {
-      const status = project.status || 'Unknown';
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    }, {});
-    return Object.entries(counts).map(([name, count]) => ({ name, count }));
-  }, [projects]);
-
-  const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#64748b'];
-
-  const activeProjectsCount = projects?.filter(p => p.status === 'In Progress' || p.status === 'IN_PROGRESS' || p.status === 'Planning' || p.status === 'PLANNING').length || 0;
-  const openIssuesCount = issues?.filter(i => i.status !== 'RESOLVED' && i.status !== 'CLOSED').length || 0;
 
   // --- Handlers ---
   const handleAddUser = async (e) => {
@@ -150,86 +126,9 @@ const AdminPortal = () => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex space-x-1 bg-slate-100 p-1 rounded-xl w-fit">
-        <button
-          onClick={() => setActiveTab('dashboard')}
-          className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            activeTab === 'dashboard' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-          }`}
-        >
-          <LayoutDashboard className="w-4 h-4 mr-2" />
-          Analytics Dashboard
-        </button>
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            activeTab === 'users' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-          }`}
-        >
-          <Users className="w-4 h-4 mr-2" />
-          User Management
-        </button>
-        <button
-          onClick={() => setActiveTab('activity')}
-          className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            activeTab === 'activity' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-          }`}
-        >
-          <Activity className="w-4 h-4 mr-2" />
-          System Notifications
-        </button>
-      </div>
-
-      {/* Tab Content */}
+      {/* Content */}
       <AnimatePresence mode="wait">
-        {activeTab === 'dashboard' && (
-          <motion.div
-            key="dashboard"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-6"
-          >
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="glass-card p-6 border-l-4 border-l-blue-500 relative overflow-hidden group">
-                <div className="relative z-10">
-                  <p className="text-sm font-semibold text-slate-500 mb-1">Total Users</p>
-                  <p className="text-3xl font-bold text-slate-800">{users?.length || 0}</p>
-                </div>
-                <Users className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-blue-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
-              </div>
 
-              <div className="glass-card p-6 border-l-4 border-l-emerald-500 relative overflow-hidden group">
-                <div className="relative z-10">
-                  <p className="text-sm font-semibold text-slate-500 mb-1">Active Projects</p>
-                  <p className="text-3xl font-bold text-slate-800">{activeProjectsCount}</p>
-                </div>
-                <Briefcase className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-emerald-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
-              </div>
-
-              <div className="glass-card p-6 border-l-4 border-l-rose-500 relative overflow-hidden group">
-                <div className="relative z-10">
-                  <p className="text-sm font-semibold text-slate-500 mb-1">Open Issues</p>
-                  <p className="text-3xl font-bold text-slate-800">{openIssuesCount}</p>
-                </div>
-                <AlertCircle className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-rose-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
-              </div>
-
-              <div className="glass-card p-6 border-l-4 border-l-amber-500 relative overflow-hidden group">
-                <div className="relative z-10">
-                  <p className="text-sm font-semibold text-slate-500 mb-1">Total Progress Logs</p>
-                  <p className="text-3xl font-bold text-slate-800">{logs?.length || 0}</p>
-                </div>
-                <FileText className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-amber-500 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
-              </div>
-            </div>
-
-
-          </motion.div>
-        )}
 
         {activeTab === 'users' && (
           <motion.div
@@ -338,29 +237,7 @@ const AdminPortal = () => {
           </motion.div>
         )}
 
-        {activeTab === 'activity' && (
-          <motion.div
-            key="activity"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-6"
-          >
-            <div>
-              <h2 className="text-xl font-bold">System Notifications</h2>
-              <p className="text-sm text-slate-500">Recent events and system notifications.</p>
-            </div>
-            <div className="glass-card p-6 flex flex-col items-center justify-center min-h-[400px] text-slate-500 text-center">
-              <Activity className="w-16 h-16 mb-4 text-slate-300" />
-              <h3 className="text-xl font-medium text-slate-800 mb-2">Notifications Log Unavailable</h3>
-              <p className="max-w-md text-slate-500">Detailed system notification logging is currently empty or not enabled. Check back later for recent administrative actions, logins, and system events.</p>
-              <button className="mt-6 px-6 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors font-medium">
-                Refresh Logs
-              </button>
-            </div>
-          </motion.div>
-        )}
+
       </AnimatePresence>
 
       {/* Add User Modal */}
