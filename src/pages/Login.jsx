@@ -3,8 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import ImageCarousel from '../components/ImageCarousel';
-import PublicNavbar from '../components/PublicNavbar';
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,10 +33,7 @@ const Login = () => {
   return (
     <div className="h-screen flex flex-col bg-transparent text-slate-900 relative font-sans overflow-hidden">
       
-      {/* Exact Header matching Landing Page */}
-      <div className="bg-[#e5e7eb] rounded-b-[3rem] pb-4 relative px-4 sm:px-8">
-        <PublicNavbar />
-      </div>
+
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 relative z-10 pb-12">

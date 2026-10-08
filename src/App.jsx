@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import { useAuth } from './context/AuthContext';
 
-import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Logs from './pages/Logs';
@@ -15,9 +14,6 @@ import ResetPassword from './pages/ResetPassword';
 import AdminPortal from './pages/AdminPortal';
 import Consultations from './pages/Consultations';
 import Issues from './pages/Issues';
-import ServicesPage from './pages/ServicesPage';
-import PortfolioPage from './pages/PortfolioPage';
-import AboutPage from './pages/AboutPage';
 import NotificationsPage from './pages/NotificationsPage';
 import CreateProjectPage from './pages/CreateProjectPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
@@ -53,10 +49,7 @@ function App() {
 
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/portfolio" element={<PortfolioPage />} />
-        <Route path="/about" element={<AboutPage />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={currentUser ? <Navigate to="/portal" replace /> : <Login />} />
 
         <Route path="/reset-password" element={<ResetPassword />} />
@@ -94,8 +87,8 @@ function App() {
           } />
         </Route>
         
-        {/* Catch all redirect to public page */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Catch all redirect to login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </>
   );
