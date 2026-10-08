@@ -58,7 +58,7 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
     try {
       const updates = { status: newStatus };
       if (newStatus === 'Reopened') {
-        const hasEvidence = parsedEvidence.length > 0;
+        const hasEvidence = evidenceFiles.length > 0;
         if (hasEvidence) {
           const reopenComment = {
             id: Date.now(),
