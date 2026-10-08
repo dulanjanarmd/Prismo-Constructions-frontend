@@ -104,7 +104,17 @@ const ProjectTasksTab = ({ projectId, project }) => {
         }
       }
 
-
+      if (formData.milestoneId) {
+        const selectedMilestone = milestones.find(m => String(m.id) === String(formData.milestoneId).replace('m', ''));
+        if (selectedMilestone && selectedMilestone.dueDate) {
+          const milestoneDate = new Date(selectedMilestone.dueDate);
+          milestoneDate.setHours(0, 0, 0, 0);
+          if (taskDate > milestoneDate) {
+            alert("Task due date cannot be after the linked milestone's due date.");
+            return;
+          }
+        }
+      }
     }
 
     setSubmitting(true);
@@ -212,7 +222,15 @@ const ProjectTasksTab = ({ projectId, project }) => {
     ? (new Date(project.startDate) > new Date(today) ? new Date(project.startDate).toISOString().split('T')[0] : today)
     : today;
   let maxDate = project?.endDate || undefined;
-
+  if (formData.milestoneId) {
+    const selectedMilestone = milestones.find(m => String(m.id) === String(formData.milestoneId).replace('m', ''));
+    if (selectedMilestone && selectedMilestone.dueDate) {
+      const milestoneDueDate = new Date(selectedMilestone.dueDate).toISOString().split('T')[0];
+      if (!maxDate || new Date(milestoneDueDate) < new Date(maxDate)) {
+        maxDate = milestoneDueDate;
+      }
+    }
+  }
   return (
     <div className="space-y-6">
       {/* Header & Filters */}
