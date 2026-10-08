@@ -70,6 +70,37 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const fetchTasksData = async () => {
+    if (!currentUser) return;
+    try {
+      const headers = { 'Authorization': `Bearer ${currentUser.token}`, 'Content-Type': 'application/json' };
+      const tRes = await fetch('http://localhost:8080/api/tasks', { headers });
+      if (tRes.ok) {
+        const rawT = await tRes.json();
+        const mapTaskStatus = (s) => {
+          if (s === 'TO_DO') return 'To Do';
+          if (s === 'IN_PROGRESS') return 'In Progress';
+          if (s === 'COMPLETED') return 'Completed';
+          if (s === 'REOPENED') return 'Reopened';
+          if (s === 'CLOSED') return 'Closed';
+          return s || 'To Do';
+        };
+        setTasks(rawT.map(t => ({
+          ...t,
+          status: mapTaskStatus(t.status),
+          projectId: `p${t.project?.id}`,
+          assignedTo: `u${t.assignee?.id}`,
+          milestoneId: t.milestone?.id,
+          milestoneName: t.milestone?.name || t.milestone?.title || null,
+          evidence: t.completionEvidence,
+          comments: t.comments ? JSON.parse(t.comments) : []
+        })));
+      }
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
+    }
+  };
+
   useEffect(() => {
     if (!currentUser) return;
     
@@ -102,28 +133,7 @@ export const DataProvider = ({ children }) => {
           })));
         }
 
-        const tRes = await fetch('http://localhost:8080/api/tasks', { headers });
-        if (tRes.ok) {
-          const rawT = await tRes.json();
-          const mapTaskStatus = (s) => {
-            if (s === 'TO_DO') return 'To Do';
-            if (s === 'IN_PROGRESS') return 'In Progress';
-            if (s === 'COMPLETED') return 'Completed';
-            if (s === 'REOPENED') return 'Reopened';
-            if (s === 'CLOSED') return 'Closed';
-            return s || 'To Do';
-          };
-          setTasks(rawT.map(t => ({
-            ...t,
-            status: mapTaskStatus(t.status),
-            projectId: `p${t.project?.id}`,
-            assignedTo: `u${t.assignee?.id}`,
-            milestoneId: t.milestone?.id,
-            milestoneName: t.milestone?.name || t.milestone?.title || null,
-            evidence: t.completionEvidence,
-            comments: t.comments ? JSON.parse(t.comments) : []
-          })));
-        }
+        await fetchTasksData();
 
         const lRes = await fetch('http://localhost:8080/api/progress', { headers });
         if (lRes.ok) {
@@ -222,7 +232,11 @@ export const DataProvider = ({ children }) => {
   useEffect(() => {
     if (!currentUser) return;
     fetchNotifications();
-    const notifInterval = setInterval(fetchNotifications, 15000);
+    fetchTasksData();
+    const notifInterval = setInterval(() => {
+      fetchNotifications();
+      fetchTasksData();
+    }, 5000);
     return () => {
       clearInterval(notifInterval);
     };
