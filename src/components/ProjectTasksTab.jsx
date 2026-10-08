@@ -207,9 +207,10 @@ const ProjectTasksTab = ({ projectId, project }) => {
     return acc;
   }, {});
 
+  const today = new Date().toISOString().split('T')[0];
   let minDate = project?.startDate 
-    ? new Date(project.startDate).toISOString().split('T')[0]
-    : undefined;
+    ? (new Date(project.startDate) > new Date(today) ? new Date(project.startDate).toISOString().split('T')[0] : today)
+    : today;
   let maxDate = project?.endDate || undefined;
 
   return (
@@ -378,7 +379,7 @@ const ProjectTasksTab = ({ projectId, project }) => {
                     <label className="block text-sm font-medium mb-1">Link to Milestone (optional)</label>
                     <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.milestoneId} onChange={e => setFormData({ ...formData, milestoneId: e.target.value })}>
                       <option value="">No milestone link</option>
-                      {milestones.map(m => (
+                      {milestones.filter(m => !m.dueDate || new Date(m.dueDate) >= new Date(today)).map(m => (
                         <option key={m.id} value={m.id}>{m.name || m.title}</option>
                       ))}
                     </select>
