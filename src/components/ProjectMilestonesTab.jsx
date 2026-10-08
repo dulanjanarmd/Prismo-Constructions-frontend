@@ -611,8 +611,19 @@ const ProjectMilestonesTab = ({ project }) => {
           <p className="text-sm mt-1">Add milestones to track key stages of this project.</p>
         </div>
       ) : (
-        <div className="glass-card overflow-hidden">
-          <div className="divide-y divide-border">
+        <div className="glass-card overflow-hidden overflow-x-auto p-6 pt-0">
+          <table className="w-full text-left text-sm mt-4">
+            <thead className="border-b border-slate-100 text-xs text-slate-400">
+              <tr>
+                <th className="px-4 py-3 font-medium">Milestone</th>
+                <th className="px-4 py-3 font-medium">Category</th>
+                <th className="px-4 py-3 font-medium">Dates</th>
+                <th className="px-4 py-3 font-medium">Budget / Pay</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                {!isClient && <th className="px-4 py-3 font-medium text-right">Action</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
             {sorted.map((m, idx) => {
               const isCompleted = m.status === 'Completed';
               const isEditing = editingId === m.id;
@@ -621,40 +632,25 @@ const ProjectMilestonesTab = ({ project }) => {
               const isOverdue = !isCompleted && displayDate && new Date(displayDate) < new Date();
 
               return (
-                <motion.div
+                <motion.tr
                   key={m.id || idx}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className={`flex items-center gap-4 px-6 py-4 transition-colors ${isCompleted ? 'bg-green-50/30 ' : 'hover:bg-slate-50/50 :bg-slate-800/30'}`}
+                  className={`transition-colors ${isCompleted ? 'bg-green-50/20' : 'hover:bg-slate-50/50'}`}
                 >
-                  {/* Toggle button - only for non-clients */}
-                  {!isClient ? (
-                    <button
-                      onClick={() => handleToggle(m.id)}
-                      className={`shrink-0 transition-colors ${isCompleted ? 'text-green-500' : 'text-slate-300 hover:text-primary'}`}
-                    >
-                      {isCompleted ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
-                    </button>
-                  ) : (
-                    <div className="shrink-0">
-                      {isCompleted ? <CheckCircle2 className="w-6 h-6 text-green-500" /> : <Circle className="w-6 h-6 text-slate-300" />}
-                    </div>
-                  )}
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    {isEditing ? (
-                      <div className="flex flex-col gap-2 w-full pr-4">
+                  {isEditing ? (
+                    <td colSpan={isClient ? 5 : 6} className="p-4">
+                      <div className="flex flex-col gap-3 w-full pr-4 bg-white/50 p-4 rounded-lg border border-slate-200">
                         <div className="flex flex-col sm:flex-row gap-2">
                           <input
                             type="text"
                             placeholder="Name"
-                            className="flex-1 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            className="flex-1 rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                             value={editForm.name}
                             onChange={e => setEditForm({ ...editForm, name: e.target.value })}
                           />
                           <select
-                            className="w-full sm:w-auto rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            className="w-full sm:w-auto rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                             value={editForm.category}
                             onChange={e => setEditForm({ ...editForm, category: e.target.value })}
                           >
@@ -667,34 +663,34 @@ const ProjectMilestonesTab = ({ project }) => {
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
                           <div className="flex flex-col flex-1">
-                            <label className="text-[10px] text-slate-500 mb-0.5">Start Date</label>
+                            <label className="text-xs text-slate-500 mb-1">Start Date</label>
                             <input
                               type="date"
                               min={minDateStr}
                               max={maxDateStr}
-                              className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                              className="w-full rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                               value={editForm.startDate}
                               onChange={e => setEditForm({ ...editForm, startDate: e.target.value })}
                             />
                           </div>
                           <div className="flex flex-col flex-1">
-                            <label className="text-[10px] text-slate-500 mb-0.5">Due Date</label>
+                            <label className="text-xs text-slate-500 mb-1">Due Date</label>
                             <input
                               type="date"
                               min={minDateStr}
                               max={maxDateStr}
-                              className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                              className="w-full rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                               value={editForm.dueDate}
                               onChange={e => setEditForm({ ...editForm, dueDate: e.target.value })}
                             />
                           </div>
                           <div className="flex flex-col w-full sm:w-32">
-                            <label className="text-[10px] text-slate-500 mb-0.5">Budget (LKR)</label>
+                            <label className="text-xs text-slate-500 mb-1">Budget (LKR)</label>
                             <input
                               type="number"
                               min="1"
                               placeholder="Budget"
-                              className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                              className="w-full rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                               value={editForm.budgetAllocated}
                               onChange={e => setEditForm({ ...editForm, budgetAllocated: e.target.value })}
                             />
@@ -704,12 +700,12 @@ const ProjectMilestonesTab = ({ project }) => {
                           <input
                             type="text"
                             placeholder="Subcontractor"
-                            className="flex-1 rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            className="flex-1 rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                             value={editForm.subcontractor}
                             onChange={e => setEditForm({ ...editForm, subcontractor: e.target.value })}
                           />
                           <select
-                            className="w-full sm:w-auto rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            className="w-full sm:w-auto rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                             value={editForm.paymentStatus}
                             onChange={e => setEditForm({ ...editForm, paymentStatus: e.target.value })}
                           >
@@ -717,101 +713,126 @@ const ProjectMilestonesTab = ({ project }) => {
                             <option value="Pending">Pending</option>
                             <option value="Paid">Paid</option>
                           </select>
-
                         </div>
                         <input
                           type="text"
                           placeholder="Description"
-                          className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                          className="w-full rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                           value={editForm.description}
                           onChange={e => setEditForm({ ...editForm, description: e.target.value })}
                         />
                         <input
                           type="text"
                           placeholder="Deliverables"
-                          className="w-full rounded border border-input bg-background px-2 py-1 text-sm focus:ring-2 focus:ring-primary outline-none"
+                          className="w-full rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                           value={editForm.deliverables}
                           onChange={e => setEditForm({ ...editForm, deliverables: e.target.value })}
                         />
+                        <div className="flex gap-2 justify-end mt-2">
+                          <button onClick={() => setEditingId(null)} className="px-4 py-2 text-sm bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg shadow-sm transition-all">
+                            Cancel
+                          </button>
+                          <button onClick={() => handleEditSave(m.id)} className="px-4 py-2 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg shadow-sm transition-all">
+                            Save Changes
+                          </button>
+                        </div>
                       </div>
-                    ) : (
-                      <>
-                        <p className={`font-semibold ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-900 '}`}>
-                          {displayName}
-                        </p>
-                        {m.description && <p className={`text-sm mt-1 ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-500'}`}>{m.description}</p>}
-                        <div className="flex flex-wrap items-center gap-2 mt-2">
-                          {displayDate && (
-                            <span className={`text-xs flex items-center gap-1 ${isOverdue ? 'text-red-500 font-semibold' : 'text-slate-500'}`}>
-                              <Calendar className="w-3 h-3" />
-                              {isOverdue ? 'Overdue · ' : ''}
-                              {m.startDate ? `${m.startDate} to ${displayDate}` : displayDate}
-                            </span>
+                    </td>
+                  ) : (
+                    <>
+                      <td className="px-4 py-3 align-top">
+                        <div className="flex items-start gap-3">
+                          {!isClient ? (
+                            <button
+                              onClick={() => handleToggle(m.id)}
+                              className={`shrink-0 mt-0.5 transition-colors ${isCompleted ? 'text-green-500' : 'text-slate-300 hover:text-primary'}`}
+                            >
+                              {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
+                            </button>
+                          ) : (
+                            <div className="shrink-0 mt-0.5">
+                              {isCompleted ? <CheckCircle2 className="w-5 h-5 text-green-500" /> : <Circle className="w-5 h-5 text-slate-300" />}
+                            </div>
                           )}
-                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full border ${statusColors[m.status] || statusColors.Incomplete}`}>
-                            {m.status}
+                          <div>
+                            <p className={`font-semibold ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
+                              {displayName}
+                            </p>
+                            {m.description && <p className={`text-xs mt-1 max-w-xs ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-500'}`}>{m.description}</p>}
+                            {m.deliverables && (
+                              <p className={`text-xs mt-1 italic ${isCompleted ? 'text-slate-400' : 'text-slate-400'}`}>
+                                Deliverables: {m.deliverables}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        {m.category && (
+                          <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                            {m.category}
                           </span>
-                          {m.category && (
-                            <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                              {m.category}
+                        )}
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        {displayDate && (
+                          <div className={`text-xs flex flex-col gap-1 ${isOverdue ? 'text-red-500 font-medium' : 'text-slate-600'}`}>
+                            {m.startDate && <span>Start: {m.startDate}</span>}
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {isOverdue ? 'Overdue: ' : 'Due: '}
+                              {displayDate}
                             </span>
-                          )}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        <div className="flex flex-col gap-1">
                           {m.budgetAllocated && (
-                            <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                              Budget: LKR {m.budgetAllocated.toLocaleString('en-LK')}
-                            </span>
-                          )}
-                          {m.subcontractor && (
-                            <span className="text-xs text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
-                              Sub: {m.subcontractor}
+                            <span className="text-xs font-medium text-slate-700">
+                              LKR {m.budgetAllocated.toLocaleString('en-LK')}
                             </span>
                           )}
                           {m.paymentStatus && m.paymentStatus !== 'Unpaid' && (
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded border ${
+                            <span className={`text-[10px] w-fit font-medium px-2 py-0.5 rounded border ${
                               m.paymentStatus === 'Paid' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'
                             }`}>
                               {m.paymentStatus}
                             </span>
                           )}
-
-                          {m.deliverables && (
-                            <span className="text-xs text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 max-w-[200px] sm:max-w-[300px] truncate" title={m.deliverables}>
-                              Deliverables: {m.deliverables}
+                          {m.subcontractor && (
+                            <span className="text-[10px] text-slate-500 truncate w-24">
+                              Sub: {m.subcontractor}
                             </span>
                           )}
                         </div>
-                      </>
-                    )}
-                  </div>
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-md border ${statusColors[m.status] || statusColors.Incomplete}`}>
+                          {m.status}
+                        </span>
+                      </td>
 
-                  {/* Action buttons - hidden from clients */}
-                  {!isClient && (
-                    <div className="flex items-center gap-1 shrink-0">
-                      {isEditing ? (
-                        <div className="flex gap-2">
-                          <button onClick={() => handleEditSave(m.id)} className="px-3 py-1.5 text-xs font-bold bg-primary text-slate-900 hover:brightness-105 rounded-md shadow-sm transition-all">
-                            Save
-                          </button>
-                          <button onClick={() => setEditingId(null)} className="px-3 py-1.5 text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 rounded-md shadow-sm transition-all">
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex gap-2">
-                          <button onClick={() => startEdit(m)} className="px-3 py-1.5 text-xs font-bold bg-primary text-slate-900 hover:brightness-105 rounded-md shadow-sm transition-all">
-                            Edit
-                          </button>
-                          <button onClick={() => handleDelete(m.id)} className="px-3 py-1.5 text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 rounded-md shadow-sm transition-all">
-                            Delete
-                          </button>
-                        </div>
+                      {/* Action buttons - hidden from clients */}
+                      {!isClient && (
+                        <td className="px-4 py-3 align-top text-right">
+                          <div className="flex items-center justify-end gap-2 shrink-0">
+                            <button onClick={() => startEdit(m)} className="px-3 py-1.5 text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-md shadow-sm transition-all">
+                              Edit
+                            </button>
+                            <button onClick={() => handleDelete(m.id)} className="px-3 py-1.5 text-xs font-bold bg-red-500 text-white hover:bg-red-600 rounded-md shadow-sm transition-all">
+                              Delete
+                            </button>
+                          </div>
+                        </td>
                       )}
-                    </div>
+                    </>
                   )}
-                </motion.div>
+                </motion.tr>
               );
             })}
-          </div>
+            </tbody>
+          </table>
         </div>
       )}
     </div>

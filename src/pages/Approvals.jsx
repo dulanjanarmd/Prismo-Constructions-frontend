@@ -57,16 +57,19 @@ const Approvals = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            {isClient ? 'Approval Requests' : 'Client Approvals'}
+          </h1>
+        </div>
+      </div>
+
       {/* Table & Filters Card */}
       <div className="glass-card flex flex-col overflow-hidden">
 
         {/* Header & Filters Section */}
-        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
-          <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
-            <h2 className="text-2xl font-bold leading-tight shrink-0">
-              {isClient ? 'Approval Requests' : 'Client Approvals'}
-            </h2>
-          </div>
+        <div className="flex flex-col lg:flex-row justify-end gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
 
           <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-3 items-start xl:items-center w-full lg:w-auto justify-end">
             <div className="relative w-full lg:w-40">

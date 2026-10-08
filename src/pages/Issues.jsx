@@ -308,17 +308,6 @@ const Issues = () => {
         {/* Filters Section */}
         <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
           <div className="flex items-center gap-3 ml-auto min-w-max">
-            <select
-              className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all"
-              value={projectFilter}
-              onChange={e => setProjectFilter(e.target.value)}
-            >
-              <option value="All">All Projects</option>
-              {myProjects.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-            
             <div className="relative w-48 shrink-0 h-12">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
@@ -329,6 +318,17 @@ const Issues = () => {
                 onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
+
+            <select
+              className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all"
+              value={projectFilter}
+              onChange={e => setProjectFilter(e.target.value)}
+            >
+              <option value="All">All Projects</option>
+              {myProjects.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
             
             <button
               onClick={() => setIsAdding(true)}
