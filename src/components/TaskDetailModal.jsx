@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
@@ -24,7 +24,17 @@ const STATUS_STYLES = {
 const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
   const { updateTask, users } = useData();
   const { currentUser } = useAuth();
-  const [evidenceUrl, setEvidenceUrl] = useState(task.evidence || '');
+  const parsedInitialEvidence = useMemo(() => {
+    if (!task.evidence) return [];
+    try {
+      const parsed = JSON.parse(task.evidence);
+      return Array.isArray(parsed) ? parsed : [{ url: task.evidence, name: 'Evidence', type: '' }];
+    } catch (e) {
+      return [{ url: task.evidence, name: 'Evidence', type: '' }];
+    }
+  }, [task.evidence]);
+  
+  const [evidenceFiles, setEvidenceFiles] = useState(parsedInitialEvidence);
   const [uploadingEvidence, setUploadingEvidence] = useState(false);
   const [completionComment, setCompletionComment] = useState('');
   const [newComment, setNewComment] = useState('');
@@ -44,15 +54,39 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
   const milestone = (project?.milestones || []).find(m => m.id === task.milestoneId);
   const siteEngineers = users.filter(u => u.role === 'site_engineer');
 
-  const handleStatusChange = (newStatus) => {
-    updateTask(task.id, { status: newStatus });
-    onClose();
+  const handleStatusChange = async (newStatus) => {
+    try {
+      const updates = { status: newStatus };
+      if (newStatus === 'Reopened') {
+        const hasEvidence = parsedEvidence.length > 0;
+        if (hasEvidence) {
+          const reopenComment = {
+            id: Date.now(),
+            text: "Evidence requires revision. Please update.",
+            author: currentUser?.name || 'System',
+            timestamp: new Date().toISOString(),
+            isCompletionNote: false
+          };
+          updates.comments = [...(task.comments || []), reopenComment];
+        }
+      }
+      await updateTask(task.id, updates);
+      onClose();
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      alert('Failed to update status: ' + error.message);
+    }
   };
 
   const handleEvidenceSubmit = () => {
-    if (!evidenceUrl) return;
+    if (evidenceFiles.length === 0) return;
     
-    const updates = { evidence: evidenceUrl, status: 'Completed' };
+    const updates = { 
+      evidence: JSON.stringify(evidenceFiles), 
+      status: 'Completed' 
+    };
+    
+    const newComments = (task.comments || []).filter(c => !c.isCompletionNote);
     
     if (completionComment) {
       const commentObj = {
@@ -63,7 +97,11 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
         date: new Date().toISOString(),
         isCompletionNote: true
       };
-      updates.comments = [...(task.comments || []), commentObj];
+      updates.comments = [...newComments, commentObj];
+    } else {
+      // If they didn't write a new note, just keep whatever comments are left (which have completion notes stripped)
+      // Actually, if we strip them unconditionally, old completion notes are wiped on resubmit. This is exactly what we want.
+      updates.comments = newComments;
     }
     
     updateTask(task.id, updates);
@@ -71,29 +109,48 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
   };
 
   const handleEvidenceUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingEvidence(true);
-    const body = new FormData();
-    body.append('file', file);
-    try {
-      const response = await fetch('http://localhost:8080/api/files/upload', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${currentUser.token}` },
-        body
-      });
-      if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || `Upload failed (${response.status})`);
-      }
-      const uploaded = await response.json();
-      setEvidenceUrl(uploaded.fullUrl || `http://localhost:8080${uploaded.url}`);
-    } catch (error) {
-      console.error('Error uploading evidence:', error);
-      alert(error.message || 'Failed to upload evidence. Please try again.');
-    } finally {
-      setUploadingEvidence(false);
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    
+    if (evidenceFiles.length + files.length > 5) {
+      alert('You can only upload up to 5 files for evidence.');
+      return;
     }
+
+    setUploadingEvidence(true);
+    const newFiles = [];
+    
+    for (const file of files) {
+      const body = new FormData();
+      body.append('file', file);
+      try {
+        const response = await fetch('http://localhost:8080/api/files/upload', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${currentUser.token}` },
+          body
+        });
+        if (!response.ok) {
+          const message = await response.text();
+          throw new Error(message || `Upload failed (${response.status})`);
+        }
+        const uploaded = await response.json();
+        newFiles.push({
+          url: uploaded.fullUrl || `http://localhost:8080${uploaded.url}`,
+          name: uploaded.originalName || file.name,
+          type: file.type || ''
+        });
+      } catch (error) {
+        console.error('Error uploading evidence:', error);
+        alert(error.message || 'Failed to upload evidence. Please try again.');
+      }
+    }
+    
+    setEvidenceFiles(prev => [...prev, ...newFiles]);
+    setUploadingEvidence(false);
+  };
+  
+  const handleRemoveEvidence = (index) => {
+    setEvidenceFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleCommentFileUpload = async (e) => {
@@ -257,62 +314,91 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
                     <ImageIcon className="w-4 h-4" /> Completion Evidence
                   </h3>
 
-                  {task.evidence ? (
-                    <div className="rounded-lg overflow-hidden border border-border p-2">
-                      {task.evidence.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) ? (
-                        <img
-                          src={task.evidence}
-                          alt="Task completion evidence"
-                          className="w-full object-cover max-h-48 rounded"
-                          onError={e => { e.target.style.display = 'none'; }}
-                        />
-                      ) : (
-                        <a href={task.evidence} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-primary hover:underline p-4 bg-slate-50 rounded">
-                          <UploadCloud className="w-5 h-5" /> View Evidence Document
-                        </a>
-                      )}
-                      <div className="mt-2 bg-green-50 text-xs text-green-700 font-medium flex items-center gap-1 p-2 rounded">
-                        <CheckCircle2 className="w-3 h-3" /> Evidence submitted
+                  {/* View/Edit Evidence */}
+                  <div className="space-y-3">
+                    {evidenceFiles.length > 0 && (
+                      <div className="grid grid-cols-2 gap-2">
+                        {evidenceFiles.map((file, idx) => (
+                          <div key={idx} className="relative rounded-lg overflow-hidden border border-border p-2 group bg-slate-50">
+                            {file.url.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) ? (
+                              <img
+                                src={file.url}
+                                alt={file.name}
+                                className="w-full h-24 object-cover rounded"
+                                onError={e => { e.target.style.display = 'none'; }}
+                              />
+                            ) : (
+                              <a href={file.url} target="_blank" rel="noreferrer" className="flex flex-col items-center justify-center h-24 gap-2 text-primary hover:underline bg-white rounded">
+                                <UploadCloud className="w-6 h-6" />
+                                <span className="text-xs text-center px-2 truncate w-full">{file.name}</span>
+                              </a>
+                            )}
+                            {(isSiteEngineer && isAssigned && (task.status === 'In Progress' || task.status === 'Reopened')) && (
+                              <button 
+                                onClick={() => handleRemoveEvidence(idx)}
+                                className="absolute top-3 right-3 p-1 bg-white/80 hover:bg-red-100 text-red-500 rounded-md opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  ) : (
-                    <div>
-                      {(isSiteEngineer && isAssigned && task.status === 'In Progress') ? (
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-xs font-medium text-slate-500 mb-1">Evidence File <span className="text-red-500">*</span></label>
-                            <input
-                              type="file"
-                              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
-                              onChange={handleEvidenceUpload}
-                              disabled={uploadingEvidence}
-                            />
-                            {uploadingEvidence && <p className="text-xs text-slate-400 mt-1">Uploading evidence...</p>}
-                            {evidenceUrl && <p className="text-xs text-green-600 mt-1 flex items-center gap-1"><UploadCloud className="w-3 h-3" /> Evidence uploaded</p>}
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-slate-500 mb-1">Completion Note (Optional)</label>
-                            <textarea
-                              rows="2"
-                              placeholder="Add a note about the completion..."
-                              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none"
-                              value={completionComment}
-                              onChange={e => setCompletionComment(e.target.value)}
-                            />
-                          </div>
-                          <button
-                            onClick={handleEvidenceSubmit}
-                            disabled={!evidenceUrl || uploadingEvidence}
-                            className="w-full py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm font-medium transition-colors disabled:opacity-50 shadow-sm"
+                    )}
+                    
+                    {/* Completion Notes displayed here */}
+                    {task.comments && task.comments.filter(c => c.isCompletionNote).map(comment => (
+                      <div key={comment.id} className="relative mt-3 p-3 bg-green-50 border border-green-100 rounded-lg text-sm text-green-800 group">
+                        <div className="font-semibold text-xs mb-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> Completion Note from {comment.author}</div>
+                        {comment.text}
+                        {(isSiteEngineer && isAssigned && (task.status === 'In Progress' || task.status === 'Reopened')) && (
+                          <button 
+                            onClick={() => handleDeleteComment(comment.id)}
+                            className="absolute top-2 right-2 p-1 text-green-600 hover:bg-green-200 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Delete this note"
                           >
-                            Submit Evidence & Mark Complete
+                            <X className="w-4 h-4" />
                           </button>
+                        )}
+                      </div>
+                    ))}
+
+                    {(isSiteEngineer && isAssigned && (task.status === 'In Progress' || task.status === 'Reopened')) ? (
+                      <div className="space-y-3 mt-4 border-t border-slate-100 pt-4">
+                        <div>
+                          <label className="block text-xs font-medium text-slate-500 mb-1">Upload Evidence (Max 5 images/docs) <span className="text-red-500">*</span></label>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*,.pdf,.doc,.docx"
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                            onChange={handleEvidenceUpload}
+                            disabled={uploadingEvidence || evidenceFiles.length >= 5}
+                          />
+                          {uploadingEvidence && <p className="text-xs text-slate-400 mt-1">Uploading evidence...</p>}
                         </div>
-                      ) : (
-                        <p className="text-sm text-slate-400 italic">No evidence submitted yet.</p>
-                      )}
-                    </div>
-                  )}
+                        <div>
+                          <label className="block text-xs font-medium text-slate-500 mb-1">Completion Note (Optional)</label>
+                          <textarea
+                            rows="2"
+                            placeholder="Add a note about the completion..."
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none resize-none"
+                            value={completionComment}
+                            onChange={e => setCompletionComment(e.target.value)}
+                          />
+                        </div>
+                        <button
+                          onClick={handleEvidenceSubmit}
+                          disabled={evidenceFiles.length === 0 || uploadingEvidence}
+                          className="w-full py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm font-medium transition-colors disabled:opacity-50 shadow-sm"
+                        >
+                          {task.status === 'Reopened' ? 'Re-Submit Evidence & Mark Complete' : 'Submit Evidence & Mark Complete'}
+                        </button>
+                      </div>
+                    ) : (
+                      evidenceFiles.length === 0 && <p className="text-sm text-slate-400 italic mt-2">No evidence submitted yet.</p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="p-6 pb-2">
@@ -322,14 +408,14 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
                 </div>
                 
                 <div className="p-4 pt-0 space-y-4 flex flex-col">
-                {(task.comments && task.comments.length > 0) ? (
-                  task.comments.map((comment) => {
+                {(task.comments && task.comments.filter(c => !c.isCompletionNote).length > 0) ? (
+                  task.comments.filter(c => !c.isCompletionNote).map((comment) => {
                     const isPMComment = comment.role === 'pm' || comment.role === 'project_manager';
                     const isSEComment = comment.role === 'site_engineer';
                     const isOwnComment = currentUser.name === comment.author;
 
                     const alignmentClass = isOwnComment ? 'self-end items-end' : 'self-start items-start';
-                    const bubbleBg = comment.isCompletionNote ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200';
+                    const bubbleBg = 'bg-white border-slate-200';
 
                     return (
                     <div key={comment.id} className={`max-w-[85%] flex flex-col ${alignmentClass}`}>
@@ -471,17 +557,17 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
             </div>
 
             {/* Right side: Status Workflow Actions */}
-            <div className="flex items-center gap-2 flex-1 justify-end">
+            <div className="flex items-center gap-3 flex-1 justify-end">
               {/* Site Engineer actions */}
               {isSiteEngineer && isAssigned && (
                 <>
                   {task.status === 'To Do' && (
-                    <button onClick={() => handleStatusChange('In Progress')} className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-bold transition-colors shadow-sm">
-                      Start Work → In Progress
+                    <button onClick={() => handleStatusChange('In Progress')} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm hover:shadow flex items-center justify-center gap-2">
+                      Start Work
                     </button>
                   )}
                   {task.status === 'Reopened' && (
-                    <button onClick={() => handleStatusChange('In Progress')} className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-sm">
+                    <button onClick={() => handleStatusChange('In Progress')} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow">
                       <AlertTriangle className="w-4 h-4" /> Restart Work
                     </button>
                   )}
@@ -493,13 +579,13 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
                 <>
                   <button
                     onClick={() => handleStatusChange('Closed')}
-                    className="px-6 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-sm"
+                    className="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow"
                   >
-                    <Lock className="w-4 h-4" /> Accept & Close
+                    <CheckCircle2 className="w-4 h-4" /> Accept & Close
                   </button>
                   <button
                     onClick={() => handleStatusChange('Reopened')}
-                    className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-sm"
+                    className="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow"
                   >
                     <RotateCcw className="w-4 h-4" /> Reopen
                   </button>
@@ -507,9 +593,9 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
               )}
 
               {task.status === 'Closed' && (
-                <div className="flex items-center justify-center gap-2 text-green-700 font-semibold px-4 py-2 bg-green-100 rounded-lg shadow-sm">
-                  <CheckCircle2 className="w-5 h-5" />
-                  Task Closed — All Done!
+                <div className="flex items-center justify-center gap-2 text-slate-600 font-semibold px-5 py-2.5 bg-slate-100 rounded-lg shadow-sm text-sm border border-slate-200">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  Task Closed
                 </div>
               )}
             </div>

@@ -242,24 +242,51 @@ export const DataProvider = ({ children }) => {
         const pMilestones = project.milestones || [];
 
         const completedTasksCount = pTasks.filter(t => t.status === 'Completed' || t.status === 'Closed').length;
-        const completedMilestonesCount = pMilestones.filter(m => m.status === 'Completed').length;
+        const allTasksDone = pTasks.length > 0 && completedTasksCount === pTasks.length;
+
+        // Auto-complete milestones if all linked tasks are done
+        let updatedMilestones = [...pMilestones];
+        let milestonesChanged = false;
+
+        updatedMilestones = updatedMilestones.map(m => {
+          const mTasks = pTasks.filter(t => String(t.milestoneId) === String(m.id));
+          if (mTasks.length > 0) {
+            const allMTasksDone = mTasks.every(t => t.status === 'Completed' || t.status === 'Closed');
+            if (allMTasksDone && m.status !== 'Completed') {
+              console.log(`Auto-completing milestone ${m.id} because all tasks are done`);
+              fetch(`http://localhost:8080/api/projects/${String(project.id).replace('p', '')}/milestones/${m.id}`, {
+                method: 'PUT',
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ...m, status: 'Completed' })
+              }).catch(console.error);
+              
+              milestonesChanged = true;
+              return { ...m, status: 'Completed' };
+            }
+          }
+          return m;
+        });
+
+        const completedMilestonesCount = updatedMilestones.filter(m => m.status === 'Completed').length;
+        const totalMilestones = updatedMilestones.length;
         
-        const totalItems = pTasks.length + pMilestones.length;
-        const calculatedProgress = totalItems > 0 
-          ? Math.round(((completedTasksCount + completedMilestonesCount) / totalItems) * 100)
-          : 0;
+        const calculatedProgress = totalMilestones > 0 
+          ? Math.round((completedMilestonesCount / totalMilestones) * 100)
+          : (pTasks.length > 0 && allTasksDone ? 100 : 0);
 
         let calculatedStatus = 'Planning';
         
-        const allTasksDone = pTasks.length > 0 && completedTasksCount === pTasks.length;
-        const allMilestonesDone = pMilestones.length > 0 && completedMilestonesCount === pMilestones.length;
+        const allMilestonesDone = totalMilestones > 0 && completedMilestonesCount === totalMilestones;
         const hasOpenIssues = pIssues.some(i => i.status === 'OPEN' || i.status === 'IN_PROGRESS');
         const hasPendingApprovals = pApprovals.some(a => a.status === 'Pending' || a.status === 'Changes Requested');
 
         // Logic for Completed
-        const isComplete = (pTasks.length > 0 || pMilestones.length > 0) &&
+        const isComplete = (pTasks.length > 0 || totalMilestones > 0) &&
                            (pTasks.length === 0 || allTasksDone) &&
-                           (pMilestones.length === 0 || allMilestonesDone) &&
+                           (totalMilestones === 0 || allMilestonesDone) &&
                            !hasOpenIssues && !hasPendingApprovals;
 
         if (isComplete) {
@@ -269,9 +296,16 @@ export const DataProvider = ({ children }) => {
           calculatedStatus = 'In Progress';
         }
 
-        if (project.status !== calculatedStatus || project.progress !== calculatedProgress) {
-          console.log(`Auto-updating project ${project.id} from ${project.status}(${project.progress}%) to ${calculatedStatus}(${calculatedProgress}%)`);
-          updateProject(project.id, { status: calculatedStatus, progress: calculatedProgress });
+        if (project.status !== calculatedStatus || project.progress !== calculatedProgress || milestonesChanged) {
+          if (project.status !== calculatedStatus || project.progress !== calculatedProgress) {
+            console.log(`Auto-updating project ${project.id} from ${project.status}(${project.progress}%) to ${calculatedStatus}(${calculatedProgress}%)`);
+            updateProject(project.id, { status: calculatedStatus, progress: calculatedProgress });
+          }
+          if (milestonesChanged) {
+            setProjects(prevProjects => prevProjects.map(p => 
+              String(p.id) === String(project.id) ? { ...p, milestones: updatedMilestones } : p
+            ));
+          }
         }
       });
     }, 1500); // Debounce to allow multiple rapid state updates (e.g. initial load) to settle
@@ -510,7 +544,7 @@ export const DataProvider = ({ children }) => {
       priority: updates.priority ?? currentTask?.priority,
       dueDate: updates.dueDate ?? currentTask?.dueDate ?? null,
       status: statusValues[updates.status] || updates.status,
-      completionEvidence: updates.evidence ?? currentTask?.evidence ?? null,
+      completionEvidence: updates.evidence !== undefined ? updates.evidence : (currentTask?.evidence ?? null),
       assignedTo: updates.assignedTo ?? currentTask?.assignedTo ?? null,
       comments: updates.comments ? JSON.stringify(updates.comments) : (currentTask?.comments ? JSON.stringify(currentTask.comments) : null)
     };
@@ -522,12 +556,15 @@ export const DataProvider = ({ children }) => {
       },
       body: JSON.stringify(payload)
     });
-    if (!response.ok) throw new Error('Failed to update task');
+    if (!response.ok) {
+      const msg = await response.text();
+      throw new Error(msg || 'Failed to update task');
+    }
     setTasks(tasks.map(task => String(task.id) === String(id) ? {
       ...task,
       ...updates,
       status: updates.status || task.status,
-      evidence: updates.evidence ?? task.evidence,
+      evidence: updates.evidence !== undefined ? updates.evidence : task.evidence,
       comments: updates.comments ?? task.comments
     } : task));
   };
