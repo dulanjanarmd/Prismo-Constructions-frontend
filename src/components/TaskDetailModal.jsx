@@ -540,7 +540,7 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
           <div className="p-4 border-t border-border bg-slate-50 shrink-0 flex items-center justify-between gap-4 flex-wrap">
             {/* Left side: Management Actions (Edit, Delete, Reassign) */}
             <div className="flex items-center gap-2">
-              {isPM && task.status !== 'Closed' && (
+              {isPM && task.status !== 'Closed' && task.status !== 'Completed' && (
                 <div className="relative">
                   {showReAssign ? (
                     <div className="flex gap-2 items-center">
@@ -572,7 +572,7 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
                 </div>
               )}
 
-              {onEdit && !showReAssign && task.status !== 'Closed' && (
+              {onEdit && !showReAssign && task.status !== 'Closed' && task.status !== 'Completed' && (
                 <button onClick={onEdit} className="px-4 py-2 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow flex items-center gap-2">
                   <Edit className="w-4 h-4" /> Edit
                 </button>
