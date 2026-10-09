@@ -7,14 +7,7 @@ import DashboardHeader from './DashboardHeader';
 import SubmitLogModal from './SubmitLogModal';
 import ReportIssueModal from './ReportIssueModal';
 import ProjectTable from './ProjectTable';
-
-const STATUS_STYLES = {
-  'To Do': 'bg-[#a855f7] text-white',
-  'In Progress': 'bg-[#06b6d4] text-white',
-  'Completed': 'bg-[#22c55e] text-white',
-  'Reopened': 'bg-[#f59e0b] text-white',
-  'Closed': 'bg-[#64748b] text-white'
-};
+import { PRIORITY_STYLES, STATUS_STYLES } from '../utils/constants';
 
 const SiteEngineerDashboard = () => {
   const { projects, tasks, logs, issues } = useData();
@@ -150,9 +143,7 @@ const SiteEngineerDashboard = () => {
                         <td className="px-4 py-3 text-slate-600 ">{task.milestoneName || (projects?.find(p => String(p.id) === String(task.projectId).replace('p', ''))?.milestones?.find(m => String(m.id) === String(task.milestoneId)?.replace('m', ''))?.name) || '—'}</td>
                         <td className="px-4 py-3">
                           <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-20 inline-block text-center ${
-                            task.priority === 'High' ? 'bg-red-500 text-white' :
-                            task.priority === 'Medium' ? 'bg-amber-500 text-white' :
-                            'bg-blue-500 text-white'
+                            PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']
                           }`}>
                             {task.priority || 'Medium'}
                           </span>

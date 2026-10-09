@@ -7,19 +7,7 @@ import {
   RotateCcw, Lock, Image as ImageIcon, AlertTriangle, MessageSquare, Send, UploadCloud, Edit, Trash2
 } from 'lucide-react';
 
-const PRIORITY_STYLES = {
-  High: 'bg-red-500 text-white',
-  Medium: 'bg-amber-500 text-white',
-  Low: 'bg-blue-500 text-white'
-};
-
-const STATUS_STYLES = {
-  'To Do': 'bg-[#a855f7] text-white',
-  'In Progress': 'bg-[#06b6d4] text-white',
-  'Completed': 'bg-[#22c55e] text-white',
-  'Reopened': 'bg-[#f59e0b] text-white',
-  'Closed': 'bg-[#64748b] text-white'
-};
+import { PRIORITY_STYLES, STATUS_STYLES } from '../utils/constants';
 
 const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
   const { updateTask, users } = useData();

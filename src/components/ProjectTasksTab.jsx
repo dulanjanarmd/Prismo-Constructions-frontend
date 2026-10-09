@@ -31,11 +31,7 @@ const STATUS_CARD_BG = {
   'Closed': 'bg-white' 
 };
 
-const PRIORITY_STYLES = {
-  High: 'bg-red-500 text-white',
-  Medium: 'bg-amber-500 text-white',
-  Low: 'bg-blue-500 text-white'
-};
+import { PRIORITY_STYLES, STATUS_STYLES } from '../utils/constants';
 
 const ProjectTasksTab = ({ projectId, project }) => {
   const { tasks, addTask, updateTask, deleteTask, users } = useData();
