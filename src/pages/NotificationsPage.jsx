@@ -1,10 +1,12 @@
 import React from 'react';
 import { useData } from '../context/DataContext';
+import { useNavigate } from 'react-router-dom';
 import { Bell, Trash2, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 const NotificationsPage = () => {
   const { notifications, markNotificationAsRead, deleteNotification, clearNotifications } = useData();
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-6">
@@ -39,7 +41,14 @@ const NotificationsPage = () => {
             {notifications.map(notification => (
               <div 
                 key={notification.id} 
-                className={`p-4 hover:bg-slate-50/50 transition-colors flex gap-4 ${!notification.read ? 'bg-blue-50/30' : ''}`}
+                className={`p-4 hover:bg-slate-50/50 transition-colors flex gap-4 cursor-pointer ${!notification.read ? 'bg-blue-50/30' : ''}`}
+                onClick={() => {
+                  if (!notification.read) markNotificationAsRead(notification.id);
+                  if (notification.referenceId && notification.referenceId.startsWith('project-')) {
+                    const projectId = notification.referenceId.split('-')[1];
+                    navigate(`/portal/projects/${projectId}`);
+                  }
+                }}
               >
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-1">
@@ -56,14 +65,20 @@ const NotificationsPage = () => {
                   <div className="flex items-center gap-3">
                     {!notification.read && (
                       <button 
-                        onClick={() => markNotificationAsRead(notification.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markNotificationAsRead(notification.id);
+                        }}
                         className="text-xs font-semibold text-primary hover:text-blue-700 flex items-center gap-1"
                       >
                         <CheckCircle className="w-3 h-3" /> Mark as read
                       </button>
                     )}
                     <button
-                      onClick={() => deleteNotification(notification.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteNotification(notification.id);
+                      }}
                       className="text-xs font-semibold text-red-500 hover:text-red-700 flex items-center gap-1"
                     >
                       <Trash2 className="w-3 h-3" /> Delete

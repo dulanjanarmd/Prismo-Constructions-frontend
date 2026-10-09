@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '../context/DataContext';
+import { useNavigate } from 'react-router-dom';
 import { X, Activity, Bell } from 'lucide-react';
 
 const NotificationDrawer = ({ isOpen, onClose }) => {
   const { notifications, markNotificationAsRead, deleteNotification, clearNotifications } = useData();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -61,6 +63,11 @@ const NotificationDrawer = ({ isOpen, onClose }) => {
                         className={`p-4 border-b border-border cursor-pointer transition-colors flex items-start justify-between gap-3 ${!notif.read ? 'bg-blue-50/30 hover:bg-blue-50/60' : 'hover:bg-slate-50/50'}`}
                         onClick={() => {
                           if (!notif.read) markNotificationAsRead(notif.id);
+                          if (notif.referenceId && notif.referenceId.startsWith('project-')) {
+                            const projectId = notif.referenceId.split('-')[1];
+                            navigate(`/portal/projects/${projectId}`);
+                            onClose();
+                          }
                         }}
                       >
                         <div className="flex items-start gap-3 flex-1">
