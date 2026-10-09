@@ -571,18 +571,14 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
       </div> {/* End scrollable area */}
 
       {/* Sticky Footer for Actions */}
-      {isReporter && (
+      {isReporter && issue.status !== 'RESOLVED' && issue.status !== 'Resolved' && (
         <div className="p-4 border-t border-border bg-slate-50/50 flex w-full gap-4 shrink-0">
-          {issue.status !== 'RESOLVED' && issue.status !== 'Resolved' && (
-            <>
-              <button onClick={handleResolve} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-green-500 text-white hover:bg-green-600 rounded-lg transition-all shadow-sm hover:shadow">
-                Resolved
-              </button>
-              <button onClick={() => setIsEditModalOpen(true)} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow">
-                Edit
-              </button>
-            </>
-          )}
+          <button onClick={handleResolve} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-green-500 text-white hover:bg-green-600 rounded-lg transition-all shadow-sm hover:shadow">
+            Resolved
+          </button>
+          <button onClick={() => setIsEditModalOpen(true)} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow">
+            Edit
+          </button>
           <button onClick={handleDelete} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow">
             Delete
           </button>
