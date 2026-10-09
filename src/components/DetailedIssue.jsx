@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { AlertTriangle, Plus, ChevronDown, ChevronUp, X, MessageSquare, MapPin, Wrench, Clock, User as UserIcon, Calendar, UploadCloud, Video, Edit, Trash2, CheckCircle, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const DetailedIssue = ({ issue, projects, tasks, users }) => {
+const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
   const { currentUser } = useAuth();
   const { getIssueComments, addIssueComment, getIssueMeetings, addIssueMeeting, updateIssueStatus, updateIssue, deleteIssue } = useData();
   
@@ -247,7 +247,12 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
   };
 
   const handleDelete = async () => {
-    await deleteIssue(issue.id);
+    if (window.confirm("Are you sure you want to delete this issue?")) {
+      const success = await deleteIssue(issue.id);
+      if (success !== false && onClose) {
+        onClose();
+      }
+    }
   };
 
   const handleResolve = async () => {

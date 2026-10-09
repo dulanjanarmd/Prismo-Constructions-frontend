@@ -63,6 +63,15 @@ const ProjectIssuesTab = ({ project }) => {
 
   const [selectedIssueId, setSelectedIssueId] = useState(null);
   const selectedIssue = selectedIssueId ? issues.find(i => i.id === selectedIssueId) : null;
+  const [lastSelectedIssue, setLastSelectedIssue] = useState(null);
+
+  React.useEffect(() => {
+    if (selectedIssue) {
+      setLastSelectedIssue(selectedIssue);
+    }
+  }, [selectedIssue]);
+
+  const displayIssue = selectedIssue || lastSelectedIssue;
 
   const handleView = (issue) => {
     setSelectedIssueId(issue.id);
@@ -452,7 +461,7 @@ const ProjectIssuesTab = ({ project }) => {
 
       {/* View Issue Modal */}
       <AnimatePresence>
-        {selectedIssue && (
+        {selectedIssue && displayIssue && (
           <div className="fixed inset-0 z-[100] flex items-center justify-end p-4 bg-black/50 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, x: 60 }}
@@ -464,20 +473,20 @@ const ProjectIssuesTab = ({ project }) => {
               <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
                 <div className="flex-1 min-w-0 pr-4">
                   <div className="flex flex-col gap-2">
-                    <h2 className="text-xl font-bold text-slate-900 leading-tight">{selectedIssue.title}</h2>
+                    <h2 className="text-xl font-bold text-slate-900 leading-tight">{displayIssue.title}</h2>
                     <div>
                       <span className="text-xs font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 inline-block">
-                        {(selectedIssue.taskId && tasks?.find(t => String(t.id) === String(selectedIssue.taskId).replace('t', '')))
-                          ? tasks.find(t => String(t.id) === String(selectedIssue.taskId).replace('t', '')).title
+                        {(displayIssue.taskId && tasks?.find(t => String(t.id) === String(displayIssue.taskId).replace('t', '')))
+                          ? tasks.find(t => String(t.id) === String(displayIssue.taskId).replace('t', '')).title
                           : "General Site Issue"}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 flex-wrap">
-                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${SEVERITY_STYLES[selectedIssue.severity]}`}>
-                        {selectedIssue.severity}
+                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${SEVERITY_STYLES[displayIssue.severity]}`}>
+                        {displayIssue.severity}
                       </span>
-                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${STATUS_STYLES[selectedIssue.status] || STATUS_STYLES['Open']}`}>
-                        {selectedIssue.status.replace('_', ' ')}
+                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${STATUS_STYLES[displayIssue.status] || STATUS_STYLES['Open']}`}>
+                        {displayIssue.status.replace('_', ' ')}
                       </span>
                     </div>
                   </div>
@@ -487,7 +496,7 @@ const ProjectIssuesTab = ({ project }) => {
                 </button>
               </div>
               <div className="flex-1 flex flex-col min-h-0">
-                <DetailedIssue issue={selectedIssue} projects={[project]} tasks={tasks} users={users || []} />
+                <DetailedIssue issue={displayIssue} projects={[project]} tasks={tasks} users={users || []} onClose={() => setSelectedIssueId(null)} />
               </div>
             </motion.div>
           </div>
