@@ -6,13 +6,7 @@ import { Clock, CheckCircle2, XCircle, RotateCcw, Lock, Filter, Eye, Search, Cal
 import { motion } from 'framer-motion';
 import ApprovalDetailModal from '../components/ApprovalDetailModal';
 
-const STATUS_STYLES = {
-  Pending: 'bg-amber-50 border-amber-200 text-amber-700',
-  Approved: 'bg-emerald-50 border-emerald-200 text-emerald-700',
-  Rejected: 'bg-red-50 border-red-200 text-red-700',
-  'Changes Requested': 'bg-orange-50 border-orange-200 text-orange-700',
-  Closed: 'bg-slate-50 border-slate-200 text-slate-700'
-};
+import { APPROVAL_STATUS_STYLES as STATUS_STYLES } from '../utils/constants';
 
 const STATUS_ICON = {
   Pending: Clock,

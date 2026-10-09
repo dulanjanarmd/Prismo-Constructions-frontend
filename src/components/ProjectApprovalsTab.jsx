@@ -5,13 +5,7 @@ import { CheckCircle2, XCircle, FileText, Send, Clock, RotateCcw, Lock, Plus, X,
 import { motion, AnimatePresence } from 'framer-motion';
 import ApprovalDetailModal from './ApprovalDetailModal';
 
-const STATUS_STYLES = {
-  Pending: 'bg-amber-500 text-white',
-  Approved: 'bg-emerald-500 text-white',
-  Rejected: 'bg-red-500 text-white',
-  'Changes Requested': 'bg-orange-500 text-white',
-  Closed: 'bg-slate-500 text-white'
-};
+import { APPROVAL_STATUS_STYLES as STATUS_STYLES } from '../utils/constants';
 
 const STATUS_ICON = {
   Pending: Clock,

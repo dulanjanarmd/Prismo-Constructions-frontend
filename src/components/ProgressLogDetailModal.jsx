@@ -9,17 +9,7 @@ import {
 } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
 
-const SEVERITY_STYLES = {
-  High: 'bg-red-100 text-red-700 border-red-200',
-  Medium: 'bg-amber-100 text-amber-700 border-amber-200',
-  Low: 'bg-blue-100 text-blue-700 border-blue-200'
-};
-
-const STATUS_STYLES = {
-  Open: 'bg-red-50 text-red-600',
-  'In Progress': 'bg-amber-50 text-amber-700',
-  Resolved: 'bg-green-50 text-green-600'
-};
+import { ISSUE_SEVERITY_STYLES as SEVERITY_STYLES, PROJECT_ISSUE_STATUS_STYLES as STATUS_STYLES } from '../utils/constants';
 
 const STATUS_NEXT = { Open: 'In Progress', 'In Progress': 'Resolved', Resolved: 'Open' };
 

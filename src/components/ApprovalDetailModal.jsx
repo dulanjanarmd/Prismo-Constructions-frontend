@@ -7,13 +7,7 @@ import {
   Lock, Send, MessageSquare, Clock, ListTodo, Paperclip, Image as ImageIcon, Edit, Trash2
 } from 'lucide-react';
 
-const STATUS_STYLES = {
-  Pending: 'bg-amber-500 text-white',
-  Approved: 'bg-emerald-500 text-white',
-  Rejected: 'bg-red-500 text-white',
-  'Changes Requested': 'bg-orange-500 text-white',
-  Closed: 'bg-slate-500 text-white'
-};
+import { APPROVAL_STATUS_STYLES as STATUS_STYLES } from '../utils/constants';
 
 const STATUS_ICON = {
   Pending: Clock,

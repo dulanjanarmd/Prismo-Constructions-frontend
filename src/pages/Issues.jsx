@@ -4,21 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { AlertTriangle, Plus, ChevronDown, ChevronUp, X, MessageSquare, MapPin, Wrench, Clock, User as UserIcon, Calendar, UploadCloud, Video, Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const SEVERITY_STYLES = {
-  High: 'bg-red-100 text-red-700 border-red-200',
-  Medium: 'bg-amber-100 text-amber-700 border-amber-200',
-  Low: 'bg-blue-100 text-blue-700 border-blue-200'
-};
-
-const STATUS_STYLES = {
-  OPEN: 'bg-red-50 text-red-600',
-  INFO_REQUESTED_SE: 'bg-orange-50 text-orange-600',
-  INFO_REQUESTED_PM: 'bg-orange-50 text-orange-600',
-  PENDING_PM: 'bg-amber-50 text-amber-600',
-  PENDING_CEO: 'bg-purple-50 text-purple-600',
-  CLIENT_REVIEW: 'bg-blue-50 text-blue-600',
-  RESOLVED: 'bg-green-50 text-green-600'
-};
+import { PROJECT_ISSUE_SEVERITY_STYLES as SEVERITY_STYLES, PROJECT_ISSUE_STATUS_STYLES as STATUS_STYLES } from '../utils/constants';
 
 import DetailedIssue from '../components/DetailedIssue';
 
@@ -372,20 +358,6 @@ const Issues = () => {
                     const assigneeStr = String(issue.assignee || issue.assigneeId || '');
                     const assignedUser = users.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
 
-                    const SEVERITY_STYLES = {
-                      High: 'bg-red-500 text-white shadow-sm',
-                      Medium: 'bg-amber-500 text-white shadow-sm',
-                      Low: 'bg-blue-500 text-white shadow-sm'
-                    };
-                    
-                    const STATUS_STYLES = {
-                      Open: 'bg-red-500 text-white shadow-sm',
-                      OPEN: 'bg-red-500 text-white shadow-sm',
-                      'In Progress': 'bg-amber-500 text-white shadow-sm',
-                      IN_PROGRESS: 'bg-amber-500 text-white shadow-sm',
-                      Resolved: 'bg-emerald-500 text-white shadow-sm',
-                      RESOLVED: 'bg-emerald-500 text-white shadow-sm'
-                    };
 
                     return (
                       <motion.tr

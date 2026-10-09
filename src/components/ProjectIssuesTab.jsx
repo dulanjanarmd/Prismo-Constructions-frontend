@@ -6,20 +6,7 @@ import { AlertTriangle, Plus, X, MessageSquare, ChevronDown, ChevronUp, UploadCl
 import { motion, AnimatePresence } from 'framer-motion';
 import DetailedIssue from './DetailedIssue';
 
-const SEVERITY_STYLES = {
-  High: 'bg-red-500 text-white shadow-sm',
-  Medium: 'bg-amber-500 text-white shadow-sm',
-  Low: 'bg-blue-500 text-white shadow-sm'
-};
-
-const STATUS_STYLES = {
-  Open: 'bg-red-500 text-white shadow-sm',
-  OPEN: 'bg-red-500 text-white shadow-sm',
-  'In Progress': 'bg-amber-500 text-white shadow-sm',
-  IN_PROGRESS: 'bg-amber-500 text-white shadow-sm',
-  Resolved: 'bg-emerald-500 text-white shadow-sm',
-  RESOLVED: 'bg-emerald-500 text-white shadow-sm'
-};
+import { PROJECT_ISSUE_SEVERITY_STYLES as SEVERITY_STYLES, PROJECT_ISSUE_STATUS_STYLES as STATUS_STYLES } from '../utils/constants';
 
 const STATUS_NEXT = {
   Open: 'In Progress',
