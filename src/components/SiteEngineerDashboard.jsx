@@ -8,6 +8,14 @@ import SubmitLogModal from './SubmitLogModal';
 import ReportIssueModal from './ReportIssueModal';
 import ProjectTable from './ProjectTable';
 
+const STATUS_STYLES = {
+  'To Do': 'bg-[#a855f7] text-white',
+  'In Progress': 'bg-[#06b6d4] text-white',
+  'Completed': 'bg-[#22c55e] text-white',
+  'Reopened': 'bg-[#f59e0b] text-white',
+  'Closed': 'bg-[#64748b] text-white'
+};
+
 const SiteEngineerDashboard = () => {
   const { projects, tasks, logs, issues } = useData();
   const { currentUser } = useAuth();
@@ -151,16 +159,14 @@ const SiteEngineerDashboard = () => {
                         </td>
                         <td className="px-4 py-3">
                           <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-28 inline-block text-center ${
-                            task.status === 'Completed' || task.status === 'Closed' ? 'bg-emerald-500 text-white' :
-                            task.status === 'In Progress' ? 'bg-amber-500 text-white' : 
-                            'bg-slate-200 text-slate-700'
+                            STATUS_STYLES[task.status] || 'bg-slate-200 text-slate-700'
                           }`}>
                             {task.status}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-slate-600 ">{task.dueDate || '—'}</td>
                         <td className="px-4 py-3 text-right">
-                          <button onClick={() => navigate('/portal/tasks')} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-md transition-colors flex items-center justify-center gap-1 ml-auto">
+                          <button onClick={() => navigate('/portal/tasks')} className="px-3 py-1.5 text-xs font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-md transition-colors shadow-sm hover:shadow flex items-center justify-center gap-1 ml-auto">
                             View <ChevronRight className="w-3 h-3" />
                           </button>
                         </td>

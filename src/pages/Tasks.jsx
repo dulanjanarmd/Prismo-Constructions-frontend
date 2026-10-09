@@ -9,15 +9,15 @@ import TaskDetailModal from '../components/TaskDetailModal';
 const PRIORITY_STYLES = {
   High: 'bg-red-500 text-white',
   Medium: 'bg-amber-500 text-white',
-  Low: 'bg-emerald-500 text-white'
+  Low: 'bg-blue-500 text-white'
 };
 
 const STATUS_STYLES = {
-  'To Do': 'bg-slate-500 text-white',
-  'In Progress': 'bg-sky-500 text-white',
-  'Completed': 'bg-emerald-500 text-white',
-  'Reopened': 'bg-red-500 text-white',
-  'Closed': 'bg-slate-600 text-white'
+  'To Do': 'bg-[#a855f7] text-white',
+  'In Progress': 'bg-[#06b6d4] text-white',
+  'Completed': 'bg-[#22c55e] text-white',
+  'Reopened': 'bg-[#f59e0b] text-white',
+  'Closed': 'bg-[#64748b] text-white'
 };
 
 const Tasks = () => {
@@ -238,7 +238,7 @@ const Tasks = () => {
                       <td className="px-6 py-5 text-right">
                         <button
                           onClick={() => setSelectedTask(task)}
-                          className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
+                          className="px-4 py-1.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
                         >
                           View
                         </button>
