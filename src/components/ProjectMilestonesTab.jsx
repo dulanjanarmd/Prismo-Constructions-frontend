@@ -14,6 +14,7 @@ const ProjectMilestonesTab = ({ project }) => {
   const { updateProject, tasks } = useData();
   const { currentUser } = useAuth();
   const isClient = currentUser?.role === 'client';
+  const isCEO = currentUser?.role === 'ceo';
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const emptyForm = { 
@@ -453,7 +454,7 @@ const ProjectMilestonesTab = ({ project }) => {
                 <option value="Handover">Handover</option>
               </select>
             </div>
-            {!isClient && project.status !== 'Completed' && (
+            {(!isClient && !isCEO) && project.status !== 'Completed' && (
               <button
                 onClick={() => setIsAdding(true)}
                 className="h-12 flex items-center px-6 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
@@ -740,7 +741,7 @@ const ProjectMilestonesTab = ({ project }) => {
                     <>
                       <td className="px-4 py-3 align-top">
                         <div className="flex items-start gap-3">
-                          {!isClient ? (
+                          {(!isClient && !isCEO) ? (
                             <button
                               onClick={() => handleToggle(m.id)}
                               className={`shrink-0 mt-0.5 transition-colors ${isCompleted ? 'text-green-500' : 'text-slate-300 hover:text-primary'}`}
@@ -811,16 +812,18 @@ const ProjectMilestonesTab = ({ project }) => {
                         </span>
                       </td>
 
-                      {/* Action buttons - hidden from clients */}
-                      {!isClient && (
+                      {/* Action buttons - hidden from clients and ceo */}
+                      {(!isClient && !isCEO) && (
                         <td className="px-4 py-3 align-top text-right">
                           <div className="flex items-center justify-end gap-2 shrink-0">
                             <button onClick={() => startEdit(m)} className="px-3 py-1.5 text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-md shadow-sm transition-all">
                               Edit
                             </button>
-                            <button onClick={() => handleDelete(m.id)} className="px-3 py-1.5 text-xs font-bold bg-red-500 text-white hover:bg-red-600 rounded-md shadow-sm transition-all">
-                              Delete
-                            </button>
+                            {!isCompleted && (
+                              <button onClick={() => handleDelete(m.id)} className="px-3 py-1.5 text-xs font-bold bg-red-500 text-white hover:bg-red-600 rounded-md shadow-sm transition-all">
+                                Delete
+                              </button>
+                            )}
                           </div>
                         </td>
                       )}
