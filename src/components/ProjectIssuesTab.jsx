@@ -61,10 +61,11 @@ const ProjectIssuesTab = ({ project }) => {
     ? baseActiveIssues 
     : baseActiveIssues.filter(i => i.status?.replace('_', ' ').toUpperCase() === statusFilter.toUpperCase());
 
-  const [selectedIssue, setSelectedIssue] = useState(null);
+  const [selectedIssueId, setSelectedIssueId] = useState(null);
+  const selectedIssue = selectedIssueId ? issues.find(i => i.id === selectedIssueId) : null;
 
   const handleView = (issue) => {
-    setSelectedIssue(issue);
+    setSelectedIssueId(issue.id);
     if (issue.status === 'Open' || issue.status === 'OPEN') {
       updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
     }
@@ -430,7 +431,7 @@ const ProjectIssuesTab = ({ project }) => {
                       </span>
                     </td>
                     <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap">
-                      {issue.reportedDate}
+                      {issue.reportedDate || (issue.createdAt ? new Date(issue.createdAt).toLocaleDateString() : '—')}
                     </td>
                     <td className="px-6 py-5 text-right">
                       <button
@@ -481,7 +482,7 @@ const ProjectIssuesTab = ({ project }) => {
                     </div>
                   </div>
                 </div>
-                <button onClick={() => setSelectedIssue(null)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1 shrink-0">
+                <button onClick={() => setSelectedIssueId(null)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1 shrink-0">
                   <X className="w-5 h-5" />
                 </button>
               </div>

@@ -281,7 +281,7 @@ const DetailedIssue = ({ issue, projects, tasks, users }) => {
               <Calendar className="w-4 h-4 text-slate-400 mt-0.5" />
               <div>
                 <p className="font-semibold text-slate-700">Reported Date</p>
-                <p className="text-slate-600">{issue.reportedDate || issue.createdAt || '—'}</p>
+                <p className="text-slate-600">{issue.reportedDate || (issue.createdAt ? new Date(issue.createdAt).toLocaleDateString() : '—')}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
