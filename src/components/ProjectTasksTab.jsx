@@ -128,7 +128,9 @@ const ProjectTasksTab = ({ projectId, project }) => {
           title: formData.title,
           description: formData.description,
           priority: formData.priority,
-          dueDate: formData.dueDate || null
+          dueDate: formData.dueDate || null,
+          assignedTo: formData.assignedTo ? `u${formData.assignedTo.toString().replace(/^u/, '')}` : null,
+          milestoneId: formData.milestoneId || null
         });
         setIsModalOpen(false);
         setIsEditing(false);
