@@ -45,8 +45,10 @@ const NotificationsPage = () => {
                 onClick={() => {
                   if (!notification.read) markNotificationAsRead(notification.id);
                   if (notification.referenceId && notification.referenceId.startsWith('project-')) {
-                    const projectId = notification.referenceId.split('-')[1];
-                    navigate(`/portal/projects/${projectId}`);
+                    const parts = notification.referenceId.split('-');
+                    const projectId = parts[1];
+                    const tab = parts[2]; // Might be undefined
+                    navigate(`/portal/projects/${projectId}`, { state: { tab } });
                   }
                 }}
               >

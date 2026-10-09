@@ -64,8 +64,10 @@ const NotificationDrawer = ({ isOpen, onClose }) => {
                         onClick={() => {
                           if (!notif.read) markNotificationAsRead(notif.id);
                           if (notif.referenceId && notif.referenceId.startsWith('project-')) {
-                            const projectId = notif.referenceId.split('-')[1];
-                            navigate(`/portal/projects/${projectId}`);
+                            const parts = notif.referenceId.split('-');
+                            const projectId = parts[1];
+                            const tab = parts[2]; // Might be undefined
+                            navigate(`/portal/projects/${projectId}`, { state: { tab } });
                             onClose();
                           }
                         }}

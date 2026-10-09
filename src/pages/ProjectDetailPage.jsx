@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import { ArrowLeft, LayoutDashboard, Flag, CheckSquare, Camera, AlertTriangle, MessageSquare, FolderOpen, X, MapPin, Building2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -25,6 +25,7 @@ const TABS = [
 const ProjectDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { projects } = useData();
   const { currentUser } = useAuth();
   
@@ -41,13 +42,19 @@ const ProjectDetailPage = () => {
         ? TABS.filter(t => ['overview', 'milestones', 'progress', 'issues', 'approvals', 'documents'].includes(t.id))
         : TABS;
 
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'overview');
   const [project, setProject] = useState(null);
 
   useEffect(() => {
     const found = projects.find(p => String(p.id) === String(id) || p.id === `p${id}`);
     setProject(found);
   }, [id, projects]);
+
+  useEffect(() => {
+    if (location.state?.tab && availableTabs.some(t => t.id === location.state.tab)) {
+      setActiveTab(location.state.tab);
+    }
+  }, [location.state?.tab, availableTabs]);
 
   if (!project) {
     return (
