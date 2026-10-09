@@ -562,6 +562,7 @@ export const DataProvider = ({ children }) => {
       status: statusValues[updates.status] || updates.status,
       completionEvidence: updates.evidence !== undefined ? updates.evidence : (currentTask?.evidence ?? null),
       assignedTo: updates.assignedTo ?? currentTask?.assignedTo ?? null,
+      milestoneId: updates.milestoneId !== undefined ? updates.milestoneId : (currentTask?.milestoneId ?? null),
       comments: updates.comments ? JSON.stringify(updates.comments) : (currentTask?.comments ? JSON.stringify(currentTask.comments) : null)
     };
     const response = await fetch(`http://localhost:8080/api/tasks/${taskId}`, {
@@ -581,6 +582,7 @@ export const DataProvider = ({ children }) => {
       ...updates,
       status: updates.status || task.status,
       evidence: updates.evidence !== undefined ? updates.evidence : task.evidence,
+      milestoneId: updates.milestoneId !== undefined ? updates.milestoneId : task.milestoneId,
       comments: updates.comments ?? task.comments
     } : task));
   };
