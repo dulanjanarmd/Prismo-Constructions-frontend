@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import ImageCarousel from '../components/ImageCarousel';
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,85 +31,69 @@ const Login = () => {
 
 
   return (
-    <div className="h-screen flex flex-col bg-transparent text-slate-900 relative font-sans overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 relative overflow-hidden font-sans">
       
+      {/* Animated Background Blobs */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-4000"></div>
 
-
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 relative z-10 pb-12">
+      <div className="relative z-10 w-full max-w-md p-8 sm:p-10 bg-white/60 backdrop-blur-xl border border-white/40 shadow-xl rounded-2xl mx-4">
         
-        <div className="w-full max-w-5xl h-[520px] flex bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden">
-          {/* Left Side: Carousel */}
-          <div className="hidden md:block w-1/2 h-full relative border-r border-slate-100">
-            <ImageCarousel className="absolute inset-0 w-full h-full" />
-          </div>
-          
-          {/* Right Side: Form */}
-          <div className="w-full md:w-1/2 p-12 flex flex-col justify-between overflow-y-auto">
-            <div className="text-center">
-            <h1 className="text-4xl font-bold text-slate-900 mb-3 tracking-tight">Prismo Constructions</h1>
-            <p className="text-slate-500 text-lg">
-              Welcome back. Please sign in.
-            </p>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded text-sm mb-2 mt-4 text-center border border-red-200 font-medium">
-              {error}
-            </div>
-          )}
-
-          {successMsg && (
-            <div className="bg-green-50 text-green-700 p-3 rounded text-sm mb-2 mt-4 text-center border border-green-200 font-medium">
-              {successMsg}
-            </div>
-          )}
-
-          <form onSubmit={handleLogin} className="flex-1 flex flex-col justify-center space-y-4 my-6">
-              <div>
-                <input 
-                  required 
-                  type="email" 
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
-                  placeholder="Email address..."
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <input 
-                  required 
-                  type="password" 
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 text-base focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
-                  placeholder="Password..."
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-
-              <button 
-                disabled={isLoading}
-                type="submit" 
-                className="w-full flex items-center justify-center px-4 py-4 bg-[#1e2a35] text-white rounded-xl font-bold text-lg hover:bg-primary hover:text-[#022c22] transition-colors disabled:opacity-70 mt-2 shadow-md"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
-                ) : (
-                  "SIGN IN"
-                )}
-              </button>
-            </form>
-
-
-            <div className="text-center text-sm text-slate-500">
-            </div>
-          </div>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-ethnocentric text-slate-800 mb-2">Prismo</h1>
+          <p className="text-slate-500 font-medium">Internal Management System</p>
         </div>
-      </main>
 
-      {/* Decorative background element */}
-      <div className="absolute -bottom-32 -right-32 text-slate-200 opacity-50 pointer-events-none z-0">
-        <div className="w-96 h-96 border-[40px] border-current rounded-full"></div>
+        {error && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50/80 backdrop-blur-sm text-red-600 p-3 rounded-lg text-sm mb-6 text-center border border-red-200 font-medium">
+            {error}
+          </motion.div>
+        )}
+
+        {successMsg && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-green-50/80 backdrop-blur-sm text-green-700 p-3 rounded-lg text-sm mb-6 text-center border border-green-200 font-medium">
+            {successMsg}
+          </motion.div>
+        )}
+
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Email Address</label>
+            <input 
+              required 
+              type="email" 
+              className="w-full rounded-lg bg-white/80 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all placeholder:text-slate-400 shadow-sm" 
+              placeholder="name@prismo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Password</label>
+            <input 
+              required 
+              type="password" 
+              className="w-full rounded-lg bg-white/80 border border-slate-200 text-slate-900 px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all placeholder:text-slate-400 shadow-sm" 
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <button 
+            disabled={isLoading}
+            type="submit" 
+            className="w-full flex items-center justify-center px-4 py-3.5 bg-primary text-white rounded-lg font-bold hover:bg-opacity-90 transition-all disabled:opacity-70 mt-6 shadow-md shadow-primary/30"
+          >
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            ) : (
+              "Sign In"
+            )}
+          </button>
+        </form>
+
       </div>
     </div>
   );
