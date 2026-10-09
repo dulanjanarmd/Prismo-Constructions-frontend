@@ -285,8 +285,20 @@ const ProjectIssuesTab = ({ project }) => {
                   <input type="text" placeholder="e.g. Electrical, Plumbing" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.tradeInvolved} onChange={e => setFormData({ ...formData, tradeInvolved: e.target.value })} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Est. Cost Impact ($)</label>
-                  <input type="number" min="0" placeholder="e.g. 5000" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" value={formData.costImpact} onChange={e => setFormData({ ...formData, costImpact: e.target.value })} />
+                  <label className="block text-sm font-medium mb-1">Est. Cost Impact (LKR)</label>
+                  <input 
+                    type="number" 
+                    min="1" 
+                    placeholder="e.g. 5000" 
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none" 
+                    value={formData.costImpact} 
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === '' || Number(val) > 0) {
+                        setFormData({ ...formData, costImpact: val });
+                      }
+                    }} 
+                  />
                 </div>
               </div>
 
