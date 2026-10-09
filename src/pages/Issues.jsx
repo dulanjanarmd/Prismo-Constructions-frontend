@@ -43,16 +43,22 @@ const Issues = () => {
     documentUrl: ''
   });
 
-  const [expandedId, setExpandedId] = useState(null);
+  const [selectedIssueId, setSelectedIssueId] = useState(null);
+  const selectedIssue = selectedIssueId ? issues.find(i => i.id === selectedIssueId) : null;
+  const [lastSelectedIssue, setLastSelectedIssue] = useState(null);
 
-  const handleExpand = (issue) => {
-    if (expandedId !== issue.id) {
-      setExpandedId(issue.id);
-      if (issue.status === 'Open' || issue.status === 'OPEN') {
-        updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
-      }
-    } else {
-      setExpandedId(null);
+  React.useEffect(() => {
+    if (selectedIssue) {
+      setLastSelectedIssue(selectedIssue);
+    }
+  }, [selectedIssue]);
+
+  const displayIssue = selectedIssue || lastSelectedIssue;
+
+  const handleView = (issue) => {
+    setSelectedIssueId(issue.id);
+    if (issue.status === 'Open' || issue.status === 'OPEN') {
+      updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
     }
   };
   const [activeTab, setActiveTab] = useState(currentUser?.role === 'ceo' ? 'pm' : 'se'); // 'se' or 'pm'
@@ -340,80 +346,143 @@ const Issues = () => {
         </div>
 
         {/* Issues list */}
-        <div className="p-5 bg-slate-50/50">
+        <div className="bg-slate-50/50">
           {filteredIssues.length === 0 ? (
             <div className="py-12 text-center text-slate-500">
               <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-40" />
               <p className="text-lg font-medium">No issues found.</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {filteredIssues.map((issue, idx) => {
-            const project = projects.find(p => String(p.id) === String(issue.projectId));
-            const task = tasks.find(t => String(t.id) === String(issue.taskId));
-            
-            const assigneeStr = String(issue.assignee || issue.assigneeId || '');
-            const assignedUser = users.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-slate-100 text-xs text-slate-400">
+                  <tr>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Issue</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Project</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Severity</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Status</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Reported Date</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {filteredIssues.map((issue, idx) => {
+                    const project = projects.find(p => String(p.id) === String(issue.projectId));
+                    const task = tasks.find(t => String(t.id) === String(issue.taskId));
+                    const assigneeStr = String(issue.assignee || issue.assigneeId || '');
+                    const assignedUser = users.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
 
-            return (
-              <motion.div
-                key={issue.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.04 }}
-                className={`glass-card overflow-hidden border-l-4 ${
-                  issue.severity === 'High' ? 'border-l-red-500' :
-                  issue.severity === 'Medium' ? 'border-l-amber-400' : 'border-l-blue-400'
-                }`}
-              >
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${SEVERITY_STYLES[issue.severity] || SEVERITY_STYLES.Medium}`}>
-                          {issue.severity || 'Medium'}
-                        </span>
-                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${STATUS_STYLES[issue.status] || STATUS_STYLES.OPEN}`}>
-                          {issue.status?.replace(/_/g, ' ') || 'OPEN'}
-                        </span>
-                        <span className="text-xs font-medium text-slate-500">
-                          {project?.name || 'Project'} {task ? `› ${task.title}` : ''}
-                        </span>
-                        <span className="text-xs text-slate-400">{issue.reportedDate || issue.createdAt ? new Date(issue.reportedDate || issue.createdAt).toLocaleDateString() : ''}</span>
-                      </div>
-                      <h3 className="font-bold text-slate-900 ">{issue.title}</h3>
-                      <p className="text-sm text-slate-600 mt-1 line-clamp-1">{issue.description}</p>
-                    </div>
-                    <div className="flex items-center gap-4 shrink-0">
-                      <button
-                        onClick={() => handleExpand(issue)}
-                        className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md transition-colors"
+                    const SEVERITY_STYLES = {
+                      High: 'bg-red-500 text-white shadow-sm',
+                      Medium: 'bg-amber-500 text-white shadow-sm',
+                      Low: 'bg-blue-500 text-white shadow-sm'
+                    };
+                    
+                    const STATUS_STYLES = {
+                      Open: 'bg-red-500 text-white shadow-sm',
+                      OPEN: 'bg-red-500 text-white shadow-sm',
+                      'In Progress': 'bg-amber-500 text-white shadow-sm',
+                      IN_PROGRESS: 'bg-amber-500 text-white shadow-sm',
+                      Resolved: 'bg-emerald-500 text-white shadow-sm',
+                      RESOLVED: 'bg-emerald-500 text-white shadow-sm'
+                    };
+
+                    return (
+                      <motion.tr
+                        key={issue.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: idx * 0.03 }}
+                        className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                        onClick={() => handleView(issue)}
                       >
-                        {expandedId === issue.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                      </button>
+                        <td className="px-6 py-5 font-bold text-slate-900 group-hover:text-primary transition-colors">
+                          {issue.title}
+                          {task && <div className="text-xs font-normal text-slate-500 mt-0.5">{task.title}</div>}
+                        </td>
+                        <td className="px-6 py-5 text-slate-600 font-medium whitespace-nowrap">
+                          {project?.name || 'Unknown Project'}
+                        </td>
+                        <td className="px-6 py-5">
+                          <span className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded shadow-sm w-28 inline-block text-center ${SEVERITY_STYLES[issue.severity] || SEVERITY_STYLES.Medium}`}>
+                            {issue.severity || 'Medium'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5">
+                          <span className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded shadow-sm w-28 inline-block text-center ${STATUS_STYLES[issue.status] || STATUS_STYLES['OPEN']}`}>
+                            {issue.status?.replace(/_/g, ' ') || 'OPEN'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap">
+                          {issue.reportedDate || issue.createdAt ? new Date(issue.reportedDate || issue.createdAt).toLocaleDateString() : '—'}
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleView(issue); }}
+                            className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow inline-flex items-center justify-center"
+                          >
+                            View
+                          </button>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* View Issue Modal */}
+      <AnimatePresence>
+        {selectedIssue && displayIssue && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-end p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 60 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="glass-card w-full max-w-2xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
+            >
+              <div className="flex items-start justify-between p-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
+                <div className="flex-1 min-w-0 pr-4">
+                  <div className="flex flex-col gap-2">
+                    <h2 className="text-xl font-bold text-slate-900 leading-tight">{displayIssue.title}</h2>
+                    <div>
+                      <span className="text-xs font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 inline-block">
+                        {(displayIssue.taskId && tasks?.find(t => String(t.id) === String(displayIssue.taskId).replace('t', '')))
+                          ? tasks.find(t => String(t.id) === String(displayIssue.taskId).replace('t', '')).title
+                          : "General Site Issue"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${
+                        displayIssue.severity === 'High' ? 'bg-red-500 text-white shadow-sm' :
+                        displayIssue.severity === 'Medium' ? 'bg-amber-500 text-white shadow-sm' : 'bg-blue-500 text-white shadow-sm'
+                      }`}>
+                        {displayIssue.severity}
+                      </span>
+                      <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded shadow-sm ${
+                        ['Resolved', 'RESOLVED'].includes(displayIssue.status) ? 'bg-emerald-500 text-white shadow-sm' :
+                        ['In Progress', 'IN_PROGRESS'].includes(displayIssue.status) ? 'bg-amber-500 text-white shadow-sm' : 'bg-red-500 text-white shadow-sm'
+                      }`}>
+                        {displayIssue.status.replace('_', ' ')}
+                      </span>
                     </div>
                   </div>
                 </div>
-
-                <AnimatePresence>
-                  {expandedId === issue.id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <DetailedIssue issue={issue} projects={projects} tasks={tasks} users={users} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
-        </div>
-      </div>
+                <button onClick={() => setSelectedIssueId(null)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors ml-1 shrink-0">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 flex flex-col min-h-0">
+                <DetailedIssue issue={displayIssue} projects={projects} tasks={tasks} users={users || []} onClose={() => setSelectedIssueId(null)} />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
