@@ -463,11 +463,9 @@ const ProjectMilestonesTab = ({ project }) => {
             )}
           </div>
         </div>
-      </div>
-
       {/* Overall progress */}
       {milestones.length > 0 && (
-        <div className="glass-card p-4">
+        <div className="p-6 border-b border-slate-100 bg-white/50">
           <div className="flex justify-between text-sm mb-2">
             <span className="font-medium text-slate-700 ">Milestone Completion</span>
             <span className="font-bold text-primary">{pct}%</span>
@@ -491,7 +489,7 @@ const ProjectMilestonesTab = ({ project }) => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             onSubmit={handleAdd}
-            className="glass-card p-4 border-2 border-primary/30 overflow-hidden"
+            className="p-6 border-b border-slate-200 bg-slate-50/50 overflow-hidden"
           >
             <h3 className="font-semibold mb-3">New Milestone</h3>
             <div className="flex flex-col gap-3">
@@ -605,13 +603,13 @@ const ProjectMilestonesTab = ({ project }) => {
 
       {/* Milestones list */}
       {milestones.length === 0 ? (
-        <div className="glass-card p-12 text-center text-slate-500">
+        <div className="p-12 text-center text-slate-500">
           <Flag className="w-12 h-12 mx-auto mb-4 opacity-40" />
           <p className="text-lg font-medium">No milestones defined yet.</p>
           <p className="text-sm mt-1">Add milestones to track key stages of this project.</p>
         </div>
       ) : (
-        <div className="glass-card overflow-hidden overflow-x-auto p-6 pt-0">
+        <div className="overflow-hidden overflow-x-auto p-6 pt-0">
           <table className="w-full text-left text-sm mt-4">
             <thead className="border-b border-slate-100 text-xs text-slate-400">
               <tr>
@@ -835,6 +833,7 @@ const ProjectMilestonesTab = ({ project }) => {
           </table>
         </div>
       )}
+      </div>
     </div>
   );
 };
