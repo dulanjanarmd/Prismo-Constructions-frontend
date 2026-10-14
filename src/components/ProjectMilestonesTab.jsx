@@ -527,7 +527,14 @@ const ProjectMilestonesTab = ({ project }) => {
                       max={maxDateStr}
                       className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                       value={newForm.startDate}
-                      onChange={e => setNewForm({ ...newForm, startDate: e.target.value })}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setNewForm(prev => ({
+                          ...prev,
+                          startDate: val,
+                          dueDate: prev.dueDate && prev.dueDate < val ? val : prev.dueDate
+                        }));
+                      }}
                     />
                   </div>
                   <div className="flex flex-col flex-1">
@@ -535,7 +542,7 @@ const ProjectMilestonesTab = ({ project }) => {
                     <input
                       required
                       type="date"
-                      min={minDateStr}
+                      min={newForm.startDate || minDateStr}
                       max={maxDateStr}
                       className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                       value={newForm.dueDate}
@@ -670,14 +677,21 @@ const ProjectMilestonesTab = ({ project }) => {
                               max={maxDateStr}
                               className="w-full rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                               value={editForm.startDate}
-                              onChange={e => setEditForm({ ...editForm, startDate: e.target.value })}
+                              onChange={e => {
+                                const val = e.target.value;
+                                setEditForm(prev => ({
+                                  ...prev,
+                                  startDate: val,
+                                  dueDate: prev.dueDate && prev.dueDate < val ? val : prev.dueDate
+                                }));
+                              }}
                             />
                           </div>
                           <div className="flex flex-col flex-1">
                             <label className="text-xs text-slate-500 mb-1">Due Date</label>
                             <input
                               type="date"
-                              min={minDateStr}
+                              min={editForm.startDate || minDateStr}
                               max={maxDateStr}
                               className="w-full rounded border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                               value={editForm.dueDate}

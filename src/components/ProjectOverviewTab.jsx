@@ -186,11 +186,31 @@ const ProjectOverviewTab = ({ project }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Start Date</label>
-                    <input required type="date" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} />
+                    <input
+                      required
+                      type="date"
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                      value={formData.startDate}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setFormData(prev => ({
+                          ...prev,
+                          startDate: val,
+                          endDate: prev.endDate && prev.endDate < val ? val : prev.endDate
+                        }));
+                      }}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">End Date</label>
-                    <input required type="date" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} />
+                    <input
+                      required
+                      type="date"
+                      min={formData.startDate}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                      value={formData.endDate}
+                      onChange={e => setFormData({ ...formData, endDate: e.target.value })}
+                    />
                   </div>
                 </div>
                 <div>
