@@ -284,9 +284,11 @@ const ProjectOverviewTab = ({ project }) => {
                   <button onClick={() => { setIsDetailsOpen(false); openModal('edit'); }} className="flex-1 py-2.5 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm flex items-center justify-center">
                     Edit
                   </button>
-                  <button onClick={handleDeleteProject} className="flex-1 py-2.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm flex items-center justify-center">
-                    Delete
-                  </button>
+                  {project.status === 'Planning' && (
+                    <button onClick={handleDeleteProject} className="flex-1 py-2.5 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm flex items-center justify-center">
+                      Delete
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       if (project.status === 'On Hold') {

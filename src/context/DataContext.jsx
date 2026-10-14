@@ -416,7 +416,14 @@ export const DataProvider = ({ children }) => {
           'Authorization': `Bearer ${currentUser.token}`
         }
       });
-      if (!res.ok) throw new Error('Failed to delete project');
+      if (!res.ok) {
+        let errorMsg = 'Failed to delete project';
+        try {
+          const errData = await res.json();
+          if (errData?.message) errorMsg = errData.message;
+        } catch (_) {}
+        throw new Error(errorMsg);
+      }
       setProjects(projects.filter(p => p.id !== id));
     } catch (err) {
       console.error(err);
