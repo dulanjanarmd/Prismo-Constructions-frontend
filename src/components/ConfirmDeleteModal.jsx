@@ -1,18 +1,14 @@
 import { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 
 /**
- * ConfirmDeleteModal - A reusable, premium-styled delete confirmation dialog.
+ * ConfirmDeleteModal - Aligned with Prismo Construction's clean, modern theme.
  *
- * Props:
- *   isOpen       {boolean}  - Whether the modal is visible
- *   onClose      {function} - Called when the user cancels
- *   onConfirm    {function} - Called when the user confirms deletion
- *   title        {string}   - Modal heading (default: "Delete Confirmation")
- *   message      {string}   - Body text explaining what will be deleted
- *   itemName     {string}   - Optional: name/label of the item being deleted (rendered bold)
- *   confirmLabel {string}   - Label for the confirm button (default: "Delete")
- *   isLoading    {boolean}  - Shows a spinner and disables buttons while deleting
+ * Uses:
+ *   - glass-card container styling (rounded-xl / border-border / subtle shadow)
+ *   - Prismo brand typography and accent hierarchy
+ *   - Consistent button styling with subtle feedback
  */
 const ConfirmDeleteModal = ({
   isOpen,
@@ -26,14 +22,12 @@ const ConfirmDeleteModal = ({
 }) => {
   const cancelRef = useRef(null);
 
-  // Focus the cancel button when the modal opens (accessibility)
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => cancelRef.current?.focus(), 50);
     }
   }, [isOpen]);
 
-  // Close on Escape key
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e) => {
@@ -43,115 +37,102 @@ const ConfirmDeleteModal = ({
     return () => window.removeEventListener('keydown', handleKey);
   }, [isOpen, isLoading, onClose]);
 
-  if (!isOpen) return null;
-
   return (
-    /* Backdrop */
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)' }}
-      onClick={(e) => { if (e.target === e.currentTarget && !isLoading) onClose(); }}
-    >
-      {/* Modal Panel */}
-      <div
-        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
-        style={{ animation: 'cdm-pop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cdm-title"
-      >
-        {/* Top accent bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-red-500 via-red-400 to-orange-400" />
-
-        {/* Close button */}
-        {!isLoading && (
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors rounded-full p-1 hover:bg-slate-100"
-            aria-label="Close"
+    <AnimatePresence>
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !isLoading) onClose();
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 8 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="glass-card w-full max-w-md p-6 relative shadow-xl overflow-hidden"
+            role="dialog"
+            aria-modal="true"
           >
-            <X className="w-4 h-4" />
-          </button>
-        )}
-
-        {/* Content */}
-        <div className="px-6 pt-6 pb-7">
-          {/* Icon */}
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center border-2 border-red-100">
-              <AlertTriangle className="w-7 h-7 text-red-500" strokeWidth={2} />
-            </div>
-          </div>
-
-          {/* Title */}
-          <h2 id="cdm-title" className="text-center text-lg font-bold text-slate-800 mb-2">
-            {title}
-          </h2>
-
-          {/* Message */}
-          <p className="text-center text-sm text-slate-500 leading-relaxed">
-            {message}
-            {itemName && (
-              <> <span className="font-semibold text-slate-700">"{itemName}"</span></>
+            {/* Close button */}
+            {!isLoading && (
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors rounded-lg p-1.5 hover:bg-slate-100"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
             )}
-          </p>
 
-          {/* Warning note */}
-          <div className="mt-4 flex items-start gap-2 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-            <Trash2 className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-red-600 leading-relaxed">
-              This action is <span className="font-semibold">permanent</span> and cannot be undone.
-            </p>
-          </div>
+            {/* Header with Icon */}
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-6 h-6 text-amber-500" />
+              </div>
+              <div className="flex-1 pr-6">
+                <h2 className="text-xl font-bold text-slate-900 leading-snug">
+                  {title}
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">Permanent action confirmation</p>
+              </div>
+            </div>
 
-          {/* Actions */}
-          <div className="mt-5 flex gap-3">
-            <button
-              ref={cancelRef}
-              onClick={onClose}
-              disabled={isLoading}
-              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={isLoading}
-              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-70"
-              style={{
-                background: isLoading
-                  ? '#f87171'
-                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                boxShadow: isLoading ? 'none' : '0 4px 14px rgba(239,68,68,0.35)',
-              }}
-            >
-              {isLoading ? (
-                <>
-                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
-                  </svg>
-                  Deleting…
-                </>
-              ) : (
-                <>
-                  <Trash2 className="w-4 h-4" />
-                  {confirmLabel}
-                </>
-              )}
-            </button>
-          </div>
+            {/* Message Body */}
+            <div className="space-y-3 mb-6">
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {message}
+                {itemName && (
+                  <> <span className="font-bold text-slate-900">"{itemName}"</span>?</>
+                )}
+              </p>
+
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center gap-2.5">
+                <div className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                <p className="text-xs text-slate-600 font-medium">
+                  This action cannot be undone and will permanently remove associated data.
+                </p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end items-center gap-3 pt-2 border-t border-slate-100">
+              <button
+                ref={cancelRef}
+                type="button"
+                onClick={onClose}
+                disabled={isLoading}
+                className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={onConfirm}
+                disabled={isLoading}
+                className="px-4 py-2 text-sm font-bold bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all shadow-md shadow-red-500/20 flex items-center gap-2 disabled:opacity-60"
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+                    </svg>
+                    <span>Deleting…</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>{confirmLabel}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </motion.div>
         </div>
-      </div>
-
-      {/* Keyframe animation */}
-      <style>{`
-        @keyframes cdm-pop {
-          0%   { opacity: 0; transform: scale(0.85) translateY(12px); }
-          100% { opacity: 1; transform: scale(1)   translateY(0); }
-        }
-      `}</style>
-    </div>
+      )}
+    </AnimatePresence>
   );
 };
 
