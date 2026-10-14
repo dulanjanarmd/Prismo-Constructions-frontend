@@ -3,6 +3,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { Flag, Plus, Trash2, CheckCircle2, Circle, Edit2, X, Check, Calendar, Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 const statusColors = {
   Completed: 'bg-green-100 text-green-700 border-green-200',
@@ -28,6 +29,10 @@ const ProjectMilestonesTab = ({ project }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [categoryFilter, setCategoryFilter] = useState('All');
+
+  // Delete confirmation state
+  const [deleteMilestoneTarget, setDeleteMilestoneTarget] = useState(null);
+  const [isDeletingMilestone, setIsDeletingMilestone] = useState(false);
 
   const milestones = project.milestones || [];
 
@@ -227,47 +232,43 @@ const ProjectMilestonesTab = ({ project }) => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     const linkedTasks = tasks.filter(t => String(t.milestoneId).replace('m', '') === String(id).replace('m', ''));
     if (linkedTasks.length > 0) {
       alert("Cannot delete milestone because it is linked to one or more tasks. Please remove the task links first.");
       return;
     }
+    const milestone = milestones.find(m => m.id === id);
+    setDeleteMilestoneTarget(milestone || { id });
+  };
 
+  const confirmDeleteMilestone = async () => {
+    if (!deleteMilestoneTarget) return;
+    setIsDeletingMilestone(true);
     try {
-      const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones/${id}`, {
+      const res = await fetch(`http://localhost:8080/api/projects/${project.id}/milestones/${deleteMilestoneTarget.id}`, {
         method: 'DELETE',
         headers: authHeaders
       });
-      
       if (!res.ok) {
         throw new Error('Failed to delete milestone');
       }
-      
-      const newMilestones = milestones.filter(x => x.id !== id);
+      const newMilestones = milestones.filter(x => x.id !== deleteMilestoneTarget.id);
       const completedCount = newMilestones.filter(x => x.status === 'Completed').length;
       const pct = newMilestones.length > 0 ? Math.round((completedCount / newMilestones.length) * 100) : 0;
-      
-      let newProjectStatus = project.status;
-      if (pct === 100 && newMilestones.length > 0) {
-        newProjectStatus = 'Completed';
-      } else if (pct > 0 && pct < 100) {
-        newProjectStatus = 'In Progress';
-      } else if (pct === 0 && project.status === 'Completed') {
-        newProjectStatus = 'In Progress';
-      }
-
-      updateProject(project.id, { 
-        milestones: newMilestones,
-        progress: pct,
-        status: newProjectStatus
-      });
+      setMilestones(newMilestones);
+      await updateProject(project.id, { milestoneProgress: pct });
+      setDeleteMilestoneTarget(null);
     } catch (err) {
       console.error(err);
+      alert('Failed to delete milestone.');
+    } finally {
+      setIsDeletingMilestone(false);
     }
   };
 
   const startEdit = (m) => {
+
     setEditingId(m.id);
     setEditForm({ 
       name: m.name || m.title || '', 
@@ -837,8 +838,20 @@ const ProjectMilestonesTab = ({ project }) => {
         </div>
       )}
       </div>
+
+      {/* Delete Milestone Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteMilestoneTarget}
+        onClose={() => setDeleteMilestoneTarget(null)}
+        onConfirm={confirmDeleteMilestone}
+        title="Delete Milestone"
+        message="You are about to permanently delete the milestone"
+        itemName={deleteMilestoneTarget?.name || deleteMilestoneTarget?.title}
+        isLoading={isDeletingMilestone}
+      />
     </div>
   );
 };
+
 
 export default ProjectMilestonesTab;

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { CheckCircle2, XCircle, FileText, Send, Clock, RotateCcw, Lock, Plus, X, Paperclip, ImageIcon, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ApprovalDetailModal from './ApprovalDetailModal';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 import { APPROVAL_STATUS_STYLES as STATUS_STYLES } from '../utils/constants';
 
@@ -48,6 +49,10 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+
+  // Delete confirmation state
+  const [deleteApprovalTarget, setDeleteApprovalTarget] = useState(null);
+  const [isDeletingApproval, setIsDeletingApproval] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -129,14 +134,21 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
     return result;
   };
 
-  const handleDelete = async (e, id) => {
+  const handleDelete = (e, approval) => {
     e.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this approval request?')) {
-      try {
-        await deleteApprovalRequest(id);
-      } catch (err) {
-        alert('Failed to delete approval request.');
-      }
+    setDeleteApprovalTarget(approval);
+  };
+
+  const confirmDeleteApproval = async () => {
+    if (!deleteApprovalTarget) return;
+    setIsDeletingApproval(true);
+    try {
+      await deleteApprovalRequest(deleteApprovalTarget.id);
+      setDeleteApprovalTarget(null);
+    } catch (err) {
+      alert('Failed to delete approval request.');
+    } finally {
+      setIsDeletingApproval(false);
     }
   };
 
@@ -444,6 +456,17 @@ const ProjectApprovalsTab = ({ projectId, project }) => {
           onUpdate={handleUpdate}
         />
       )}
+
+      {/* Delete Approval Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteApprovalTarget}
+        onClose={() => setDeleteApprovalTarget(null)}
+        onConfirm={confirmDeleteApproval}
+        title="Delete Approval Request"
+        message="You are about to permanently delete the approval request"
+        itemName={deleteApprovalTarget?.title}
+        isLoading={isDeletingApproval}
+      />
     </div>
   );
 };

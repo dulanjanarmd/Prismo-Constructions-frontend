@@ -3,6 +3,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { Camera, Plus, X, UploadCloud, AlertTriangle, MessageSquare, Download, Eye, LayoutList, Edit, Trash2, Filter, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 
 const Logs = () => {
   const { logs, addLog, updateLog, deleteLog, projects, tasks } = useData();
@@ -37,6 +38,10 @@ const Logs = () => {
   const [selectedLog, setSelectedLog] = useState(null);
   const [editingLogId, setEditingLogId] = useState(null);
 
+  // Delete confirmation state
+  const [deleteLogTarget, setDeleteLogTarget] = useState(null);
+  const [isDeletingLog, setIsDeletingLog] = useState(false);
+
   const openEditModal = (log) => {
     setEditingLogId(log.id);
     setFormData({
@@ -65,8 +70,18 @@ const Logs = () => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this log?")) {
-      deleteLog(id);
+    const log = logs.find(l => l.id === id);
+    setDeleteLogTarget(log || { id });
+  };
+
+  const confirmDeleteLog = async () => {
+    if (!deleteLogTarget) return;
+    setIsDeletingLog(true);
+    try {
+      await deleteLog(deleteLogTarget.id);
+      setDeleteLogTarget(null);
+    } finally {
+      setIsDeletingLog(false);
     }
   };
 
@@ -673,6 +688,16 @@ const Logs = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Delete Log Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteLogTarget}
+        onClose={() => setDeleteLogTarget(null)}
+        onConfirm={confirmDeleteLog}
+        title="Delete Log"
+        message="You are about to permanently delete this progress log entry."
+        isLoading={isDeletingLog}
+      />
     </div>
   );
 };

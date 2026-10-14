@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 
 import { PRIORITY_STYLES, STATUS_STYLES } from '../utils/constants';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
   const { updateTask, users } = useData();
@@ -34,6 +35,7 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editCommentText, setEditCommentText] = useState('');
   const [activeActionCommentId, setActiveActionCommentId] = useState(null);
+  const [deleteCommentTarget, setDeleteCommentTarget] = useState(null);
 
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
   const isSiteEngineer = currentUser?.role === 'site_engineer';
@@ -196,9 +198,14 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
   };
 
   const handleDeleteComment = (commentId) => {
-    if (!window.confirm("Are you sure you want to delete this comment?")) return;
-    const updatedComments = task.comments.filter(c => c.id !== commentId);
+    setDeleteCommentTarget(commentId);
+  };
+
+  const confirmDeleteComment = () => {
+    if (!deleteCommentTarget) return;
+    const updatedComments = task.comments.filter(c => c.id !== deleteCommentTarget);
     updateTask(task.id, { comments: updatedComments });
+    setDeleteCommentTarget(null);
   };
 
   const handleEditCommentSubmit = (e, commentId) => {
@@ -618,6 +625,16 @@ const TaskDetailModal = ({ task, project, onClose, onEdit, onDelete }) => {
           </div>
         </motion.div>
       </div>
+
+      {/* Delete Comment Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteCommentTarget}
+        onClose={() => setDeleteCommentTarget(null)}
+        onConfirm={confirmDeleteComment}
+        title="Delete Comment"
+        message="Are you sure you want to permanently delete this comment?"
+        confirmLabel="Delete"
+      />
     </AnimatePresence>
   );
 };

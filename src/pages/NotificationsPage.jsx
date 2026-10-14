@@ -1,12 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Trash2, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 
 const NotificationsPage = () => {
   const { notifications, markNotificationAsRead, deleteNotification, clearNotifications } = useData();
   const navigate = useNavigate();
+
+  const [deleteTarget, setDeleteTarget] = useState(null); // { id, title } or 'ALL'
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      if (deleteTarget === 'ALL') {
+        await clearNotifications();
+      } else {
+        await deleteNotification(deleteTarget.id);
+      }
+      setDeleteTarget(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -20,7 +38,7 @@ const NotificationsPage = () => {
         </div>
         {notifications?.length > 0 && (
           <button
-            onClick={() => clearNotifications()}
+            onClick={() => setDeleteTarget('ALL')}
             className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
@@ -47,7 +65,7 @@ const NotificationsPage = () => {
                   if (notification.referenceId && notification.referenceId.startsWith('project-')) {
                     const parts = notification.referenceId.split('-');
                     const projectId = parts[1];
-                    const tab = parts[2]; // Might be undefined
+                    const tab = parts[2];
                     navigate(`/portal/projects/${projectId}`, { state: { tab } });
                   }
                 }}
@@ -79,7 +97,7 @@ const NotificationsPage = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteNotification(notification.id);
+                        setDeleteTarget({ id: notification.id, title: notification.title });
                       }}
                       className="text-xs font-semibold text-red-500 hover:text-red-700 flex items-center gap-1"
                     >
@@ -92,6 +110,22 @@ const NotificationsPage = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Notification Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title={deleteTarget === 'ALL' ? 'Clear All Notifications' : 'Delete Notification'}
+        message={
+          deleteTarget === 'ALL'
+            ? 'You are about to permanently delete all notifications. This action cannot be undone.'
+            : 'You are about to permanently delete the notification'
+        }
+        itemName={deleteTarget !== 'ALL' ? deleteTarget?.title : undefined}
+        confirmLabel={deleteTarget === 'ALL' ? 'Clear All' : 'Delete'}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

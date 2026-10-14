@@ -6,6 +6,7 @@ import {
   X, FileText, Calendar, CheckCircle2, XCircle, RotateCcw,
   Lock, Send, MessageSquare, Clock, ListTodo, Paperclip, Image as ImageIcon, Edit, Trash2
 } from 'lucide-react';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 import { APPROVAL_STATUS_STYLES as STATUS_STYLES } from '../utils/constants';
 
@@ -21,19 +22,28 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
   const { currentUser } = useAuth();
   const { logs, deleteApprovalRequest } = useData();
 
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this approval request?')) {
-      try {
-        await deleteApprovalRequest(approval.id);
-        onClose();
-      } catch (err) {
-        alert('Failed to delete approval request.');
-      }
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    setIsDeletingApproval(true);
+    try {
+      await deleteApprovalRequest(approval.id);
+      setShowDeleteModal(false);
+      onClose();
+    } catch (err) {
+      alert('Failed to delete approval request.');
+    } finally {
+      setIsDeletingApproval(false);
     }
   };
 
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
   const isClient = currentUser?.role === 'client';
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeletingApproval, setIsDeletingApproval] = useState(false);
 
   const [clientDecision, setClientDecision] = useState('');
   const [clientComment, setClientComment] = useState('');
@@ -195,15 +205,16 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-end p-4 bg-black/60 backdrop-blur-sm">
-        <motion.div
-          initial={{ opacity: 0, x: 80 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 80 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="glass-card w-full max-w-5xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
-        >
+    <>
+      <AnimatePresence>
+        <div className="fixed inset-0 z-50 flex items-center justify-end p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, x: 80 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 80 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="glass-card w-full max-w-5xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col"
+          >
           {/* Header */}
           <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-md px-6 py-5 border-b border-border flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -575,6 +586,17 @@ const ApprovalDetailModal = ({ approval, project, minDateStr, maxDateStr, onClos
         </motion.div>
       </div>
     </AnimatePresence>
+
+      {/* Delete Approval Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete Approval Request"
+        message="You are about to permanently delete this approval request."
+        isLoading={isDeletingApproval}
+      />
+    </>
   );
 };
 

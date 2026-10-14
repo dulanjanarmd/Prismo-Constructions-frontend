@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Plus, X, Calendar, Edit2, Flag, Activity, CheckCircle2, Circle, ArrowRight, Trash2, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 
 const Projects = () => {
   const { projects, tasks, updateProject, deleteProject, users } = useData();
@@ -36,6 +37,10 @@ const Projects = () => {
   const [modalType, setModalType] = useState(null); // 'create', 'edit', 'milestones', 'status'
   const [activeProject, setActiveProject] = useState(null);
 
+  // Delete confirmation state
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Form states
   const [formData, setFormData] = useState({ name: '', client: '', location: '', startDate: '', endDate: '', description: '' });
   const [statusData, setStatusData] = useState({ status: '', progress: 0 });
@@ -56,14 +61,21 @@ const Projects = () => {
     }
   };
 
-  const handleDeleteProject = async (project) => {
-    if (window.confirm(`Are you sure you want to completely delete the project "${project.name}"? This action cannot be undone.`)) {
-      try {
-        await deleteProject(project.id);
-      } catch (err) {
-        console.error(err);
-        alert('Failed to delete project. Please check if there are any dependent records.');
-      }
+  const handleDeleteProject = (project) => {
+    setDeleteTarget(project);
+  };
+
+  const confirmDeleteProject = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteProject(deleteTarget.id);
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete project. Please check if there are any dependent records.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -421,8 +433,20 @@ const Projects = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDeleteProject}
+        title="Delete Project"
+        message="You are about to permanently delete the project"
+        itemName={deleteTarget?.name}
+        isLoading={isDeleting}
+      />
     </div>
   );
+
 };
 
 export default Projects;

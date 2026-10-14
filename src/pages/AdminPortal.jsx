@@ -3,6 +3,7 @@ import { useData } from '../context/DataContext';
 import { UserPlus, Shield, Mail, Trash2, X, Edit, Key, Users, Briefcase, AlertCircle, FileText, Activity, LayoutDashboard, Search, Filter } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 
 
 const AdminPortal = () => {
@@ -19,6 +20,10 @@ const AdminPortal = () => {
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'CLIENT' });
   const [editUser, setEditUser] = useState({ name: '', email: '', role: 'CLIENT' });
   const [newPassword, setNewPassword] = useState('');
+
+  // Delete user confirmation state
+  const [deleteUserTarget, setDeleteUserTarget] = useState(null);
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
 
   // Filter State
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,20 +71,26 @@ const AdminPortal = () => {
     }
   };
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUser = (userId) => {
     const user = users.find(u => u.id === userId);
     if (user && (user.role === 'admin' || user.role === 'ceo')) {
       alert('Cannot delete Admin or CEO users.');
       return;
     }
-    
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await deleteUser(userId);
-      } catch (error) {
-        console.error('Error deleting user:', error);
-        alert('Failed to delete user. Please try again.');
-      }
+    setDeleteUserTarget(user);
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!deleteUserTarget) return;
+    setIsDeletingUser(true);
+    try {
+      await deleteUser(deleteUserTarget.id);
+      setDeleteUserTarget(null);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Failed to delete user. Please try again.');
+    } finally {
+      setIsDeletingUser(false);
     }
   };
 
@@ -552,6 +563,17 @@ const AdminPortal = () => {
           </motion.div>
         </div>
       )}
+
+      {/* Delete User Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteUserTarget}
+        onClose={() => setDeleteUserTarget(null)}
+        onConfirm={confirmDeleteUser}
+        title="Delete User"
+        message="You are about to permanently delete the user account for"
+        itemName={deleteUserTarget?.name}
+        isLoading={isDeletingUser}
+      />
     </div>
   );
 };

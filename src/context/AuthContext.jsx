@@ -23,25 +23,38 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, requestedRole, mfaCode) => {
     try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, mfaCode })
       });
       
       if (!response.ok) {
-        throw new Error('Invalid email or password');
+        let errorMsg = 'Invalid email or password';
+        try {
+          const errData = await response.json();
+          if (errData && errData.message) {
+            errorMsg = errData.message;
+          }
+        } catch (_) {}
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
       
+      const backendRole = data.role.toLowerCase();
+      
+      if (requestedRole && backendRole !== requestedRole) {
+        throw new Error('Access Denied: Your account role does not match the requested role.');
+      }
+
       const user = {
         id: data.id,
         name: data.name,
         email: data.email,
-        role: data.role.toLowerCase(),
+        role: backendRole,
         token: data.token,
         phone: data.phone,
         profilePictureUrl: data.profilePictureUrl,

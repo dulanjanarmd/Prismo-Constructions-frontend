@@ -3,6 +3,7 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { AlertTriangle, Plus, ChevronDown, ChevronUp, X, MessageSquare, MapPin, Wrench, Clock, User as UserIcon, Calendar, UploadCloud, Video, Edit, Trash2, CheckCircle, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
   const { currentUser } = useAuth();
@@ -11,6 +12,8 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
   const [comments, setComments] = useState([]);
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeletingIssue, setIsDeletingIssue] = useState(false);
 
   const [newComment, setNewComment] = useState('');
   const [commentType, setCommentType] = useState('GENERAL');
@@ -246,12 +249,20 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
     }
   };
 
-  const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this issue?")) {
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteIssue = async () => {
+    setIsDeletingIssue(true);
+    try {
       const success = await deleteIssue(issue.id);
+      setShowDeleteModal(false);
       if (success !== false && onClose) {
         onClose();
       }
+    } finally {
+      setIsDeletingIssue(false);
     }
   };
 
@@ -722,6 +733,15 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
         )}
       </AnimatePresence>
 
+      {/* Delete Issue Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDeleteIssue}
+        title="Delete Issue"
+        message="You are about to permanently delete this issue and all its associated data."
+        isLoading={isDeletingIssue}
+      />
     </div>
   );
 };

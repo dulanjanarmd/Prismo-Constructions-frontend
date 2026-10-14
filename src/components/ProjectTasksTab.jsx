@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Plus, Filter, Eye, AlertTriangle, Lock, Edit, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskDetailModal from './TaskDetailModal';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 const STATUS_COLUMNS = ['To Do', 'In Progress', 'Completed', 'Reopened', 'Closed'];
 
@@ -42,6 +43,10 @@ const ProjectTasksTab = ({ projectId, project }) => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [statusFilter, setStatusFilter] = useState('All');
   const [assigneeFilter, setAssigneeFilter] = useState('All');
+
+  // Delete confirmation state
+  const [deleteTaskTarget, setDeleteTaskTarget] = useState(null);
+  const [isDeletingTask, setIsDeletingTask] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '', description: '', assignedTo: '',
@@ -198,13 +203,21 @@ const ProjectTasksTab = ({ projectId, project }) => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteTask = async (task) => {
-    if (!window.confirm(`Delete task "${task.title}"?`)) return;
+  const handleDeleteTask = (task) => {
+    setDeleteTaskTarget(task);
+  };
+
+  const confirmDeleteTask = async () => {
+    if (!deleteTaskTarget) return;
+    setIsDeletingTask(true);
     try {
-      await deleteTask(task.id);
+      await deleteTask(deleteTaskTarget.id);
+      setDeleteTaskTarget(null);
     } catch (error) {
       console.error('Error deleting task:', error);
       alert('Failed to delete task: ' + (error.message || 'Unknown error'));
+    } finally {
+      setIsDeletingTask(false);
     }
   };
 
@@ -444,9 +457,20 @@ const ProjectTasksTab = ({ projectId, project }) => {
           project={project}
           onClose={() => setSelectedTask(null)}
           onEdit={isPM ? () => { setSelectedTask(null); openEditTask(selectedTask); } : undefined}
-          onDelete={isPM ? () => { handleDeleteTask(selectedTask); setSelectedTask(null); } : undefined}
+          onDelete={isPM ? () => { setSelectedTask(null); handleDeleteTask(selectedTask); } : undefined}
         />
       )}
+
+      {/* Delete Task Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteTaskTarget}
+        onClose={() => setDeleteTaskTarget(null)}
+        onConfirm={confirmDeleteTask}
+        title="Delete Task"
+        message="You are about to permanently delete the task"
+        itemName={deleteTaskTarget?.title}
+        isLoading={isDeletingTask}
+      />
     </div>
   );
 };

@@ -62,6 +62,11 @@ export const DataProvider = ({ children }) => {
     try {
       const headers = { 'Authorization': `Bearer ${currentUser.token}` };
       const notifRes = await fetch('http://localhost:8080/api/notifications', { headers });
+      if (notifRes.status === 401) {
+        localStorage.removeItem('prismoUser');
+        window.location.href = '/login';
+        return;
+      }
       if (notifRes.ok) {
         setNotifications(await notifRes.json());
       }
@@ -75,6 +80,11 @@ export const DataProvider = ({ children }) => {
     try {
       const headers = { 'Authorization': `Bearer ${currentUser.token}`, 'Content-Type': 'application/json' };
       const tRes = await fetch('http://localhost:8080/api/tasks', { headers });
+      if (tRes.status === 401) {
+        localStorage.removeItem('prismoUser');
+        window.location.href = '/login';
+        return;
+      }
       if (tRes.ok) {
         const rawT = await tRes.json();
         const mapTaskStatus = (s) => {
@@ -112,6 +122,11 @@ export const DataProvider = ({ children }) => {
     const loadData = async () => {
       try {
         const pRes = await fetch('http://localhost:8080/api/projects', { headers });
+        if (pRes.status === 401) {
+          localStorage.removeItem('prismoUser');
+          window.location.href = '/login';
+          return;
+        }
         if (pRes.ok) {
           const rawP = await pRes.json();
           setProjects(rawP.map(p => ({
@@ -273,7 +288,7 @@ export const DataProvider = ({ children }) => {
               fetch(`http://localhost:8080/api/projects/${String(project.id).replace('p', '')}/milestones/${m.id}`, {
                 method: 'PUT',
                 headers: {
-                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                  'Authorization': `Bearer ${currentUser.token}`,
                   'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ ...m, status: 'Completed' })
@@ -503,7 +518,9 @@ export const DataProvider = ({ children }) => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to update user');
+        const errText = await response.text();
+        console.error('Update User Error Response:', response.status, errText);
+        throw new Error(`Failed to update user: ${response.status} ${errText}`);
       }
       
       const updatedUser = await response.json();

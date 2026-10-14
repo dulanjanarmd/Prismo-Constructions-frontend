@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Calendar, Edit2, Activity, X, CheckSquare, AlertTriangle, Clock, FileText, Trash2, MapPin, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 const SummaryCard = ({ icon: Icon, label, value, colorClass }) => {
   const textColor = colorClass.split(' ').find(c => c.startsWith('text-')) || 'text-slate-500';
@@ -30,6 +31,8 @@ const ProjectOverviewTab = ({ project }) => {
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [modalType, setModalType] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeletingProject, setIsDeletingProject] = useState(false);
   const [formData, setFormData] = useState({
     name: project.name,
     client: project.client,
@@ -62,15 +65,21 @@ const ProjectOverviewTab = ({ project }) => {
     }
   };
 
-  const handleDeleteProject = async () => {
-    if (window.confirm(`Are you sure you want to completely delete "${project.name}"? This action cannot be undone.`)) {
-      try {
-        await deleteProject(project.id);
-        navigate('/portal/projects');
-      } catch (err) {
-        console.error(err);
-        alert('Failed to delete project. Please check if there are any dependent records.');
-      }
+  const handleDeleteProject = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteProject = async () => {
+    setIsDeletingProject(true);
+    try {
+      await deleteProject(project.id);
+      setShowDeleteModal(false);
+      navigate('/portal/projects');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete project. Please check if there are any dependent records.');
+    } finally {
+      setIsDeletingProject(false);
     }
   };
 
@@ -297,6 +306,17 @@ const ProjectOverviewTab = ({ project }) => {
         )}
 
       </AnimatePresence>
+
+      {/* Delete Project Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDeleteProject}
+        title="Delete Project"
+        message="You are about to permanently delete the project"
+        itemName={project.name}
+        isLoading={isDeletingProject}
+      />
     </div>
   );
 };

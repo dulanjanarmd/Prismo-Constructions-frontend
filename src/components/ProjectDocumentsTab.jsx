@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FileText, Upload, Download, Trash2, File, FileImage, FileCode, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 // Helper to pick an icon based on file type
 const FileIcon = ({ name }) => {
@@ -35,6 +36,10 @@ const ProjectDocumentsTab = ({ project }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const projectId = String(project?.id || '').replace(/^p/, '');
+
+  // Delete confirmation state
+  const [deleteDocTarget, setDeleteDocTarget] = useState(null);
+  const [isDeletingDoc, setIsDeletingDoc] = useState(false);
 
   const isPM = currentUser?.role === 'project_manager' || currentUser?.role === 'pm';
 
@@ -88,12 +93,23 @@ const ProjectDocumentsTab = ({ project }) => {
     }
   };
 
-  const handleDelete = async (id) => {
-    const response = await fetch(`http://localhost:8080/api/projects/${projectId}/documents/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${currentUser.token}` }
-    });
-    if (response.ok) setDocuments(current => current.filter(d => d.id !== id));
+  const handleDelete = (doc) => {
+    setDeleteDocTarget(doc);
+  };
+
+  const confirmDeleteDoc = async () => {
+    if (!deleteDocTarget) return;
+    setIsDeletingDoc(true);
+    try {
+      const response = await fetch(`http://localhost:8080/api/projects/${projectId}/documents/${deleteDocTarget.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${currentUser.token}` }
+      });
+      if (response.ok) setDocuments(current => current.filter(d => d.id !== deleteDocTarget.id));
+      setDeleteDocTarget(null);
+    } finally {
+      setIsDeletingDoc(false);
+    }
   };
 
   // No longer grouping by category, rendering in a single table
@@ -287,7 +303,7 @@ const ProjectDocumentsTab = ({ project }) => {
                       </a>
                       {isPM && (
                         <button
-                          onClick={() => handleDelete(doc.id)}
+                          onClick={() => handleDelete(doc)}
                           className="p-1.5 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                           title="Delete"
                         >
@@ -303,6 +319,17 @@ const ProjectDocumentsTab = ({ project }) => {
         </div>
       )}
       </div>
+
+      {/* Delete Document Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteDocTarget}
+        onClose={() => setDeleteDocTarget(null)}
+        onConfirm={confirmDeleteDoc}
+        title="Delete Document"
+        message="You are about to permanently delete the document"
+        itemName={deleteDocTarget?.fileName || deleteDocTarget?.name}
+        isLoading={isDeletingDoc}
+      />
     </div>
   );
 };
