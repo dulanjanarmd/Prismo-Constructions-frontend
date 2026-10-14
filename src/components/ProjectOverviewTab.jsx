@@ -77,7 +77,7 @@ const ProjectOverviewTab = ({ project }) => {
       navigate('/portal/projects');
     } catch (err) {
       console.error(err);
-      alert('Failed to delete project. Please check if there are any dependent records.');
+      alert(err.message || 'Failed to delete project. Please check if there are any dependent records.');
     } finally {
       setIsDeletingProject(false);
     }
