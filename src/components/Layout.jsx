@@ -82,41 +82,78 @@ const Navbar = () => {
   const roleNav = currentUser ? (navItems[currentUser.role?.toLowerCase()] || []) : [];
 
   return (
-    <div className="bg-[#e5e7eb] rounded-b-[3rem] pb-4 relative px-4 sm:px-8 z-50">
-      <header className="py-6 px-4 mx-auto w-full max-w-7xl flex items-center justify-between">
-        
-        {/* Left Side: Logo and Nav */}
-        <div className="flex items-center space-x-2">
-          <Link to="/portal" className="bg-white rounded-lg flex items-center justify-center h-12 px-3 shadow-md hover:opacity-90 transition-opacity">
-            <img src="/prismo-logo.png" alt="Prismo Construction" className="h-10 w-auto object-contain" />
-          </Link>
-          <nav className="hidden md:flex bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center space-x-1 text-sm font-bold text-slate-600">
-            {roleNav.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className={`relative px-5 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full ${
-                    isActive 
-                      ? 'bg-white shadow-sm text-slate-900 font-bold' 
-                      : 'hover:text-slate-900'
-                  }`}
-                >
-                  <span className="relative z-10 transition-colors duration-200">
-                    {item.name}
-                  </span>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+    <div className="bg-[#e5e7eb] rounded-b-2xl sm:rounded-b-[3rem] pb-2 sm:pb-4 relative px-3 sm:px-6 md:px-8 z-50">
+      <header className="py-3 sm:py-6 mx-auto w-full max-w-7xl">
+        <div className="flex items-center justify-between gap-2">
+          {/* Left Side: Logo and Nav */}
+          <div className="flex items-center space-x-2 min-w-0">
+            <Link to="/portal" className="bg-white rounded-lg flex items-center justify-center h-10 sm:h-12 px-2.5 sm:px-3 shadow-md hover:opacity-90 transition-opacity shrink-0">
+              <img src="/prismo-logo.png" alt="Prismo Construction" className="h-8 sm:h-10 w-auto object-contain" />
+            </Link>
+            <nav className="hidden lg:flex bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center space-x-1 text-sm font-bold text-slate-600">
+              {roleNav.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className={`relative px-4 xl:px-5 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                      isActive 
+                        ? 'bg-white shadow-sm text-slate-900 font-bold' 
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    <span className="relative z-10 transition-colors duration-200">
+                      {item.name}
+                    </span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
 
-        <div className="flex items-center space-x-2">
-          <div className="hidden md:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 gap-2 text-sm font-bold relative">
+          {/* Right Side: Actions */}
+          <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+            {/* Desktop Quick Actions */}
+            <div className="hidden lg:flex items-center bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 gap-2 text-sm font-bold relative">
+              <button
+                onClick={() => setShowNotifications(true)}
+                className="relative w-10 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all"
+                title="Notifications"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              <button 
+                onClick={() => setShowProfileModal(true)}
+                className="relative w-10 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all overflow-hidden"
+                title="Profile"
+              >
+                {currentUser?.profilePictureUrl ? (
+                  <img src={currentUser.profilePictureUrl} alt="Profile" className="w-full h-full rounded-lg object-cover" />
+                ) : (
+                  <div className="w-full h-full rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-sm uppercase">
+                    {currentUser?.name?.charAt(0) || 'U'}
+                  </div>
+                )}
+              </button>
+              <button 
+                onClick={logout}
+                className="px-5 py-2 bg-primary text-white rounded-lg transition-colors uppercase h-full flex items-center hover:opacity-90 font-bold tracking-wide"
+              >
+                SIGN OUT
+              </button>
+            </div>
+
+            {/* Mobile / Tablet Notifications Button */}
             <button
               onClick={() => setShowNotifications(true)}
-              className="relative w-10 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-lg transition-all"
+              className="lg:hidden relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-slate-600 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm rounded-lg"
+              title="Notifications"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
@@ -125,65 +162,75 @@ const Navbar = () => {
                 </span>
               )}
             </button>
+
+            {/* Mobile / Tablet Profile Button */}
             <button 
               onClick={() => setShowProfileModal(true)}
-              className="relative w-10 h-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all overflow-hidden"
+              className="lg:hidden w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-slate-600 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm rounded-lg overflow-hidden p-1"
+              title="Profile"
             >
               {currentUser?.profilePictureUrl ? (
-                <img src={currentUser.profilePictureUrl} alt="Profile" className="w-full h-full rounded-lg object-cover" />
+                <img src={currentUser.profilePictureUrl} alt="Profile" className="w-full h-full rounded-md object-cover" />
               ) : (
-                <div className="w-full h-full rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-sm uppercase">
+                <div className="w-full h-full rounded-md bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-xs sm:text-sm uppercase">
                   {currentUser?.name?.charAt(0) || 'U'}
                 </div>
               )}
             </button>
+
+            {/* Mobile / Tablet Menu Toggle */}
             <button 
-              onClick={logout}
-              className="px-6 py-2 bg-primary text-white rounded-lg transition-colors uppercase h-full flex items-center hover:opacity-90 font-bold"
+              className="lg:hidden text-slate-700 bg-white/80 backdrop-blur-xl border border-white/40 shadow-sm h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center rounded-lg"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle Menu"
             >
-              SIGN OUT
+              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
           </div>
-          <button 
-            className="md:hidden text-slate-600 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 w-12 flex items-center justify-center rounded-lg"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation Dropdown */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div 
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="md:hidden flex flex-col space-y-4 pt-6 pb-2 overflow-hidden"
+              className="lg:hidden flex flex-col space-y-2 pt-4 pb-2 border-t border-slate-300/60 mt-3"
             >
-              {roleNav.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center px-4 py-2 text-sm font-medium transition-colors rounded ${
-                    location.pathname === item.path 
-                      ? 'text-primary' 
-                      : 'text-slate-600'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="border-t border-slate-300 pt-4 flex items-center justify-between px-4">
-                <div className="flex items-center text-slate-600">
-                  <User className="w-4 h-4 mr-2" />
-                  <span className="font-medium text-xs">{currentUser?.name}</span>
+              <div className="grid grid-cols-2 gap-2">
+                {roleNav.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center px-3 py-2.5 text-sm font-semibold transition-all rounded-lg ${
+                        isActive 
+                          ? 'bg-primary text-white shadow-sm' 
+                          : 'bg-white/80 text-slate-700 hover:bg-white'
+                      }`}
+                    >
+                      {item.icon}
+                      <span className="truncate">{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+              <div className="border-t border-slate-300/80 pt-3 flex items-center justify-between px-2">
+                <div className="flex items-center text-slate-700">
+                  <User className="w-4 h-4 mr-2 text-primary" />
+                  <span className="font-bold text-xs truncate max-w-[150px]">{currentUser?.name}</span>
+                  <span className="text-[10px] ml-1.5 uppercase px-1.5 py-0.5 bg-slate-200 rounded font-bold text-slate-600">
+                    {currentUser?.role}
+                  </span>
                 </div>
                 <button 
                   onClick={logout}
-                  className="text-red-500 flex items-center text-sm font-semibold"
+                  className="text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg flex items-center text-xs font-bold transition-colors shadow-sm"
                 >
+                  <LogOut className="w-3.5 h-3.5 mr-1" />
                   SIGN OUT
                 </button>
               </div>

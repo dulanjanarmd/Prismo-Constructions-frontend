@@ -20,18 +20,18 @@ const DashboardHeader = ({ rightElement }) => {
   const timeStr = time.toLocaleTimeString('en-LK', { timeZone: 'Asia/Colombo', hour: 'numeric', minute: '2-digit', hour12: true });
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 pb-1 flex items-center gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 pb-1 flex flex-wrap items-center gap-2">
           {greeting}, <span className="text-primary">{currentUser?.name || 'User'}</span>
         </h1>
-        <div className="flex items-center gap-4 mt-2 text-slate-500 text-sm font-medium">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 text-slate-500 text-xs sm:text-sm font-medium">
           <div className="flex items-center gap-1.5">
-            <Calendar className="w-4 h-4 text-primary opacity-80" />
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary opacity-80" />
             {dateStr}
           </div>
           <div className="flex items-center gap-1.5">
-            <Clock className="w-4 h-4 text-primary opacity-80" />
+            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary opacity-80" />
             {timeStr}
           </div>
         </div>

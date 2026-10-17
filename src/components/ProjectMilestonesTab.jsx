@@ -256,8 +256,7 @@ const ProjectMilestonesTab = ({ project }) => {
       const newMilestones = milestones.filter(x => x.id !== deleteMilestoneTarget.id);
       const completedCount = newMilestones.filter(x => x.status === 'Completed').length;
       const pct = newMilestones.length > 0 ? Math.round((completedCount / newMilestones.length) * 100) : 0;
-      setMilestones(newMilestones);
-      await updateProject(project.id, { milestoneProgress: pct });
+      await updateProject(project.id, { milestones: newMilestones, progress: pct });
       setDeleteMilestoneTarget(null);
     } catch (err) {
       console.error(err);
@@ -401,26 +400,26 @@ const ProjectMilestonesTab = ({ project }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="glass-card flex flex-col overflow-hidden mb-6">
-        <div className="flex flex-col lg:flex-row justify-between gap-6 p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
-          <div className="flex flex-col xl:flex-row items-start xl:items-center gap-6">
+        <div className="flex flex-col xl:flex-row justify-between gap-4 p-4 sm:p-6 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <h2 className="text-xl font-bold leading-tight shrink-0">
-              Project<br />Milestones
+              Project Milestones
             </h2>
           </div>
           
-          <div className="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4 items-start xl:items-center w-full lg:w-auto justify-end">
-            <div className="relative w-full lg:w-48">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full xl:w-auto justify-end">
+            <div className="relative w-full sm:w-48 h-11 sm:h-12 shrink-0">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 h-12 rounded-lg border border-slate-300 bg-white/80 focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-sm"
+                className="w-full pl-9 pr-4 h-full rounded-lg border border-slate-300 bg-white/80 focus:bg-white focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-sm text-sm"
               />
             </div>
             
-            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto shrink-0 max-w-full">
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-11 sm:h-12 rounded-lg p-1 items-center text-xs sm:text-sm font-bold text-slate-600 overflow-x-auto no-scrollbar max-w-full">
               {['All', 'Incomplete', 'In Progress', 'Completed'].map(s => {
                 const count = s === 'All'
                   ? milestones.length
@@ -429,7 +428,7 @@ const ProjectMilestonesTab = ({ project }) => {
                   <button 
                     key={s}
                     onClick={() => setStatusFilter(s)}
-                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap outline-none ${
+                    className={`relative px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap shrink-0 outline-none ${
                       statusFilter === s
                         ? 'bg-white shadow-sm text-slate-900 font-bold'
                         : 'hover:text-slate-900'
@@ -441,11 +440,11 @@ const ProjectMilestonesTab = ({ project }) => {
               })}
             </div>
 
-            <div className="flex items-center h-12 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm rounded-lg px-2 shrink-0">
+            <div className="flex items-center h-11 sm:h-12 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm rounded-lg px-2 shrink-0">
               <select
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
-                className="bg-transparent border-none outline-none text-sm font-medium text-slate-700 cursor-pointer h-full"
+                className="bg-transparent border-none outline-none text-xs sm:text-sm font-medium text-slate-700 cursor-pointer h-full"
               >
                 <option value="All">All Categories</option>
                 <option value="Pre-construction">Pre-construction</option>
@@ -458,9 +457,9 @@ const ProjectMilestonesTab = ({ project }) => {
             {(!isClient && !isCEO) && project.status !== 'Completed' && (
               <button
                 onClick={() => setIsAdding(true)}
-                className="h-12 flex items-center px-6 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
+                className="h-11 sm:h-12 flex items-center justify-center px-4 sm:px-6 py-2 bg-primary hover:opacity-90 text-white rounded-lg transition-colors shadow-lg shadow-orange-500/20 font-bold shrink-0 text-sm whitespace-nowrap"
               >
-                Add Milestone
+                + Add Milestone
               </button>
             )}
           </div>

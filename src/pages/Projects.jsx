@@ -167,27 +167,30 @@ const Projects = () => {
       {/* Project Analytics moved below table */}
 
       <div className="glass-card flex flex-col overflow-hidden">
-        <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
-          <div className="flex items-center gap-3 ml-auto min-w-max">
-            <div className="relative w-full lg:w-48 shrink-0 h-12">
+        <div className="flex flex-col xl:flex-row justify-between gap-4 p-4 sm:p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-slate-900">Projects</h2>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full xl:w-auto justify-end">
+            <div className="relative w-full sm:w-64 h-11 sm:h-12 shrink-0">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search projects..."
-                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/70 backdrop-blur-xl border border-white/50 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
 
-            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600 overflow-x-auto">
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-11 sm:h-12 rounded-lg p-1 items-center text-xs sm:text-sm font-bold text-slate-600 overflow-x-auto no-scrollbar max-w-full">
               {['All', 'Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(status => {
                 const count = status === 'All' ? baseProjects.length : baseProjects.filter(p => p.status === status).length;
                 return (
                   <button
                     key={status}
                     onClick={() => setStatusFilter(status)}
-                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                    className={`relative px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap shrink-0 ${
                       statusFilter === status 
                         ? 'bg-white shadow-sm text-slate-900 font-bold' 
                         : 'hover:text-slate-900'
@@ -202,9 +205,9 @@ const Projects = () => {
             {!isSiteEngineer && !isClient && (
               <button 
                 onClick={() => navigate('/portal/projects/new')}
-                className="flex items-center px-4 py-2 h-12 bg-primary text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30 font-bold shrink-0"
+                className="flex items-center justify-center px-4 py-2 h-11 sm:h-12 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-colors shadow-lg shadow-orange-500/20 font-bold shrink-0 whitespace-nowrap"
               >
-                New Project
+                + New Project
               </button>
             )}
           </div>

@@ -81,27 +81,30 @@ const Tasks = () => {
       <div className="glass-card flex flex-col overflow-hidden">
         
         {/* Filters Section */}
-        <div className="flex items-center gap-3 p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200 overflow-x-auto">
-          <div className="flex items-center gap-3 ml-auto min-w-max">
-            <div className="relative w-full lg:w-48 shrink-0 h-12">
+        <div className="flex flex-col xl:flex-row justify-between gap-4 p-4 sm:p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-slate-900">Tasks</h2>
+          </div>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center w-full xl:w-auto justify-end">
+            <div className="relative w-full sm:w-56 h-11 sm:h-12 shrink-0">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search tasks..."
-                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/70 backdrop-blur-xl border border-white/50 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
 
-            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-12 rounded-lg p-1 items-center text-sm font-bold text-slate-600">
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-11 sm:h-12 rounded-lg p-1 items-center text-xs sm:text-sm font-bold text-slate-600 overflow-x-auto no-scrollbar max-w-full">
               {['All', 'To Do', 'In Progress', 'Completed', 'Reopened', 'Closed'].map(status => {
                 const count = status === 'All' ? displayTasks.length : (statusCounts[status] || 0);
                 return (
                   <button
                     key={status}
                     onClick={() => setStatusFilter(status)}
-                    className={`relative px-4 py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap ${
+                    className={`relative px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap shrink-0 ${
                       statusFilter === status 
                         ? 'bg-white shadow-sm text-slate-900 font-bold' 
                         : 'hover:text-slate-900'
@@ -114,7 +117,7 @@ const Tasks = () => {
             </div>
 
             <select
-              className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+              className="h-11 sm:h-12 w-full sm:w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-xs sm:text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={projectFilter}
               onChange={e => setProjectFilter(e.target.value)}
             >
@@ -124,7 +127,7 @@ const Tasks = () => {
 
             {isPM && (
               <select
-                className="h-12 w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                className="h-11 sm:h-12 w-full sm:w-36 shrink-0 rounded-lg bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm px-3 text-xs sm:text-sm text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
                 value={assigneeFilter}
                 onChange={e => setAssigneeFilter(e.target.value)}
               >
@@ -165,12 +168,6 @@ const Tasks = () => {
                     const assignee = users.find(u => u.id === task.assignedTo || `u${u.id}` === task.assignedTo);
                     const needsReview = isPM && task.status === 'Completed';
 
-                    console.log('DEBUG TASKS ROW:', {
-                      taskId: task.id,
-                      taskMilestoneId: task.milestoneId,
-                      projectId: project?.id,
-                      milestones: project?.milestones
-                    });
 
                     return (
                       <motion.tr
