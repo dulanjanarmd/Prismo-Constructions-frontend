@@ -3,8 +3,8 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Briefcase, AlertTriangle, CheckSquare, BarChart3, 
-  ArrowRight, Search, Filter, ShieldAlert, ChevronDown, ChevronUp 
+  AlertTriangle, CheckSquare, 
+  ArrowRight, Search, ChevronDown, ChevronUp 
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -87,46 +87,46 @@ const CEODashboard = () => {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        
-        {/* Main Content (Portfolio) */}
-        <div className="xl:col-span-2 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 className="text-xl font-bold text-slate-900  flex items-center">
-              <Briefcase className="w-5 h-5 mr-2 text-primary" />
-              Portfolio Overview
-            </h2>
-            <div className="flex gap-2">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  type="text" 
-                  placeholder="Search projects..." 
-                  className="pl-9 pr-4 py-2 text-sm bg-white  border border-slate-200  rounded-lg focus:ring-2 focus:ring-primary outline-none w-48 transition-all"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="relative">
-                <Filter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <select 
-                  className="pl-9 pr-8 py-2 text-sm bg-white  border border-slate-200  rounded-lg focus:ring-2 focus:ring-primary outline-none appearance-none"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="All">All Status</option>
-                  <option value="Planning">Planning</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="On Hold">On Hold</option>
-                  <option value="Delayed">Delayed</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </div>
+      {/* Projects Table */}
+      <div className="glass-card overflow-hidden">
+        <div className="flex flex-col xl:flex-row justify-between gap-4 p-4 sm:p-5 bg-[#e5e7eb] text-slate-900 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-slate-900">Projects</h2>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full xl:w-auto justify-end">
+            <div className="relative w-full sm:w-64 h-11 sm:h-12 shrink-0">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input 
+                type="text" 
+                placeholder="Search projects..." 
+                className="pl-9 pr-4 h-full w-full rounded-lg bg-white/70 backdrop-blur-xl border border-white/50 shadow-sm text-slate-900 placeholder:text-slate-500 font-medium text-sm focus:bg-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="flex space-x-1 bg-white/60 backdrop-blur-xl border border-white/40 shadow-sm h-11 sm:h-12 rounded-lg p-1 items-center text-xs sm:text-sm font-bold text-slate-600 overflow-x-auto no-scrollbar max-w-full">
+              {['All', 'Planning', 'In Progress', 'On Hold', 'Delayed', 'Completed'].map(status => {
+                const count = status === 'All' ? projects.length : projects.filter(p => p.status === status).length;
+                return (
+                  <button
+                    key={status}
+                    onClick={() => setStatusFilter(status)}
+                    className={`relative px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg cursor-pointer transition-colors flex items-center h-full whitespace-nowrap shrink-0 ${
+                      statusFilter === status 
+                        ? 'bg-white shadow-sm text-slate-900 font-bold' 
+                        : 'hover:text-slate-900'
+                    }`}
+                  >
+                    {status} <span className="ml-1 opacity-60 font-normal">{count}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
+        </div>
 
-          <div className="glass-card overflow-hidden">
-            <div className="overflow-x-auto">
+        <div className="overflow-x-auto">
               <table className="w-full text-left text-sm whitespace-nowrap">
                 <thead className="bg-slate-50  border-b border-border">
                   <tr>
@@ -196,16 +196,14 @@ const CEODashboard = () => {
               </table>
             </div>
           </div>
-        </div>
 
-        {/* Sidebar (Alerts & Decisions) */}
-        <div className="space-y-6">
+      {/* Escalated Issues & Decisions (Under Project Table) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           
           {/* Critical Issues */}
           <div className="glass-card p-5 border-t-4 border-t-red-500">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-slate-900  flex items-center">
-                <ShieldAlert className="w-5 h-5 mr-2 text-red-500" />
+              <h2 className="text-lg font-bold text-slate-900">
                 Escalated Issues
               </h2>
             </div>
@@ -268,8 +266,7 @@ const CEODashboard = () => {
 
           {/* Recent Decisions */}
           <div className="glass-card p-5">
-            <h2 className="text-lg font-bold text-slate-900  mb-4 flex items-center">
-              <BarChart3 className="w-5 h-5 mr-2 text-primary" />
+            <h2 className="text-lg font-bold text-slate-900 mb-4">
               Recent Client Decisions
             </h2>
             
@@ -307,8 +304,7 @@ const CEODashboard = () => {
 
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default CEODashboard;
