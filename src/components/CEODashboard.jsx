@@ -37,11 +37,55 @@ const CEODashboard = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // --- Recent Approvals ---
+  const getApprovalTimestamp = (item) => {
+    if (Array.isArray(item.auditTrail) && item.auditTrail.length > 0) {
+      for (let i = item.auditTrail.length - 1; i >= 0; i--) {
+        const entry = item.auditTrail[i];
+        if (entry?.timestamp) {
+          const t = new Date(entry.timestamp).getTime();
+          if (!isNaN(t)) return t;
+        }
+      }
+    }
+    if (item.dateRequested) {
+      const t = new Date(item.dateRequested).getTime();
+      if (!isNaN(t)) return t;
+    }
+    return Number(String(item.id).replace(/\D/g, '')) || 0;
+  };
+
+  const getDecisionDate = (item) => {
+    if (Array.isArray(item.auditTrail) && item.auditTrail.length > 0) {
+      for (let i = item.auditTrail.length - 1; i >= 0; i--) {
+        const entry = item.auditTrail[i];
+        if (entry?.timestamp) return entry.timestamp;
+      }
+    }
+    if (item.dateRequested) {
+      try {
+        const d = new Date(item.dateRequested);
+        if (!isNaN(d.getTime())) return d.toLocaleDateString();
+      } catch (_) {}
+      return String(item.dateRequested);
+    }
+    return '';
+  };
+
+  // --- Recent Approvals / Decisions ---
   const recentApprovals = [...approvals]
-    .filter(a => ['Approved', 'Rejected', 'Changes Requested'].includes(a.status))
-    .sort((a, b) => new Date(b.dateRequested) - new Date(a.dateRequested))
-    .slice(0, 3);
+    .filter(a => {
+      if (!a.status) return false;
+      const st = a.status.toLowerCase().replace(/_/g, ' ').trim();
+      return ['approved', 'rejected', 'changes requested', 'pending'].includes(st);
+    })
+    .sort((a, b) => {
+      const aIsDecided = ['approved', 'rejected', 'changes requested'].includes((a.status || '').toLowerCase().replace(/_/g, ' '));
+      const bIsDecided = ['approved', 'rejected', 'changes requested'].includes((b.status || '').toLowerCase().replace(/_/g, ' '));
+      if (aIsDecided && !bIsDecided) return -1;
+      if (!aIsDecided && bIsDecided) return 1;
+      return getApprovalTimestamp(b) - getApprovalTimestamp(a);
+    })
+    .slice(0, 4);
 
   // Helper for project issues count
   const getProjectHighIssuesCount = (projectId) => {
@@ -198,65 +242,69 @@ const CEODashboard = () => {
           </div>
 
       {/* Escalated Issues & Decisions (Under Project Table) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           
           {/* Critical Issues */}
-          <div className="glass-card p-5 border-t-4 border-t-red-500">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-slate-900">
-                Escalated Issues
-              </h2>
-            </div>
-            
-            {highSeverityIssues.length > 0 ? (
-              <div className="space-y-3">
-                {highSeverityIssues.slice(0, 4).map(issue => {
-                  const proj = projects.find(p => String(p.id) === String(issue.projectId) || `p${p.id}` === issue.projectId);
-                  return (
-                    <div key={issue.id} className="bg-red-50 rounded-lg border border-red-100 overflow-hidden">
-                      <div className="p-3">
-                        <div className="flex justify-between items-start mb-1">
-                          <h4 className="font-semibold text-sm text-slate-900 line-clamp-1 pr-2">{issue.title}</h4>
-                          <span className="text-[10px] uppercase font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded shrink-0">High</span>
-                        </div>
-                        <p className="text-xs text-slate-600 mb-2">{proj?.name}</p>
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="text-slate-500">{issue.reportedDate || issue.createdAt ? new Date(issue.reportedDate || issue.createdAt).toLocaleDateString() : ''}</span>
-                          <div className="flex gap-2 items-center">
-                            <button 
-                              onClick={() => navigate(`/portal/projects/${proj?.id}`)}
-                              className="font-bold text-red-700 hover:underline"
-                            >
-                              Go to Project &rarr;
-                            </button>
-                            <button
-                              onClick={() => setExpandedIssueId(expandedIssueId === issue.id ? null : issue.id)}
-                              className="p-1 hover:bg-red-200 rounded text-red-700 transition-colors"
-                            >
-                              {expandedIssueId === issue.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                            </button>
+          <div className="glass-card p-5 border-t-4 border-t-red-500 h-full flex flex-col justify-between min-h-[280px]">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-slate-900">
+                  Escalated Issues
+                </h2>
+              </div>
+              
+              {highSeverityIssues.length > 0 ? (
+                <div className="space-y-3">
+                  {highSeverityIssues.slice(0, 4).map(issue => {
+                    const proj = projects.find(p => String(p.id) === String(issue.projectId) || `p${p.id}` === issue.projectId);
+                    return (
+                      <div key={issue.id} className="bg-red-50 rounded-lg border border-red-100 overflow-hidden">
+                        <div className="p-3">
+                          <div className="flex justify-between items-start mb-1">
+                            <h4 className="font-semibold text-sm text-slate-900 line-clamp-1 pr-2">{issue.title}</h4>
+                            <span className="text-[10px] uppercase font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded shrink-0">High</span>
+                          </div>
+                          <p className="text-xs text-slate-600 mb-2">{proj?.name}</p>
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-slate-500">{issue.reportedDate || issue.createdAt ? new Date(issue.reportedDate || issue.createdAt).toLocaleDateString() : ''}</span>
+                            <div className="flex gap-2 items-center">
+                              <button 
+                                onClick={() => navigate(`/portal/projects/${proj?.id}`)}
+                                className="font-bold text-red-700 hover:underline"
+                              >
+                                Go to Project &rarr;
+                              </button>
+                              <button
+                                onClick={() => setExpandedIssueId(expandedIssueId === issue.id ? null : issue.id)}
+                                className="p-1 hover:bg-red-200 rounded text-red-700 transition-colors"
+                              >
+                                {expandedIssueId === issue.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                              </button>
+                            </div>
                           </div>
                         </div>
+                        
+                        <AnimatePresence>
+                          {expandedIssueId === issue.id && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden border-t border-red-200 bg-white"
+                            >
+                              <DetailedIssue issue={issue} projects={projects} tasks={tasks} users={users} />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
-                      
-                      <AnimatePresence>
-                        {expandedIssueId === issue.id && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden border-t border-red-200 bg-white"
-                          >
-                            <DetailedIssue issue={issue} projects={projects} tasks={tasks} users={users} />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-6 text-slate-500 bg-slate-50  rounded-lg border border-dashed border-slate-200 ">
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+
+            {highSeverityIssues.length === 0 && (
+              <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-lg border border-dashed border-slate-200 flex-1 flex flex-col items-center justify-center my-auto">
                 <CheckSquare className="w-8 h-8 mx-auto mb-2 text-green-500/50" />
                 <p className="text-sm font-medium">No critical issues</p>
                 <p className="text-xs mt-1">Portfolio health is stable.</p>
@@ -265,39 +313,68 @@ const CEODashboard = () => {
           </div>
 
           {/* Recent Decisions */}
-          <div className="glass-card p-5">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">
-              Recent Client Decisions
-            </h2>
-            
-            {recentApprovals.length > 0 ? (
-              <div className="space-y-4">
-                {recentApprovals.map(approval => {
-                  const proj = projects.find(p => String(p.id) === String(approval.projectId) || `p${p.id}` === approval.projectId);
-                  return (
-                    <div key={approval.id} className="relative pl-4 border-l-2 border-slate-200 ">
-                      <div className={`absolute -left-[5px] top-1.5 w-2 h-2 rounded-full ${
-                        approval.status === 'Approved' ? 'bg-green-500' :
-                        approval.status === 'Rejected' ? 'bg-red-500' : 'bg-orange-500'
-                      }`} />
-                      <p className="text-sm text-slate-800  font-medium line-clamp-1">{approval.title}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{proj?.name}</p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                          approval.status === 'Approved' ? 'text-green-700 bg-green-100  ' :
-                          approval.status === 'Rejected' ? 'text-red-700 bg-red-100  ' : 
-                          'text-orange-700 bg-orange-100  '
-                        }`}>
-                          {approval.status}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+          <div className="glass-card p-5 border-t-4 border-t-blue-500 h-full flex flex-col justify-between min-h-[280px]">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-slate-900">
+                  Recent Client Decisions
+                </h2>
               </div>
-            ) : (
-              <div className="text-center py-6 text-slate-500">
-                <p className="text-sm">No recent decisions recorded.</p>
+              
+              {recentApprovals.length > 0 ? (
+                <div className="space-y-3">
+                  {recentApprovals.map(approval => {
+                    const projId = approval.projectId ? String(approval.projectId).replace(/^p/, '') : (approval.project?.id ? String(approval.project.id) : '');
+                    const proj = projects.find(p => String(p.id).replace(/^p/, '') === projId);
+                    const projName = proj?.name || approval.project?.name || 'Project';
+                    const st = (approval.status || 'Pending').toLowerCase().replace(/_/g, ' ').trim();
+                    const isApproved = st === 'approved';
+                    const isRejected = st === 'rejected';
+                    const isChanges = st === 'changes requested';
+                    const decisionDate = getDecisionDate(approval);
+
+                    return (
+                      <div key={approval.id} className="bg-slate-50 rounded-lg border border-slate-200/80 overflow-hidden">
+                        <div className="p-3">
+                          <div className="flex justify-between items-start mb-1">
+                            <h4 className="font-semibold text-sm text-slate-900 line-clamp-1 pr-2">{approval.title}</h4>
+                            <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded shrink-0 ${
+                              isApproved ? 'text-green-700 bg-green-100' :
+                              isRejected ? 'text-red-700 bg-red-100' :
+                              isChanges ? 'text-orange-700 bg-orange-100' :
+                              'text-amber-700 bg-amber-100'
+                            }`}>
+                              {approval.status || 'Pending'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-600 mb-1">{projName}</p>
+                          {approval.feedback && (
+                            <p className="text-xs text-slate-500 italic mb-2 line-clamp-1">
+                              "{approval.feedback}"
+                            </p>
+                          )}
+                          <div className="flex justify-between items-center text-xs mt-2 pt-1 border-t border-slate-200/40">
+                            <span className="text-slate-500">{decisionDate}</span>
+                            <button 
+                              onClick={() => navigate(`/portal/projects/${projId}?tab=approvals`)}
+                              className="font-bold text-primary hover:underline flex items-center"
+                            >
+                              Go to Project &rarr;
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+
+            {recentApprovals.length === 0 && (
+              <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-lg border border-dashed border-slate-200 flex-1 flex flex-col items-center justify-center my-auto">
+                <CheckSquare className="w-8 h-8 mx-auto mb-2 text-slate-400/50" />
+                <p className="text-sm font-medium">No recent decisions recorded</p>
+                <p className="text-xs mt-1">Client approval responses will appear here.</p>
               </div>
             )}
           </div>
