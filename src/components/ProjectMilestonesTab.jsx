@@ -89,8 +89,7 @@ const ProjectMilestonesTab = ({ project }) => {
       }
 
       const todayStr = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
-      const today = new Date(todayStr);
-      if (msStart < today) {
+      if (newForm.startDate < todayStr) {
         alert("Milestone start date cannot be in the past.");
         return;
       }
@@ -119,8 +118,7 @@ const ProjectMilestonesTab = ({ project }) => {
       }
 
       const todayStr = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
-      const today = new Date(todayStr);
-      if (msDate < today) {
+      if (newForm.dueDate < todayStr) {
         alert("Milestone due date cannot be in the past.");
         return;
       }
@@ -307,8 +305,7 @@ const ProjectMilestonesTab = ({ project }) => {
       }
 
       const todayStr = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
-      const today = new Date(todayStr);
-      if (msStart < today) {
+      if (editForm.startDate < todayStr) {
         alert("Milestone start date cannot be in the past.");
         return;
       }
@@ -337,8 +334,7 @@ const ProjectMilestonesTab = ({ project }) => {
       }
 
       const todayStr = new Date(Date.now() + (5.5 * 60 * 60 * 1000)).toISOString().split('T')[0];
-      const today = new Date(todayStr);
-      if (msDate < today) {
+      if (editForm.dueDate < todayStr) {
         alert("Milestone due date cannot be in the past.");
         return;
       }

@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { X, Camera, Plus, Trash2 } from 'lucide-react';
 
 const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjects = [], assignedTasks = [] }) => {
-  const { addLog } = useData();
+  const { addLog, projects = [], tasks = [] } = useData();
   const { currentUser } = useAuth();
   
   const [formData, setFormData] = useState({
@@ -69,8 +69,60 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
     }));
   };
 
+  const selectedProjectId = String(formData.projectId || '').replace('p', '');
+  const projectTasks = selectedProjectId
+    ? (assignedTasks.length > 0 ? assignedTasks : tasks).filter(t => String(t.projectId || '').replace('p', '') === selectedProjectId)
+    : [];
+
+  const selectedProject = (assignedProjects.length > 0 ? assignedProjects : projects).find(p => String(p.id) === selectedProjectId);
+  const selectedTask = (tasks.length > 0 ? tasks : assignedTasks).find(t => String(t.id) === String(formData.taskId));
+
+  const formatDateToYMD = (val) => {
+    if (!val) return '';
+    if (typeof val === 'string' && val.length === 10) return val;
+    try {
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return '';
+      return d.toISOString().split('T')[0];
+    } catch {
+      return '';
+    }
+  };
+
+  const projStart = formatDateToYMD(selectedProject?.startDate);
+  const projEnd = formatDateToYMD(selectedProject?.endDate);
+  const taskStart = formatDateToYMD(selectedTask?.startDate);
+  const taskDue = formatDateToYMD(selectedTask?.dueDate || selectedTask?.endDate);
+
+  let allowedMinDate = '';
+  if (selectedTask && taskStart) {
+    allowedMinDate = (projStart && taskStart < projStart) ? projStart : taskStart;
+  } else if (selectedProject && projStart) {
+    allowedMinDate = projStart;
+  }
+
+  let allowedMaxDate = '';
+  if (selectedTask && taskDue) {
+    allowedMaxDate = (projEnd && taskDue > projEnd) ? projEnd : taskDue;
+  } else if (selectedProject && projEnd) {
+    allowedMaxDate = projEnd;
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.projectId) {
+      alert('Please select a project.');
+      return;
+    }
+    if (allowedMinDate && formData.date < allowedMinDate) {
+      alert(`Log date cannot be before ${selectedTask ? 'task' : 'project'} start date (${allowedMinDate}).`);
+      return;
+    }
+    if (allowedMaxDate && formData.date > allowedMaxDate) {
+      alert(`Log date cannot be after ${selectedTask ? 'task due' : 'project end'} date (${allowedMaxDate}).`);
+      return;
+    }
+
     const newLog = {
       projectId: formData.projectId,
       date: formData.date,
@@ -101,20 +153,18 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
 
   if (!isOpen) return null;
 
-  // Normalize both sides — project options have raw id (e.g. 3), tasks have projectId 'p3'
-  const selectedProjectId = String(formData.projectId || '').replace('p', '');
-  const projectTasks = selectedProjectId
-    ? assignedTasks.filter(t => String(t.projectId || '').replace('p', '') === selectedProjectId)
-    : [];
-
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div 
+        className="fixed inset-0 z-[100] flex items-center justify-end p-4 bg-black/50 backdrop-blur-sm"
+        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      >
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="glass-card w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto"
+          initial={{ opacity: 0, x: 60 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 60 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          className="glass-card w-full max-w-2xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col relative p-6"
         >
           <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
             <X className="w-5 h-5" />
@@ -133,7 +183,16 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
                   required
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                   value={formData.projectId}
-                  onChange={e => setFormData({ ...formData, projectId: e.target.value })}
+                  onChange={e => {
+                    const newProjId = e.target.value;
+                    const p = (assignedProjects.length > 0 ? assignedProjects : projects).find(proj => String(proj.id) === String(newProjId).replace(/^p/, ''));
+                    const pStart = formatDateToYMD(p?.startDate);
+                    const pEnd = formatDateToYMD(p?.endDate);
+                    let nextDate = formData.date;
+                    if (pStart && nextDate < pStart) nextDate = pStart;
+                    else if (pEnd && nextDate > pEnd) nextDate = pEnd;
+                    setFormData({ ...formData, projectId: newProjId, taskId: '', date: nextDate });
+                  }}
                 >
                   <option value="" disabled>Select Project</option>
                   {assignedProjects.map(p => (
@@ -145,10 +204,17 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
                 <label className="block text-sm font-medium mb-1">Date <span className="text-red-500">*</span></label>
                 <input
                   required type="date"
+                  min={allowedMinDate || undefined}
+                  max={allowedMaxDate || undefined}
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                   value={formData.date}
                   onChange={e => setFormData({ ...formData, date: e.target.value })}
                 />
+                {(allowedMinDate || allowedMaxDate) && (
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Allowed: <span className="font-semibold text-slate-700">{allowedMinDate || 'Any'}</span> to <span className="font-semibold text-slate-700">{allowedMaxDate || 'Any'}</span>
+                  </p>
+                )}
               </div>
             </div>
 
@@ -206,7 +272,18 @@ const SubmitLogModal = ({ isOpen, onClose, defaultProjectId = '', assignedProjec
                   <select
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                     value={formData.taskId}
-                    onChange={e => setFormData({ ...formData, taskId: e.target.value })}
+                    onChange={e => {
+                      const newTaskId = e.target.value;
+                      const t = (tasks.length > 0 ? tasks : assignedTasks).find(tsk => String(tsk.id) === String(newTaskId));
+                      const tStart = formatDateToYMD(t?.startDate);
+                      const tDue = formatDateToYMD(t?.dueDate || t?.endDate);
+                      const minD = (t && tStart) ? ((projStart && tStart < projStart) ? projStart : tStart) : (projStart || '');
+                      const maxD = (t && tDue) ? ((projEnd && tDue > projEnd) ? projEnd : tDue) : (projEnd || '');
+                      let nextDate = formData.date;
+                      if (minD && nextDate < minD) nextDate = minD;
+                      else if (maxD && nextDate > maxD) nextDate = maxD;
+                      setFormData({ ...formData, taskId: newTaskId, date: nextDate });
+                    }}
                   >
                     <option value="">— None —</option>
                     {projectTasks.map(t => (

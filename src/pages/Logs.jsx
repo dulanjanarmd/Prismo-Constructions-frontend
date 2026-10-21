@@ -170,6 +170,19 @@ const Logs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.projectId) {
+      alert('Please select a project.');
+      return;
+    }
+    if (allowedMinDate && formData.date < allowedMinDate) {
+      alert(`Log date cannot be before ${selectedTask ? 'task' : 'project'} start date (${allowedMinDate}).`);
+      return;
+    }
+    if (allowedMaxDate && formData.date > allowedMaxDate) {
+      alert(`Log date cannot be after ${selectedTask ? 'task due' : 'project end'} date (${allowedMaxDate}).`);
+      return;
+    }
+
     // Default mock photo if none provided
     const finalPhotos = formData.photos.length > 0 ? formData.photos : [{
       fileUrl: 'https://images.unsplash.com/photo-1541888081622-6323c21c7e92?q=80&w=2070&auto=format&fit=crop',
@@ -225,6 +238,40 @@ const Logs = () => {
         return taskProjectId === String(project.id) && assignedTo === currentUserId;
       }))
     : projects;
+
+  const selectedProject = projects.find(p => String(p.id) === String(formData.projectId).replace(/^p/, ''));
+  const selectedTask = tasks.find(t => String(t.id) === String(formData.taskId));
+
+  const formatDateToYMD = (val) => {
+    if (!val) return '';
+    if (typeof val === 'string' && val.length === 10) return val;
+    try {
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return '';
+      return d.toISOString().split('T')[0];
+    } catch {
+      return '';
+    }
+  };
+
+  const projStart = formatDateToYMD(selectedProject?.startDate);
+  const projEnd = formatDateToYMD(selectedProject?.endDate);
+  const taskStart = formatDateToYMD(selectedTask?.startDate);
+  const taskDue = formatDateToYMD(selectedTask?.dueDate || selectedTask?.endDate);
+
+  let allowedMinDate = '';
+  if (selectedTask && taskStart) {
+    allowedMinDate = (projStart && taskStart < projStart) ? projStart : taskStart;
+  } else if (selectedProject && projStart) {
+    allowedMinDate = projStart;
+  }
+
+  let allowedMaxDate = '';
+  if (selectedTask && taskDue) {
+    allowedMaxDate = (projEnd && taskDue > projEnd) ? projEnd : taskDue;
+  } else if (selectedProject && projEnd) {
+    allowedMaxDate = projEnd;
+  }
 
   const filteredLogs = logs.filter(log => {
     const project = projects.find(p => String(p.id) === String(log.projectId).replace('p', ''));
@@ -350,12 +397,21 @@ const Logs = () => {
 
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+          <div 
+            className="fixed inset-0 z-[100] flex items-center justify-end p-4 bg-black/50 backdrop-blur-sm"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setIsModalOpen(false);
+                setEditingLogId(null);
+              }
+            }}
+          >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white  border border-border w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto rounded shadow-2xl"
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 60 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="glass-card w-full max-w-2xl h-full max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col relative p-6"
             >
               <button 
                 onClick={() => {
@@ -382,7 +438,14 @@ const Logs = () => {
                   <div>
                     <label className="block text-sm font-bold text-slate-700  mb-1">Project</label>
                     <select required className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.projectId} onChange={e => {
-                        setFormData({...formData, projectId: e.target.value, taskId: ''});
+                        const newProjId = e.target.value;
+                        const p = projects.find(proj => String(proj.id) === String(newProjId).replace(/^p/, ''));
+                        const pStart = formatDateToYMD(p?.startDate);
+                        const pEnd = formatDateToYMD(p?.endDate);
+                        let nextDate = formData.date;
+                        if (pStart && nextDate < pStart) nextDate = pStart;
+                        else if (pEnd && nextDate > pEnd) nextDate = pEnd;
+                        setFormData({...formData, projectId: newProjId, taskId: '', date: nextDate});
                     }}>
                       <option value="" disabled>Select a project</option>
                       {assignedProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -390,7 +453,18 @@ const Logs = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-1">Related Task (Optional)</label>
-                    <select className="w-full rounded border border-input bg-slate-50 px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.taskId} onChange={e => setFormData({...formData, taskId: e.target.value})}>
+                    <select className="w-full rounded border border-input bg-slate-50 px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.taskId} onChange={e => {
+                        const newTaskId = e.target.value;
+                        const t = tasks.find(tsk => String(tsk.id) === String(newTaskId));
+                        const tStart = formatDateToYMD(t?.startDate);
+                        const tDue = formatDateToYMD(t?.dueDate || t?.endDate);
+                        const minD = (t && tStart) ? ((projStart && tStart < projStart) ? projStart : tStart) : (projStart || '');
+                        const maxD = (t && tDue) ? ((projEnd && tDue > projEnd) ? projEnd : tDue) : (projEnd || '');
+                        let nextDate = formData.date;
+                        if (minD && nextDate < minD) nextDate = minD;
+                        else if (maxD && nextDate > maxD) nextDate = maxD;
+                        setFormData({...formData, taskId: newTaskId, date: nextDate});
+                    }}>
                       <option value="">General Site Progress</option>
                       {tasks.filter(t => String(t.projectId).replace('p', '') === String(formData.projectId)).map(t => (
                         <option key={t.id} value={t.id}>{t.title}</option>
@@ -399,7 +473,20 @@ const Logs = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-700  mb-1">Date</label>
-                    <input required type="date" className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
+                    <input 
+                      required 
+                      type="date" 
+                      min={allowedMinDate || undefined}
+                      max={allowedMaxDate || undefined}
+                      className="w-full rounded border border-input bg-slate-50  px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none" 
+                      value={formData.date} 
+                      onChange={e => setFormData({...formData, date: e.target.value})} 
+                    />
+                    {(allowedMinDate || allowedMaxDate) && (
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        Allowed: <span className="font-semibold text-slate-700">{allowedMinDate || 'Any'}</span> to <span className="font-semibold text-slate-700">{allowedMaxDate || 'Any'}</span>
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-700  mb-1">Temperature (°C)</label>

@@ -60,9 +60,17 @@ const ProjectIssuesTab = ({ project }) => {
 
   const displayIssue = selectedIssue || lastSelectedIssue;
 
+  const isReporterOf = (issue) => {
+    if (!issue) return false;
+    const reporterRaw = issue.reportedBy?.id != null ? issue.reportedBy.id : (issue.reportedById != null ? issue.reportedById : (issue.reportedBy || ''));
+    const reporterClean = String(reporterRaw).replace(/^u/, '');
+    const currentUserIdClean = String(currentUser?.id || '').replace(/^u/, '');
+    return Boolean(currentUserIdClean && reporterClean && currentUserIdClean === reporterClean);
+  };
+
   const handleView = (issue) => {
     setSelectedIssueId(issue.id);
-    if (issue.status === 'Open' || issue.status === 'OPEN') {
+    if ((issue.status === 'Open' || issue.status === 'OPEN') && !isReporterOf(issue)) {
       updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
     }
   };

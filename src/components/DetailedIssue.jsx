@@ -92,10 +92,23 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
   const assigneeStr = String(issue.assignee || issue.assigneeId || '');
   const assignedUser = users.find(u => String(u.id) === assigneeStr) || { name: 'Unassigned', role: '' };
   
-  const reporterStr = String(issue.reportedBy || issue.reportedById || '');
-  const reporterUser = users.find(u => String(u.id) === reporterStr) || { name: 'Unknown', role: '' };
+  const reporterRaw = issue.reportedBy?.id != null ? issue.reportedBy.id : (issue.reportedById != null ? issue.reportedById : (issue.reportedBy || ''));
+  const reporterStr = String(reporterRaw);
+  const reporterIdClean = reporterStr.replace(/^u/, '');
+  const currentUserIdClean = String(currentUser?.id || '').replace(/^u/, '');
+  const reporterUser = users.find(u => {
+    const uid = String(u.id).replace(/^u/, '');
+    return uid && reporterIdClean && uid === reporterIdClean;
+  }) || (typeof issue.reportedBy === 'object' && issue.reportedBy ? issue.reportedBy : { name: 'Unknown', role: '' });
   
-  const isReporter = String(currentUser.id).replace(/^u/, '') === reporterStr.replace(/^u/, '');
+  const isReporter = Boolean(currentUserIdClean && reporterIdClean && currentUserIdClean === reporterIdClean);
+  const isOpen = issue.status === 'OPEN' || issue.status === 'Open';
+
+  useEffect(() => {
+    if (isReporter && commentType === 'SOLUTION') {
+      setCommentType('GENERAL');
+    }
+  }, [isReporter, commentType]);
 
   useEffect(() => {
     if ((issue.status === 'OPEN' || issue.status === 'Open') && !isReporter) {
@@ -201,6 +214,10 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
 
   const submitComment = async () => {
     if (!newComment.trim() && !commentPhoto) return;
+    if (isReporter && commentType === 'SOLUTION') {
+      alert('Issue creator cannot provide a solution to their own issue.');
+      return;
+    }
     const body = {
       message: newComment.trim() || 'File attachment',
       commentType,
@@ -220,7 +237,9 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
       if (currentUser.role === 'PROJECT_MANAGER') updateIssueStatus(String(issue.id).replace('i', ''), 'INFO_REQUESTED_SE', reporterUser.id);
       else if (currentUser.role === 'CEO') updateIssueStatus(String(issue.id).replace('i', ''), 'INFO_REQUESTED_PM', null);
     } else if (commentType === 'SOLUTION') {
-      updateIssueStatus(String(issue.id).replace('i', ''), 'RESOLVED', null);
+      if (issue.status === 'OPEN' || issue.status === 'Open') {
+        updateIssueStatus(String(issue.id).replace('i', ''), 'IN_PROGRESS', null);
+      }
     }
   };
 
@@ -250,10 +269,18 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
   };
 
   const handleDelete = () => {
+    if (!isOpen) {
+      alert('Only open status issues can be deleted.');
+      return;
+    }
     setShowDeleteModal(true);
   };
 
   const confirmDeleteIssue = async () => {
+    if (!isOpen) {
+      alert('Only open status issues can be deleted.');
+      return;
+    }
     setIsDeletingIssue(true);
     try {
       const success = await deleteIssue(issue.id);
@@ -270,7 +297,11 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
     await updateIssueStatus(String(issue.id).replace('i', ''), 'RESOLVED', null);
   };
 
-  const hasSolution = comments.some(c => c.commentType === 'SOLUTION');
+  const hasSolution = comments.some(c => {
+    if (c.commentType !== 'SOLUTION') return false;
+    const senderIdClean = String(c.sender?.id || c.senderId || '').replace(/^u/, '');
+    return Boolean(senderIdClean && senderIdClean !== reporterIdClean);
+  });
 
   return (
     <div className="flex flex-col h-full relative">
@@ -568,7 +599,7 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
                   <select className="text-xs border border-slate-200 rounded px-2 py-1.5 outline-none bg-white text-slate-700 font-medium shadow-sm cursor-pointer" value={commentType} onChange={e => setCommentType(e.target.value)}>
                     <option value="GENERAL">General Comment</option>
                     {(currentUser.role === 'PROJECT_MANAGER' || currentUser.role === 'CEO') && <option value="INFO_REQUEST">Request Info</option>}
-                    <option value="SOLUTION">Provide Solution</option>
+                    {!isReporter && <option value="SOLUTION">Provide Solution</option>}
                   </select>
                   <button onClick={submitComment} disabled={uploading || (!newComment.trim() && !commentPhoto)} className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white px-5 py-1.5 rounded-lg text-sm font-bold transition-all shadow-sm flex items-center gap-2">
                     Send
@@ -595,9 +626,11 @@ const DetailedIssue = ({ issue, projects, tasks, users, onClose }) => {
           <button onClick={() => setIsEditModalOpen(true)} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg transition-all shadow-sm hover:shadow">
             Edit
           </button>
-          <button onClick={handleDelete} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow">
-            Delete
-          </button>
+          {isOpen && (
+            <button onClick={handleDelete} className="flex-1 flex justify-center items-center px-6 py-3 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-lg transition-all shadow-sm hover:shadow">
+              Delete
+            </button>
+          )}
         </div>
       )}      {/* Meeting Modal */}
       <AnimatePresence>
