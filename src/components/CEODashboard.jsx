@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
   AlertTriangle, CheckSquare, 
-  ArrowRight, Search, ChevronDown, ChevronUp 
+  Search, ChevronDown, ChevronUp 
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -124,9 +124,8 @@ const CEODashboard = () => {
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-card p-5 border border-red-200  bg-red-50/50 ">
           <p className="text-sm font-medium text-red-600  mb-1">Critical Issues</p>
-          <p className="text-3xl font-bold text-red-600  flex items-center gap-2">
+          <p className="text-3xl font-bold text-red-600">
             {criticalIssuesCount}
-            {criticalIssuesCount > 0 && <span className="animate-pulse">🚨</span>}
           </p>
         </motion.div>
       </div>
@@ -197,7 +196,12 @@ const CEODashboard = () => {
                           <p className="text-xs text-slate-500 mt-0.5">{project.client}</p>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100  text-slate-700  border border-slate-200 `}>
+                          <span className={`px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded shadow-sm w-28 inline-block text-center ${
+                            project.status === 'Completed' ? 'bg-emerald-500 text-white' :
+                            project.status === 'In Progress' ? 'bg-amber-500 text-white' : 
+                            project.status === 'Planning' ? 'bg-purple-500 text-white' : 
+                            project.status === 'On Hold' ? 'bg-amber-600 text-white' : 'bg-red-500 text-white'
+                          }`}>
                             {project.status}
                           </span>
                         </td>
@@ -221,9 +225,9 @@ const CEODashboard = () => {
                         <td className="px-6 py-4 text-right">
                           <button 
                             onClick={() => navigate(`/portal/projects/${project.id}`)}
-                            className="px-3 py-1.5 text-xs font-bold text-primary bg-primary/10 hover:bg-primary hover:text-white rounded-md transition-colors inline-flex items-center"
+                            className="px-4 py-1.5 text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all ml-auto shadow-sm hover:shadow"
                           >
-                            View <ArrowRight className="w-3 h-3 ml-1" />
+                            View
                           </button>
                         </td>
                       </motion.tr>
@@ -244,139 +248,164 @@ const CEODashboard = () => {
       {/* Escalated Issues & Decisions (Under Project Table) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           
-          {/* Critical Issues */}
-          <div className="glass-card p-5 border-t-4 border-t-red-500 h-full flex flex-col justify-between min-h-[280px]">
-            <div>
-              <div className="flex items-center justify-between mb-4">
+          {/* Critical Issues Table */}
+          <div className="glass-card overflow-hidden border-t-4 border-t-red-500 h-full flex flex-col justify-between min-h-[280px]">
+            <div className="flex-1 flex flex-col">
+              <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between">
                 <h2 className="text-lg font-bold text-slate-900">
                   Escalated Issues
                 </h2>
               </div>
               
-              {highSeverityIssues.length > 0 ? (
-                <div className="space-y-3">
-                  {highSeverityIssues.slice(0, 4).map(issue => {
-                    const proj = projects.find(p => String(p.id) === String(issue.projectId) || `p${p.id}` === issue.projectId);
-                    return (
-                      <div key={issue.id} className="bg-red-50 rounded-lg border border-red-100 overflow-hidden">
-                        <div className="p-3">
-                          <div className="flex justify-between items-start mb-1">
-                            <h4 className="font-semibold text-sm text-slate-900 line-clamp-1 pr-2">{issue.title}</h4>
-                            <span className="text-[10px] uppercase font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded shrink-0">High</span>
-                          </div>
-                          <p className="text-xs text-slate-600 mb-2">{proj?.name}</p>
-                          <div className="flex justify-between items-center text-xs">
-                            <span className="text-slate-500">{issue.reportedDate || issue.createdAt ? new Date(issue.reportedDate || issue.createdAt).toLocaleDateString() : ''}</span>
-                            <div className="flex gap-2 items-center">
-                              <button 
-                                onClick={() => navigate(`/portal/projects/${proj?.id}`)}
-                                className="font-bold text-red-700 hover:underline"
-                              >
-                                Go to Project &rarr;
-                              </button>
-                              <button
-                                onClick={() => setExpandedIssueId(expandedIssueId === issue.id ? null : issue.id)}
-                                className="p-1 hover:bg-red-200 rounded text-red-700 transition-colors"
-                              >
-                                {expandedIssueId === issue.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <AnimatePresence>
-                          {expandedIssueId === issue.id && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden border-t border-red-200 bg-white"
-                            >
-                              <DetailedIssue issue={issue} projects={projects} tasks={tasks} users={users} />
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : null}
-            </div>
-
-            {highSeverityIssues.length === 0 && (
-              <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-lg border border-dashed border-slate-200 flex-1 flex flex-col items-center justify-center my-auto">
-                <CheckSquare className="w-8 h-8 mx-auto mb-2 text-green-500/50" />
-                <p className="text-sm font-medium">No critical issues</p>
-                <p className="text-xs mt-1">Portfolio health is stable.</p>
+              <div className="overflow-x-auto flex-1">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-slate-50 border-b border-border">
+                    <tr>
+                      <th className="px-5 py-3 font-semibold text-slate-600 text-xs">Issue & Project</th>
+                      <th className="px-5 py-3 font-semibold text-slate-600 text-xs">Severity</th>
+                      <th className="px-5 py-3 font-semibold text-slate-600 text-xs">Date</th>
+                      <th className="px-5 py-3 font-semibold text-slate-600 text-xs text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {highSeverityIssues.length > 0 ? (
+                      highSeverityIssues.slice(0, 4).map(issue => {
+                        const proj = projects.find(p => String(p.id) === String(issue.projectId) || `p${p.id}` === issue.projectId);
+                        return (
+                          <React.Fragment key={issue.id}>
+                            <tr className="hover:bg-slate-50 transition-colors">
+                              <td className="px-5 py-3.5">
+                                <p className="font-bold text-slate-900 text-sm line-clamp-1">{issue.title}</p>
+                                <p className="text-xs text-slate-500 mt-0.5">{proj?.name || 'Project'}</p>
+                              </td>
+                              <td className="px-5 py-3.5">
+                                <span className="px-2.5 py-1 text-[10px] uppercase tracking-wider font-bold rounded shadow-sm bg-red-500 text-white inline-block">
+                                  High
+                                </span>
+                              </td>
+                              <td className="px-5 py-3.5 text-xs text-slate-500">
+                                {issue.reportedDate || issue.createdAt ? new Date(issue.reportedDate || issue.createdAt).toLocaleDateString() : '—'}
+                              </td>
+                              <td className="px-5 py-3.5 text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button 
+                                    onClick={() => navigate(`/portal/projects/${proj?.id}`)}
+                                    className="px-3.5 py-1.5 text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all shadow-sm hover:shadow"
+                                  >
+                                    View
+                                  </button>
+                                  <button
+                                    onClick={() => setExpandedIssueId(expandedIssueId === issue.id ? null : issue.id)}
+                                    className="p-1 hover:bg-slate-100 rounded text-slate-600 transition-colors"
+                                    title="Toggle details"
+                                  >
+                                    {expandedIssueId === issue.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                            {expandedIssueId === issue.id && (
+                              <tr>
+                                <td colSpan="4" className="p-0 border-t border-red-200 bg-white">
+                                  <DetailedIssue issue={issue} projects={projects} tasks={tasks} users={users} />
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-12 text-center text-slate-500">
+                          <CheckSquare className="w-8 h-8 mx-auto mb-2 text-green-500/50" />
+                          <p className="text-sm font-medium">No critical issues</p>
+                          <p className="text-xs mt-1">Portfolio health is stable.</p>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Recent Decisions */}
-          <div className="glass-card p-5 border-t-4 border-t-blue-500 h-full flex flex-col justify-between min-h-[280px]">
-            <div>
-              <div className="flex items-center justify-between mb-4">
+          {/* Recent Decisions Table */}
+          <div className="glass-card overflow-hidden border-t-4 border-t-blue-500 h-full flex flex-col justify-between min-h-[280px]">
+            <div className="flex-1 flex flex-col">
+              <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between">
                 <h2 className="text-lg font-bold text-slate-900">
                   Recent Client Decisions
                 </h2>
               </div>
               
-              {recentApprovals.length > 0 ? (
-                <div className="space-y-3">
-                  {recentApprovals.map(approval => {
-                    const projId = approval.projectId ? String(approval.projectId).replace(/^p/, '') : (approval.project?.id ? String(approval.project.id) : '');
-                    const proj = projects.find(p => String(p.id).replace(/^p/, '') === projId);
-                    const projName = proj?.name || approval.project?.name || 'Project';
-                    const st = (approval.status || 'Pending').toLowerCase().replace(/_/g, ' ').trim();
-                    const isApproved = st === 'approved';
-                    const isRejected = st === 'rejected';
-                    const isChanges = st === 'changes requested';
-                    const decisionDate = getDecisionDate(approval);
+              <div className="overflow-x-auto flex-1">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-slate-50 border-b border-border">
+                    <tr>
+                      <th className="px-5 py-3 font-semibold text-slate-600 text-xs">Decision & Project</th>
+                      <th className="px-5 py-3 font-semibold text-slate-600 text-xs">Status</th>
+                      <th className="px-5 py-3 font-semibold text-slate-600 text-xs">Date</th>
+                      <th className="px-5 py-3 font-semibold text-slate-600 text-xs text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {recentApprovals.length > 0 ? (
+                      recentApprovals.map(approval => {
+                        const projId = approval.projectId ? String(approval.projectId).replace(/^p/, '') : (approval.project?.id ? String(approval.project.id) : '');
+                        const proj = projects.find(p => String(p.id).replace(/^p/, '') === projId);
+                        const projName = proj?.name || approval.project?.name || 'Project';
+                        const st = (approval.status || 'Pending').toLowerCase().replace(/_/g, ' ').trim();
+                        const isApproved = st === 'approved';
+                        const isRejected = st === 'rejected';
+                        const isChanges = st === 'changes requested';
+                        const decisionDate = getDecisionDate(approval);
 
-                    return (
-                      <div key={approval.id} className="bg-slate-50 rounded-lg border border-slate-200/80 overflow-hidden">
-                        <div className="p-3">
-                          <div className="flex justify-between items-start mb-1">
-                            <h4 className="font-semibold text-sm text-slate-900 line-clamp-1 pr-2">{approval.title}</h4>
-                            <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded shrink-0 ${
-                              isApproved ? 'text-green-700 bg-green-100' :
-                              isRejected ? 'text-red-700 bg-red-100' :
-                              isChanges ? 'text-orange-700 bg-orange-100' :
-                              'text-amber-700 bg-amber-100'
-                            }`}>
-                              {approval.status || 'Pending'}
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-600 mb-1">{projName}</p>
-                          {approval.feedback && (
-                            <p className="text-xs text-slate-500 italic mb-2 line-clamp-1">
-                              "{approval.feedback}"
-                            </p>
-                          )}
-                          <div className="flex justify-between items-center text-xs mt-2 pt-1 border-t border-slate-200/40">
-                            <span className="text-slate-500">{decisionDate}</span>
-                            <button 
-                              onClick={() => navigate(`/portal/projects/${projId}?tab=approvals`)}
-                              className="font-bold text-primary hover:underline flex items-center"
-                            >
-                              Go to Project &rarr;
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : null}
-            </div>
-
-            {recentApprovals.length === 0 && (
-              <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-lg border border-dashed border-slate-200 flex-1 flex flex-col items-center justify-center my-auto">
-                <CheckSquare className="w-8 h-8 mx-auto mb-2 text-slate-400/50" />
-                <p className="text-sm font-medium">No recent decisions recorded</p>
-                <p className="text-xs mt-1">Client approval responses will appear here.</p>
+                        return (
+                          <tr key={approval.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-5 py-3.5">
+                              <p className="font-bold text-slate-900 text-sm line-clamp-1">{approval.title}</p>
+                              <p className="text-xs text-slate-500 mt-0.5">{projName}</p>
+                              {approval.feedback && (
+                                <p className="text-xs text-slate-400 italic line-clamp-1 mt-0.5">"{approval.feedback}"</p>
+                              )}
+                            </td>
+                            <td className="px-5 py-3.5">
+                              <span className={`px-2.5 py-1 text-[10px] uppercase tracking-wider font-bold rounded shadow-sm inline-block ${
+                                isApproved ? 'bg-emerald-500 text-white' :
+                                isRejected ? 'bg-red-500 text-white' :
+                                isChanges ? 'bg-amber-500 text-white' :
+                                'bg-blue-500 text-white'
+                              }`}>
+                                {approval.status || 'Pending'}
+                              </span>
+                            </td>
+                            <td className="px-5 py-3.5 text-xs text-slate-500">
+                              {decisionDate || '—'}
+                            </td>
+                            <td className="px-5 py-3.5 text-right">
+                              <button 
+                                onClick={() => navigate(`/portal/projects/${projId}?tab=approvals`)}
+                                className="px-3.5 py-1.5 text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 rounded-lg transition-all shadow-sm hover:shadow ml-auto"
+                              >
+                                View
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-12 text-center text-slate-500">
+                          <CheckSquare className="w-8 h-8 mx-auto mb-2 text-slate-400/50" />
+                          <p className="text-sm font-medium">No recent decisions recorded</p>
+                          <p className="text-xs mt-1">Client approval responses will appear here.</p>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-            )}
+            </div>
           </div>
 
         </div>
